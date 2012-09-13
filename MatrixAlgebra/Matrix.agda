@@ -1,40 +1,43 @@
 -- own files
-open import Definitions
-open import VecLemmas
+--open import Definitions using ()
+open import VecLemmas    using (rowIndices; lookRowInd; lookup-map)
 
 
 -- standard library:
-open import Algebra
-open import Algebra.Structures
-import Algebra.Props.AbelianGroup as AGP
-open import Data.Product hiding (map; <_,_>)
-
-open import Level renaming (zero to zz ; suc to ss)
-open import Data.Vec
-open import Data.Nat using (ℕ) 
-                     renaming (_+_ to _n+_; zero to nzero; suc to nsuc)
+open import Algebra      using (Ring)
+open import Data.Product using (uncurry′; proj₁; proj₂; _,_)
+open import Data.Sum     using (_⊎_) 
+                         renaming (inj₁ to inj1; inj₂ to inj2)
+open import Level        using () 
+                         renaming (zero to zeroL)
+open import Data.Vec     using (Vec; map; lookup; _++_; head; tail; foldl₁; 
+                                _∷_; [])
+open import Data.Nat     using (ℕ) 
+                         renaming (_+_ to _n+_; zero to nzero; suc to nsuc)
 open import Data.Nat.Properties using (n∸m≤n)
-open import Data.Fin using (Fin; _ℕ-_; inject≤; inject₁; toℕ; fromℕ) 
-                     renaming (zero to fzero; suc to fsuc; pred to fpred)
-open import Data.Bool
-open import Function
-open import Relation.Binary
-open import Algebra.Props.Ring
+open import Data.Fin     using (Fin; _ℕ-_; inject≤; inject₁; toℕ; fromℕ) 
+                         renaming (zero to fzero; suc to fsuc; pred to fpred)
+open import Data.Bool    using (Bool; _∧_; _∨_; true; false)
+open import Function     using (flip; _$_)
+open import Algebra.Props.Ring  using ()
 
-import Relation.Binary.EqReasoning as EqR
-open import Relation.Binary.PropositionalEquality as P
-  using (_≡_; _≢_) 
-  renaming (refl to eqrefl; sym to eqsym; cong to eqcong; cong₂ to eqcong₂)
+import Relation.Binary.EqReasoning as EqR 
+            using () 
+            renaming (begin_ to Rbegin_; _≈⟨_⟩_ to _R≈⟨_⟩_; _∎ to _R∎ )
+open import Relation.Binary.PropositionalEquality as P 
+            using (_≡_; refl; sym; cong)
 
 module Matrix 
-  (A : Ring zz zz) -- is this ok??? 
+  (A : Ring zeroL zeroL) -- is this ok??? 
 where
 
-open P.≡-Reasoning renaming (begin_ to start_; _∎ to _□; _≡⟨_⟩_ to _t≡⟨_⟩_)
+open P.≡-Reasoning using (begin_; _∎; _≡⟨_⟩_)
 
-open Ring A
+open Algebra.Ring A using (setoid; 0#; _*_; _+_; _≈_; *-cong; zero; +-cong; 
+                           +-identity; 1#) 
+                    renaming (refl to Rrefl; trans to Rtrans)
 
-open EqR setoid -- no idea what this means, from ring properties file.
+open EqR setoid using (Rbegin_; _R≈⟨_⟩_; _R∎) -- no idea what this means, from ring properties file.
 
 -- short name for set with ring elements
 R : Set
@@ -210,43 +213,42 @@ mOr A = foldl₁ _∨_ (map (λ x → foldl₁ _∨_ x) (scols A))
 -- Two vectors (v1, ..., vn) and (u1, ..., un) are orthogonal if for every 
 -- 0 ≤ i ≤ n, ui = 0 or vi = 0
 data simpleOrth {n : ℕ} (x y : Vec R (nsuc n)) : Set where
-  sOrth : ((i : Fin (nsuc n)) -> Either (lookup i x ≈ 0#) (lookup i y ≈ 0#)) ->
+  sOrth : ((i : Fin (nsuc n)) -> (lookup i x ≈ 0#) ⊎ (lookup i y ≈ 0#)) ->
           simpleOrth x y 
 
 
 -- Lemma for proving simpleOrth => Orthogonal
 head≈lookup0 : {n : ℕ} -> (x : Vec R (nsuc n)) -> head x ≈ lookup fzero x
-head≈lookup0 (a ∷ as) = refl
+head≈lookup0 (a ∷ as) = Rrefl
 
 -- Lemma for proving simpleOrth => Orthogonal
 lookupInTail : {n : ℕ} {i : Fin n} -> (x : Vec R (nsuc n)) -> lookup i (tail x) ≈ lookup (fsuc i) x
-lookupInTail (x ∷ xs) = refl
+lookupInTail (x ∷ xs) = Rrefl
 
 -- Lemma for proving simpleOrth => Orthogonal
-head0 : {n : ℕ} (x y : Vec R (nsuc n)) -> Either (lookup fzero x ≈ 0#) 
-                                                 (lookup fzero y ≈ 0#) -> 
+head0 : {n : ℕ} (x y : Vec R (nsuc n)) -> (lookup fzero x ≈ 0#) ⊎ 
+                                          (lookup fzero y ≈ 0#) -> 
         head x * head y ≈ 0#
 
-head0 x y (left x0≈0) = begin
-  head x * head y                   ≈⟨ *-cong (head≈lookup0 x) refl ⟩
-  lookup fzero x * head y           ≈⟨ *-cong x0≈0 refl ⟩
-  0#     * head y                   ≈⟨ proj₁ zero _ ⟩
-  0# ∎
-head0 x y (right  y0≈0) = begin
-  head x * head y                   ≈⟨ *-cong refl (head≈lookup0 y) ⟩
-  head x * lookup fzero y           ≈⟨ *-cong refl y0≈0 ⟩
-  head x * 0#                       ≈⟨ proj₂ zero _ ⟩
-  0# ∎
+head0 x y (inj1 x0≈0) = Rbegin
+  head x * head y                   R≈⟨ *-cong (head≈lookup0 x) Rrefl ⟩
+  lookup fzero x * head y           R≈⟨ *-cong x0≈0 Rrefl ⟩
+  0#     * head y                   R≈⟨ proj₁ zero _ ⟩
+  0# R∎
+head0 x y (inj2  y0≈0) = Rbegin
+  head x * head y                   R≈⟨ *-cong Rrefl (head≈lookup0 y) ⟩
+  head x * lookup fzero y           R≈⟨ *-cong Rrefl y0≈0 ⟩
+  head x * 0#                       R≈⟨ proj₂ zero _ ⟩
+  0# R∎
 
 -- Helper function for proving simpleOrth => Orthogonal, translates lookup
 -- function for removing head
 newfun : {n : ℕ} {x y : Vec R (nsuc (nsuc n))} -> 
-  ((i : Fin (nsuc (nsuc n))) -> Either (lookup i x ≈ 0#) (lookup i y ≈ 0#)) -> 
-  ((i : Fin (nsuc n)) -> Either (lookup i (tail x) ≈ 0#) 
-                                (lookup i (tail y) ≈ 0#))
+  ((i : Fin (nsuc (nsuc n))) -> (lookup i x ≈ 0#) ⊎ (lookup i y ≈ 0#)) -> 
+  ((i : Fin (nsuc n)) -> (lookup i (tail x) ≈ 0#) ⊎ (lookup i (tail y) ≈ 0#))
 newfun {_} {x} {y} f i with f (fsuc i)
-...| left  x0≈0 = left (trans (lookupInTail x) x0≈0)
-...| right y0≈0 = right (trans (lookupInTail y) y0≈0)
+...| inj1 x0≈0 = inj1 (Rtrans (lookupInTail x) x0≈0)
+...| inj2 y0≈0 = inj2 (Rtrans (lookupInTail y) y0≈0)
 
 -- Remove head of while keeping proof of orthogonality
 removeHead : {n : ℕ} {x y : Vec R (nsuc (nsuc n))} -> simpleOrth x y 
@@ -256,58 +258,58 @@ removeHead {_} {x} {y} (sOrth pf) = sOrth $ newfun pf
 -- SimpleOrth => Orthogonal (i. e., <_,_> == 0#)
 simpleOrthOrth : {n : ℕ} {x y : Vec R (nsuc n)} -> simpleOrth x y -> 
                  < x , y > ≈ 0#
-simpleOrthOrth {nzero} {x} {y} (sOrth pf) = begin 
-  head x * head y + 0#                   ≈⟨ +-cong (head0 x y (pf fzero)) refl ⟩
-  0# + 0#                                ≈⟨ proj₂ +-identity _ ⟩
-  0# ∎
-simpleOrthOrth {nsuc n} {x} {y} (sOrth pf) = begin
-  head x * head y + < tail x , tail y >  ≈⟨ +-cong (head0 x y (pf fzero)) refl ⟩
-  0# + < tail x , tail y >               ≈⟨ proj₁ +-identity _ ⟩
-  < tail x , tail y >                    ≈⟨ simpleOrthOrth {n} {tail x} {tail y}
+simpleOrthOrth {nzero} {x} {y} (sOrth pf) = Rbegin 
+  head x * head y + 0#                   R≈⟨ +-cong (head0 x y (pf fzero)) Rrefl ⟩
+  0# + 0#                                R≈⟨ proj₂ +-identity _ ⟩
+  0# R∎
+simpleOrthOrth {nsuc n} {x} {y} (sOrth pf) = Rbegin
+  head x * head y + < tail x , tail y >  R≈⟨ +-cong (head0 x y (pf fzero)) Rrefl ⟩
+  0# + < tail x , tail y >               R≈⟨ proj₁ +-identity _ ⟩
+  < tail x , tail y >                    R≈⟨ simpleOrthOrth {n} {tail x} {tail y}
                                             (removeHead {_} {x} {y} (sOrth pf))⟩
-  0# ∎
+  0# R∎
 
 
 -- Lookup in matrix == Lookup in lookup in rows. Probably useful enough to get
 -- a proper name!
 lookupLemma1 : {m n : ℕ} (A : Matrix m n) -> (i : Fin m) -> (k : Fin n) -> (A ![ i , k ] ≡ lookup k (lookup i (rows A)))
-lookupLemma1 {m} {n} (fMatrix f) i k = start 
-  f i k t≡⟨ eqrefl ⟩
+lookupLemma1 {m} {n} (fMatrix f) i k = begin 
+  f i k ≡⟨ refl ⟩
   uncurry′ f ( i , k )
               
-  t≡⟨ eqcong (uncurry′ f) (eqsym (lookRowInd i k)) ⟩
+  ≡⟨ cong (uncurry′ f) (sym (lookRowInd i k)) ⟩
   
   uncurry′ f (lookup k (lookup i (rowIndices m n)))
   
-  t≡⟨ eqsym (lookup-map k (lookup i (rowIndices m n)) 
+  ≡⟨ sym (lookup-map k (lookup i (rowIndices m n)) 
            (uncurry′ f)) ⟩
   
   lookup k (map (uncurry′ f) (lookup i (rowIndices m n))) 
 
-  t≡⟨ eqcong (λ x → lookup k x) (eqsym (lookup-map i 
+  ≡⟨ cong (λ x → lookup k x) (sym (lookup-map i 
            (rowIndices m n) (map (λ y → uncurry′ f y)))) ⟩
 
-  lookup k (lookup i (rows (fMatrix f))) □
+  lookup k (lookup i (rows (fMatrix f))) ∎
 
 -- Lookup in matrix == Lookup in lookup in cols.
 lookupLemma2 : {m n : ℕ} (A : Matrix m n) -> (i : Fin m) -> (k : Fin n) -> (A ![ i , k ] ≡ lookup i (lookup k (cols A)))
-lookupLemma2 {m} {n} (fMatrix f) i k = start
-  f i k t≡⟨ eqrefl ⟩
+lookupLemma2 {m} {n} (fMatrix f) i k = begin
+  f i k ≡⟨ refl ⟩
   uncurry′ f ( i , k )
               
-  t≡⟨ eqcong (uncurry′(flip f)) (eqsym (lookRowInd k i)) ⟩
+  ≡⟨ cong (uncurry′(flip f)) (sym (lookRowInd k i)) ⟩
   
   uncurry′ (flip f) (lookup i (lookup k (rowIndices n m)))
   
-  t≡⟨ eqsym (lookup-map i (lookup k (rowIndices n m)) 
+  ≡⟨ sym (lookup-map i (lookup k (rowIndices n m)) 
            (uncurry′ (flip f))) ⟩
   
   lookup i (map (uncurry′ (flip f)) (lookup k (rowIndices n m)))
 
-  t≡⟨ eqcong (λ x → lookup i x) (eqsym (lookup-map k 
+  ≡⟨ cong (λ x → lookup i x) (sym (lookup-map k 
            (rowIndices n m) (map (λ y → uncurry′ (flip f) y)))) ⟩
 
-  lookup i (lookup k (cols (fMatrix f))) □
+  lookup i (lookup k (cols (fMatrix f))) ∎
 
 
 -- examples
