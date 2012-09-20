@@ -9,8 +9,9 @@ open import Data.Product
 open import Data.Nat      -- for the example
 open import Data.List
 
+open import Data.Unit.Core
 open import Relation.Binary.PropositionalEquality 
-                      using (inspect; _with-≡_)
+                            using (inspect) renaming ([_] to [-[_]-])
 
 open import Sets      using (_≡_; refl; subst)
 open import Relations using (_←_; _○_; fun; _˘; _⊑_; _⊒_)
@@ -61,9 +62,9 @@ foldR-unfoldr : {A B : Set} → (f : B → ⊤ ⊎ (A × B)) →
     (b : B) → (accb : Acc (ε-listF ○ fun f) b) →
         foldR ((inj₂˘ ○ fun f)˘) (isInj₁ ∘' f)
             b (unfoldr-acc f b accb)
-foldR-unfoldr f b (acc .b h) with inspect (f b)
-foldR-unfoldr f b (acc .b h) | inj₁ tt with-≡ fb≡v rewrite fb≡v = fb≡v
-foldR-unfoldr f b (acc .b h) | inj₂ (a , b') with-≡ fb≡v rewrite fb≡v = 
+foldR-unfoldr f b (acc .b h) with f b | (inspect f b)
+... | inj₁ tt | [-[ fb≡v ]-] = fb≡v
+... | inj₂ (a , b') |  [-[ fb≡v ]-] =
   ((a , b') , (refl , foldR-unfoldr f b' (h b' (inj₂ (a , b') , refl , refl))) ,
                 inj₂ (a , b') , fb≡v , refl)
 
