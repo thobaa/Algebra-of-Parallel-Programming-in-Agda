@@ -1,0 +1,11 @@
+- Read (a bit) about functors; 
+  - what is the functor law for Bin?
+
+- To discuss next time: universal property of cata.
+
+- What is the (parallel) cata for matrices?
+
+- We (probably) can't express matrix mult. in terms of that cata. 
+  - What is the proper generalisation?
+  - Look also at matrix addition (first)
+
