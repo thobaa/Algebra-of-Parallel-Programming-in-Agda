@@ -45,7 +45,6 @@ R1 = Ring.1#
 
 data Bin : Set where
   empty : Bin
---  one   : a -> Bin a
   two   : Bin  -> Bin -> Bin
 
 AbVec : (a : Ring') -> ℕ -> Set
@@ -56,19 +55,17 @@ AbDot {a} {zero} u v = R0 a
 AbDot {a} {suc n} u v = R+ a (R* a (u f0) (v f0)) (AbDot {a}
                                           (λ i → u (fsuc i)) (λ j → v (fsuc j)))
 
+-- Abstract matrix
 AbMatrix : (a : Ring') -> ℕ -> ℕ -> Set
 AbMatrix a m n = Fin m -> Fin n -> RC a
 
-AbTProof : (a : Ring') (m n d : ℕ) -> (A : AbMatrix a m n) -> Set
-         
-AbTProof a m n d A = (i : Fin m) → (j : Fin n) → 
+IsTrianguar : (a : Ring') -> ∀ {m n} -> (d : ℕ) -> (A : AbMatrix a m n) -> Set
+IsTrianguar a {m} {n} d A = (i : Fin m) → (j : Fin n) → 
                      (toℤ j - toℤ i z< + d) → A i j ≡ R0 a
 
 --AbUTMatrix : (a : Ring') -> (m : ℕ) -> (n : ℕ) -> (d : ℕ) -> Set
---             (A : AbMatrix a m n) -> AbTProof a m n d A -> Set
+--             (A : AbMatrix a m n) -> IsTrianguar a m n d A -> Set
 --AbUTMatrix a m n d A = {!!}
-
---postulate 
 
 -- identity matrix!
 AbId : ∀ a n -> AbMatrix a n n
@@ -78,9 +75,11 @@ AbId a (suc n) f0 (fsuc i) = R0 a
 AbId a (suc n) (fsuc i) f0 = R0 a
 AbId a (suc n) (fsuc i) (fsuc i') = AbId a n i i'
 
+-- Matrix addition
 AbMatrix+ : ∀ a {m n} -> AbMatrix a m n -> AbMatrix a m n -> AbMatrix a m n
 AbMatrix+ a A B = λ i j → R+ a (A i j) (B i j)
 
+-- Matrix multiplication
 AbMatrix* : ∀ a {n m p} -> AbMatrix a m n -> AbMatrix a n p -> AbMatrix a m p
 AbMatrix* a A B = λ i j → AbDot {a} (A i) (λ k → B k j)
 
@@ -90,16 +89,19 @@ reduce≤ i pf = fromℕ≤ pf --fromℕ≤ {toℕ i} (s≤s pf)
 --reduce≥ : ∀ {m n} (i : Fin (m N+ n)) (i≥m : toℕ i N≥ m) → Fin n
 --j ∈ m + o, suc j > n -> j ≥ n
 
+
 ≰to> : ∀ {m n} -> m ≰ n -> m > n
 ≰to> {zero} {m} pf = ⊥-elim (pf z≤n)
 ≰to> {suc n} {zero} pf = s≤s z≤n
 ≰to> {suc n} {suc n'} pf = s≤s (≰to> (λ z → pf (s≤s z)))
 
+-- Concatenation 
 Ab++ : ∀ a {m n o} -> AbMatrix a m n -> AbMatrix a m o -> AbMatrix a m (n + o)
 Ab++ a {m} {n} {o} A B i j with suc (toℕ j) ≤? n
 ...| yes p = A i (reduce≤ j p)
 ...| no ¬p = B i (reduce≥ j (p≤p (≰to> ¬p)))
 
+-- Concatenation in other dimension
 AbOver : ∀ a {m n o} -> AbMatrix a m n -> 
                         AbMatrix a o n -> AbMatrix a (m + o) n
 AbOver a {m} {n} {o} A B i j with suc (toℕ i) ≤? m
@@ -107,15 +109,33 @@ AbOver a {m} {n} {o} A B i j with suc (toℕ i) ≤? m
 ...| no ¬p = B (reduce≥ i (p≤p (≰to> ¬p))) j
 
 
-
-
--- en rek ska vara kombinationen av 4 rektanglar
+-- Matrices
 data Rec (a : Ring') : Bin -> Bin -> Set where
   one  : (x : RC a) -> Rec a empty empty
   side : ∀ {rt ct1 ct2} -> Rec a rt ct1 -> 
                            Rec a rt ct2 -> Rec a rt (two ct1 ct2)
   over : ∀ {rt1 rt2 ct} -> Rec a rt1 ct -> Rec a rt2 ct -> 
                                            Rec a (two rt1 rt2) ct
+
+
+data Splitting : Set where
+  empty : Splitting -- no extent
+  one : Splitting -- unsplittable
+  deeper : (pos : ℕ) -> Splitting -> Splitting -> Splitting
+
+
+data Splitted (a : Ring') : Splitting -> Splitting → Set where
+  one : (x : RC a) -> Splitted a one one
+  empty : ∀ {r c} -> Splitted a r c
+  quad : ∀ {r1 r2 c1 c2} -> ∀ m n -> Splitted a r1 c1 -> Splitted a r1 c2 -> Splitted a r2 c1 -> Splitted a r2 c2 -> 
+            Splitted a (deeper m r1 r2) (deeper n c1 c2)
+
+
+test : (a : Ring') -> Splitted a (deeper 1 one one) (deeper 1 one one)
+test a = quad 1 1 empty (one (R0 a)) (one (R0 a)) empty 
+
+
+
 
 flatTree : ℕ -> Bin
 flatTree zero = empty
@@ -188,9 +208,9 @@ data Tri (a : Ring') : Bin -> Set where
 
 --AbUTriang : Ring' -> ℕ -> ℕ -> ℕ -> Set
 --AbUTriang = {!_,_!}
---AbTProof : (a : Ring') (m n d : ℕ) -> (A : AbMatrix a m n) -> Set
+--IsTrianguar : (a : Ring') (m n d : ℕ) -> (A : AbMatrix a m n) -> Set
 
-tembed : ∀ {a n} -> (A : AbMatrix a (suc n) (suc n)) -> AbTProof a (suc n) (suc n) 1 A -> Tri a (flatTree n) 
+tembed : ∀ {a n} -> (A : AbMatrix a (suc n) (suc n)) -> IsTrianguar a 1 A -> Tri a (flatTree n) 
 tembed {a} {zero} A pf = one
 tembed {a} {suc n} A pf = trt one (embed {!!}) (tembed {a} {n} (λ i j → A (fsuc i) (fsuc j)) (λ i j x → pf (fsuc i) (fsuc j) {!!}))
 -- vill ha:
@@ -316,9 +336,8 @@ transclose (trt one C (trt B₃ B₂ B₁)) with transclose (trt B₃ B₂ B₁)
 ...| B⁺ = trt one (rt* C B⁺) B⁺
 transclose (trt (trt A₁ A₂ A₃) C one) with transclose (trt A₁ A₂ A₃)
 ...| A⁺ = trt A⁺ (tr* A⁺ C) one
-transclose (trt (trt A₁ A₂ A₃) C (trt B₃ B₂ B₁))
-  with transclose (trt A₁ A₂ A₃) | transclose (trt B₃ B₂ B₁)
-...| A⁺ | B⁺ = trt A⁺ (valiant A⁺ C B⁺) B⁺
+transclose (trt (trt A₁ A₂ A₃) C (trt B₃ B₂ B₁)) with transclose (trt A₁ A₂ A₃) | transclose (trt B₃ B₂ B₁)
+...                                                 | A⁺                        | B⁺                        = trt A⁺ (valiant A⁺ C B⁺) B⁺
 --trt A₁⁺ A₂⁺ A₃⁺ | trt B₃⁺ B₂⁺ B₁⁺ = trt (trt A₁⁺ A₂⁺ A₃⁺) (valiant (trt A₁⁺ A₂⁺ A₃⁺) C (trt B₃⁺ B₂⁺ B₁⁺)) (trt B₃⁺ B₂⁺ B₁⁺)
 
 
@@ -342,7 +361,7 @@ matPow a {n} mat = sum (AbMatrix* a) matGen
   matGen (suc n') = mat
 
 -- transitive closure is sum
-transclosure : ∀ {a n} -> (A : AbMatrix a n n) -> AbTProof a n n 1 A -> 
+transclosure : ∀ {a n} -> (A : AbMatrix a n n) -> IsTrianguar a 1 A -> 
                           AbMatrix a n n
 transclosure {a} {n} A pf = sum (AbMatrix+ a) (matPow a A) n
 
