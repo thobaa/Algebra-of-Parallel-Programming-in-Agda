@@ -14,99 +14,19 @@ open import Algebra
 open import Algebra.Structures
 open import Data.Product
 open import Relation.Binary.PropositionalEquality
-open Relation.Binary.PropositionalEquality.≡-Reasoning
+--open Relation.Binary.PropositionalEquality.≡-Reasoning
 open import Function
 open import Relation.Nullary.Core
 
+open import Relation.Binary.HeterogeneousEquality using (_≅_; ≡-to-≅)
+open Relation.Binary.HeterogeneousEquality.≅-Reasoning
+--open Relation.Binary.PropositionalEquality.≡-Reasoning (_≅_)
 
-
-open import Level using () renaming (zero to Lzero)
-Ring' : Set₁
-Ring' = Ring Lzero Lzero
-
-RC : Ring' -> Set
-RC = Ring.Carrier
-
-R+ : (a : Ring') -> RC a -> RC a -> RC a
-R+ = Ring._+_
-
-R* : (a : Ring') -> RC a -> RC a -> RC a
-R* = Ring._*_
-
-
-R0 : (a : Ring') -> Ring.Carrier a
-R0 = Ring.0#
-
-R1 : (a : Ring') -> Ring.Carrier a
-R1 = Ring.1#
-
---toℤ : ∀ {n} -> Fin n -> ℤ
---toℤ f = + (toℕ f)
+open import Abstract
 
 data Bin : Set where
   empty : Bin
   two   : Bin  -> Bin -> Bin
-
-AbVec : (a : Ring') -> ℕ -> Set
-AbVec a n = Fin n -> RC a
-
-AbDot : ∀ {a n} -> AbVec a n -> AbVec a n -> RC a
-AbDot {a} {zero} u v = R0 a
-AbDot {a} {suc n} u v = R+ a (R* a (u f0) (v f0)) (AbDot {a}
-                                          (λ i → u (fsuc i)) (λ j → v (fsuc j)))
-
--- Abstract matrix
-AbMatrix : (a : Ring') -> ℕ -> ℕ -> Set
-AbMatrix a m n = Fin m -> Fin n -> RC a
-
-IsTrianguar : (a : Ring') -> ∀ {m n} -> (d : ℕ) -> (A : AbMatrix a m n) -> Set
-IsTrianguar a {m} {n} d A = (i : Fin m) → (j : Fin n) → 
-                     (toℤ j - toℤ i z< + d) → A i j ≡ R0 a
-
---AbUTMatrix : (a : Ring') -> (m : ℕ) -> (n : ℕ) -> (d : ℕ) -> Set
---             (A : AbMatrix a m n) -> IsTrianguar a m n d A -> Set
---AbUTMatrix a m n d A = {!!}
-
--- identity matrix!
-AbId : ∀ a n -> AbMatrix a n n
-AbId a zero () ()
-AbId a (suc n) f0 f0 = R1 a
-AbId a (suc n) f0 (fsuc i) = R0 a
-AbId a (suc n) (fsuc i) f0 = R0 a
-AbId a (suc n) (fsuc i) (fsuc i') = AbId a n i i'
-
--- Matrix addition
-AbMatrix+ : ∀ a {m n} -> AbMatrix a m n -> AbMatrix a m n -> AbMatrix a m n
-AbMatrix+ a A B = λ i j → R+ a (A i j) (B i j)
-
--- Matrix multiplication
-AbMatrix* : ∀ a {n m p} -> AbMatrix a m n -> AbMatrix a n p -> AbMatrix a m p
-AbMatrix* a A B = λ i j → AbDot {a} (A i) (λ k → B k j)
-
--- fromℕ≤ : ∀ {m n} → m N< n → Fin n
-reduce≤ : ∀ {n m} -> (i : Fin (n + m)) -> (suc (toℕ i) ≤ n) -> Fin n
-reduce≤ i pf = fromℕ≤ pf --fromℕ≤ {toℕ i} (s≤s pf)
---reduce≥ : ∀ {m n} (i : Fin (m N+ n)) (i≥m : toℕ i N≥ m) → Fin n
---j ∈ m + o, suc j > n -> j ≥ n
-
-
-≰to> : ∀ {m n} -> m ≰ n -> m > n
-≰to> {zero} {m} pf = ⊥-elim (pf z≤n)
-≰to> {suc n} {zero} pf = s≤s z≤n
-≰to> {suc n} {suc n'} pf = s≤s (≰to> (λ z → pf (s≤s z)))
-
--- Concatenation 
-Ab++ : ∀ a {m n o} -> AbMatrix a m n -> AbMatrix a m o -> AbMatrix a m (n + o)
-Ab++ a {m} {n} {o} A B i j with suc (toℕ j) ≤? n
-...| yes p = A i (reduce≤ j p)
-...| no ¬p = B i (reduce≥ j (p≤p (≰to> ¬p)))
-
--- Concatenation in other dimension
-AbOver : ∀ a {m n o} -> AbMatrix a m n -> 
-                        AbMatrix a o n -> AbMatrix a (m + o) n
-AbOver a {m} {n} {o} A B i j with suc (toℕ i) ≤? m
-...| yes p = A (reduce≤ i p) j
-...| no ¬p = B (reduce≥ i (p≤p (≰to> ¬p))) j
 
 
 -- Matrices
@@ -121,18 +41,53 @@ data Rec (a : Ring') : Bin -> Bin -> Set where
 data Splitting : Set where
   empty : Splitting -- no extent
   one : Splitting -- unsplittable
-  deeper : (pos : ℕ) -> Splitting -> Splitting -> Splitting
+  deeper : Splitting -> Splitting -> Splitting -- what does pos do here?
 
 
 data Splitted (a : Ring') : Splitting -> Splitting → Set where
   one : (x : RC a) -> Splitted a one one
-  empty : ∀ {r c} -> Splitted a r c
-  quad : ∀ {r1 r2 c1 c2} -> ∀ m n -> Splitted a r1 c1 -> Splitted a r1 c2 -> Splitted a r2 c1 -> Splitted a r2 c2 -> 
-            Splitted a (deeper m r1 r2) (deeper n c1 c2)
+  empty : ∀ {r c} -> Splitted a r c -- either no extent, or zeros. => need ring
+  quad : ∀ {r1 r2 c1 c2} -> Splitted a r1 c1 -> Splitted a r1 c2 -> 
+                            Splitted a r2 c1 -> Splitted a r2 c2 -> Splitted a (deeper r1 r2) (deeper c1 c2)
+
+Ssize : Splitting -> ℕ
+Ssize empty = 0
+Ssize one = 1
+Ssize (deeper y y') = Ssize y + Ssize y'
+
+splittedProj : ∀ {a rs cs} -> Splitted a rs cs -> Matrix a (Ssize rs) (Ssize cs)
+splittedProj (one x) = λ i j → x
+splittedProj {a} (empty {rs} {cs}) = λ i j → R0 a
+splittedProj (quad A B 
+                    C D) = {!!}
+
+sFlatTree : ℕ -> Splitting
+sFlatTree zero = empty
+--sFlatTree (suc zero) = one
+sFlatTree (suc n) = deeper one (sFlatTree n)
+
+splittedEmbedRVec : ∀ {a n} -> Vec a n -> Splitted a one (sFlatTree n)
+splittedEmbedRVec = {!!} 
+
+splittedEmbedCVec : ∀ {a n} -> Vec a n -> Splitted a (sFlatTree n) one
+splittedEmbedCVec = {!!} 
 
 
-test : (a : Ring') -> Splitted a (deeper 1 one one) (deeper 1 one one)
-test a = quad 1 1 empty (one (R0 a)) (one (R0 a)) empty 
+
+splittedEmbed : ∀ {a m n} -> Matrix a m n -> Splitted a (sFlatTree m) (sFlatTree n)
+splittedEmbed {a} {zero} {n} A = empty
+splittedEmbed {a} {suc n} {zero} A = empty
+splittedEmbed {a} {suc m} {suc n} A = quad (one (A f0 f0)) (splittedEmbedRVec (λ x → A f0 (fsuc x))) (splittedEmbedCVec (λ x → A (fsuc x) f0)) (splittedEmbed (λ i j → A (fsuc i) (fsuc j)))
+
+splitProjEmbed≡Id : ∀ a m n (A : Matrix a m n) -> splittedProj {a} (splittedEmbed {a} A) ≅ A
+splitProjEmbed≡Id a zero n A = begin 
+                               splittedProj {a} (splittedEmbed {a} A) 
+                                 ≅⟨ {!Extensionality ? ?!} ⟩ -- or applying
+                               A ∎
+splitProjEmbed≡Id a (suc n) n' A = {!!}
+
+test : (a : Ring') -> Splitted a (deeper one one) (deeper one one)
+test a = quad empty (one (R0 a)) (one (R0 a)) empty 
 
 
 
@@ -162,7 +117,7 @@ Fs->Fsf {suc n} (fsuc i) = fsuc (Fs->Fsf {n} i)
 --Fs->Fs≡id : ∀ {n i} -> Fsf->Fs {suc n} (Fs->Fsf i) ≡ i
 --Fs->Fs≡id = {!!}
 
-embed : ∀ {a m n} -> AbMatrix a (suc m) (suc n) -> Rec a (flatTree m) 
+embed : ∀ {a m n} -> Matrix a (suc m) (suc n) -> Rec a (flatTree m) 
                                                          (flatTree n) 
 embed {a} {zero} {zero} mat = one (mat f0 f0)
 embed {a} {suc m} {zero} mat = over (one (mat f0 f0)) 
@@ -172,29 +127,29 @@ embed {a} {suc m} {suc n} mat = side (over (one (mat f0 f0)) (embed (λ i j → 
 
 
 
-proj : ∀ {a tr tc} -> Rec a tr tc -> AbMatrix a (size tr) (size tc)
+proj : ∀ {a tr tc} -> Rec a tr tc -> Matrix a (size tr) (size tc)
 proj (one x) = λ i j → x
-proj {a} (side y y') = Ab++ a (proj y) (proj y')
-proj {a} (over y y') = AbOver a (proj y) (proj y')
+proj {a} (side y y') = ++ a (proj y) (proj y')
+proj {a} (over y y') = Over a (proj y) (proj y')
 {-
-agda : ∀ {a m n} -> AbMatrix a (suc m) (suc n) -> AbMatrix a (size (flatTree m)) (size (flatTree n))
+agda : ∀ {a m n} -> Matrix a (suc m) (suc n) -> Matrix a (size (flatTree m)) (size (flatTree n))
 agda {a} {m} {n} A with size∘flatTree≡suc m | inspect size∘flatTree≡suc m | size∘flatTree≡suc n | inspect size∘flatTree≡suc n
 ...| aa | ia | bb | bi = λ i j → A {!i!} {!!}
 -}
 -- agda-isom
 
---Goal: (Ab++ a (λ i' j' → A f0 f0)
+--Goal: (++ a (λ i' j' → A f0 f0)
 --       (proj (embed (λ i' j' → A i' (fsuc j')))) i (Fs->Fsf j)
 --       | (suc (toℕ (Fs->Fsf j)) ≤? suc 0 | toℕ (Fs->Fsf j) ≤? 0))
 --      ≡ A i j
 
---lemma'' : ∀ a n (i : Fin 1) (j : Fin (suc n)) -> (A : AbMatrix a 1 (suc n)) -> proj (embed {a} (A)) (Fs->Fsf i) (Fs->Fsf j) ≡ A i j 
+--lemma'' : ∀ a n (i : Fin 1) (j : Fin (suc n)) -> (A : Matrix a 1 (suc n)) -> proj (embed {a} (A)) (Fs->Fsf i) (Fs->Fsf j) ≡ A i j 
 --lemma'' = {!!}
 
-postulate 
-  pf : ∀ a m n (i : Fin (suc m)) (j : Fin (suc n)) -> (A : AbMatrix a (suc m) (suc n)) -> proj (embed {a} (A)) (Fs->Fsf i) (Fs->Fsf j) ≡ A i j 
+--postulate 
+--  pf : ∀ a m n (i : Fin (suc m)) (j : Fin (suc n)) -> (A : Matrix a (suc m) (suc n)) -> proj (embed {a} (A)) (Fs->Fsf i) (Fs->Fsf j) ≡ A i j 
 
-{-proj∘embed≡id : ∀ a m n (i : Fin (suc m)) (j : Fin (suc n)) -> (A : AbMatrix a (suc m) (suc n)) -> proj (embed {a} (A)) (Fs->Fsf i) (Fs->Fsf j) ≡ A i j 
+{-proj∘embed≡id : ∀ a m n (i : Fin (suc m)) (j : Fin (suc n)) -> (A : Matrix a (suc m) (suc n)) -> proj (embed {a} (A)) (Fs->Fsf i) (Fs->Fsf j) ≡ A i j 
 proj∘embed≡id a zero zero f0 f0 A = refl
 proj∘embed≡id a zero zero f0 (fsuc ()) A
 proj∘embed≡id a zero zero (fsuc ()) j A
@@ -206,11 +161,11 @@ data Tri (a : Ring') : Bin -> Set where
   one : Tri a empty
   trt : {t1 t2 : Bin} -> Tri a t1 -> Rec a t1 t2 -> Tri a t2 -> Tri a (two t1 t2)
 
---AbUTriang : Ring' -> ℕ -> ℕ -> ℕ -> Set
---AbUTriang = {!_,_!}
---IsTrianguar : (a : Ring') (m n d : ℕ) -> (A : AbMatrix a m n) -> Set
+--UTriang : Ring' -> ℕ -> ℕ -> ℕ -> Set
+--UTriang = {!_,_!}
+--IsTriangular : (a : Ring') (m n d : ℕ) -> (A : Matrix a m n) -> Set
 
-tembed : ∀ {a n} -> (A : AbMatrix a (suc n) (suc n)) -> IsTrianguar a 1 A -> Tri a (flatTree n) 
+tembed : ∀ {a n} -> (A : Matrix a (suc n) (suc n)) -> IsTriangular a 1 A -> Tri a (flatTree n) 
 tembed {a} {zero} A pf = one
 tembed {a} {suc n} A pf = trt one (embed {!!}) (tembed {a} {n} (λ i j → A (fsuc i) (fsuc j)) (λ i j x → pf (fsuc i) (fsuc j) {!!}))
 -- vill ha:
@@ -226,10 +181,10 @@ tembed {a} {suc n} A pf = trt one (embed {!!}) (tembed {a} {n} (λ i j → A (fs
 -- 1 + (toℕ j) + (- toℕ i) ≤ 1
 
 
---proj : ∀ {a tr tc} -> Rec a tr tc -> AbMatrix a (size tr) (size tc)
+--proj : ∀ {a tr tc} -> Rec a tr tc -> Matrix a (size tr) (size tc)
 
 
-tproj : ∀ {a t} -> Tri a t -> AbMatrix a (size t) (size t)
+tproj : ∀ {a t} -> Tri a t -> Matrix a (size t) (size t)
 tproj = {!!}
 
 -- tembed = tproj-inv
@@ -341,28 +296,5 @@ transclose (trt (trt A₁ A₂ A₃) C (trt B₃ B₂ B₁)) with transclose (tr
 --trt A₁⁺ A₂⁺ A₃⁺ | trt B₃⁺ B₂⁺ B₁⁺ = trt (trt A₁⁺ A₂⁺ A₃⁺) (valiant (trt A₁⁺ A₂⁺ A₃⁺) C (trt B₃⁺ B₂⁺ B₁⁺)) (trt B₃⁺ B₂⁺ B₁⁺)
 
 
-
-
--- summation : takes a sum thing, a function that creates, (hylomorphism, maybe)
-sum : {a : Set} -> (plus : a -> a -> a) -> (gen : ℕ -> a) -> ℕ -> a
-sum plus gen zero = gen zero
-sum plus gen (suc n) = plus (gen (suc n)) (sum plus gen n)
-
--- pretty close to sum, sum with gen = if 0 then id else mat
---AbPow : {a : Set} -> (mul : a -> a -> a) -> a -> ℕ -> a
---AbPow mul mat zero = {!!}
---AbPow mul mat (suc n) = {!!}
-
-matPow : ∀ a {n} -> AbMatrix a n n -> ℕ -> AbMatrix a n n
-matPow a {n} mat = sum (AbMatrix* a) matGen
-  where
-  matGen : ℕ -> AbMatrix a n n
-  matGen zero = AbId a n
-  matGen (suc n') = mat
-
--- transitive closure is sum
-transclosure : ∀ {a n} -> (A : AbMatrix a n n) -> IsTrianguar a 1 A -> 
-                          AbMatrix a n n
-transclosure {a} {n} A pf = sum (AbMatrix+ a) (matPow a A) n
 
 
