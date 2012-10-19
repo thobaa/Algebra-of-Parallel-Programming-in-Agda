@@ -1,4 +1,4 @@
-module Definitions where
+module Matrix.Definitions where
 
 open import Data.Nat          using (ℕ)
 open import Data.Fin          using (Fin; toℕ)

@@ -1,4 +1,4 @@
-module Abstract where
+module Matrix.Abstract where
 
 open import Data.Nat
 open import Data.Fin using (Fin; fromℕ; fromℕ≤; toℕ;  raise; reduce≥) 
@@ -6,10 +6,10 @@ open import Data.Fin using (Fin; fromℕ; fromℕ≤; toℕ;  raise; reduce≥)
 
 open import Data.Integer using (ℤ; +_; _-_)
                         -- renaming (≥ to z≥)
-open import Definitions using (toℤ) renaming (_≥_ to _z≥_; _<_ to _z<_)
+open import Matrix.Definitions using (toℤ) renaming (_≥_ to _z≥_; _<_ to _z<_)
 open import Data.Empty
-open import ZLemmas
-open import NatLemmas
+open import Matrix.ZLemmas
+open import Matrix.NatLemmas
 open import Algebra
 open import Algebra.Structures
 open import Data.Product

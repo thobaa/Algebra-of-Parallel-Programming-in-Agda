@@ -21,7 +21,7 @@ open Algebra.CommutativeSemiring commutativeSemiring   using ()
                                                                  zero to nzero)
 open Relation.Binary.DecTotalOrder decTotalOrder       using (_≤_)
 
-module NatLemmas where
+module Matrix.NatLemmas where
 
 maxIsOne : {d1 d2 : ℕ} -> (max d1 d2 ≡ d1) ⊎ (max d1 d2 ≡ d2)
 maxIsOne {zero} {d2} = inj2 eqrefl

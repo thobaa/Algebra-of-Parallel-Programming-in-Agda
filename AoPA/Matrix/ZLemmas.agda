@@ -1,6 +1,6 @@
 -- own
-open import Definitions using (_≰_; _>_; _<_)
-open import NatLemmas   using (m≤sm; m≤m; p≤p)
+open import Matrix.Definitions using (_≰_; _>_; _<_)
+open import Matrix.NatLemmas   using (m≤sm; m≤m; p≤p)
 
 -- standard library
 open import Data.Sum                using (_⊎_) renaming (inj₁ to inj1; inj₂ to inj2)
@@ -21,7 +21,7 @@ open Relation.Binary.PropositionalEquality.≡-Reasoning
 open ℤ.≤-Reasoning renaming (begin_ to start_ ; _∎ to _□; _≡⟨_⟩_ to _≡'⟨_⟩_)
 open ℕ.≤-Reasoning renaming (begin_ to nstart_ ; _∎ to _n□; _≡⟨_⟩_ to _n≡'⟨_⟩_; 
                             _≤⟨_⟩_ to _n≤⟨_⟩_ )
-module ZLemmas where
+module Matrix.ZLemmas where
 
 open Algebra.CommutativeRing commutativeRing hiding (_+_; zero; _-_; -_)
 open Algebra.CommutativeSemiring ncsr hiding (_+_ ; zero) 
