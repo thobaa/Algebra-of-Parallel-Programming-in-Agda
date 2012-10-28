@@ -81,18 +81,30 @@ coerce T .(splitSize (forget proj₁)) n x | yes p | proj₁ , refl | proj₃ , 
 coerce T m n x | no ¬p with cut m n {!!} | cut m m {!!}
 coerce T m .(splitSize (forget proj₁)) x | no ¬p | proj₁ , refl | proj₃ , proj₄ = _ , proj₃ , proj₁ , subst (\x -> T x (splitSize (forget proj₁))) (sym proj₄) x
 
-postulate
-  _∙_ : ∀ {a s1 s2 s3} -> SplitMat a s1 s2 -> SplitMat a s2 s3 -> SplitMat a s1 s3
-  _M+_ : ∀ {a s1 s2} -> SplitMat a s1 s2 -> SplitMat a s1 s2 -> SplitMat a s1 s2
+
+_⊕_ : ∀ {a s1 s2} -> SplitMat a s1 s2 -> SplitMat a s1 s2 -> SplitMat a s1 s2
+x ⊕ zero = {!x!}
+zero ⊕ y = y
+one x ⊕ one x₁ = one {!!}
+quad x x₁ x₂ x₃ ⊕ quad y y₁ y₂ y₃ = quad (x ⊕ y) (x₁ ⊕ y₁) (x₂ ⊕ y₂) (x₃ ⊕ y₃)
+
+_⊗_ : ∀ {a s1 s2 s3} -> SplitMat a s1 s2 -> SplitMat a s2 s3 -> SplitMat a s1 s3
+x ⊗ zero = zero
+zero ⊗ y = zero
+one x ⊗ one y = one {!!}
+quad x11 x12 x21 x22 ⊗ quad y11 y12 y21 y22 = 
+  quad ((x11 ⊗ y11) ⊕ (x12 ⊗ y21)) ((x11 ⊗ y12) ⊕ (x12 ⊗ y22)) 
+       ((x21 ⊗ y11) ⊕ (x22 ⊗ y21)) ((x21 ⊗ y12) ⊕ (x22 ⊗ y22)) -- TODO: this could generate more zeros
+
 
 valiantOverlap : ∀ {a s1 s2} -> Triangle a s1 -> SplitMat a s1 s2 -> Triangle a s2 -> SplitMat a s1 s2
 valiantOverlap A zero C = zero
 valiantOverlap one (one x) one = one x
 valiantOverlap (quad A1 A2 A3) (quad C2 C4 C1 C3) (quad B1 B2 B3) = quad X2 X4 X1 X3
   where X1 = valiantOverlap A3 C1 B1
-        X2 = valiantOverlap A1 (C2 M+ (A2 ∙ X1)) B1
-        X3 = valiantOverlap A3 (C3 M+ (X1 ∙ B2)) B3
-        X4 = valiantOverlap A1 ((A2 ∙ X3) M+ (X2 ∙ B2)) B3
+        X2 = valiantOverlap A1 (C2 ⊕ (A2 ⊗ X1)) B1
+        X3 = valiantOverlap A3 (C3 ⊕ (X1 ⊗ B2)) B3
+        X4 = valiantOverlap A1 ((A2 ⊗ X3) ⊕ (X2 ⊗ B2)) B3
 
 valiant : ∀ {a s} -> Triangle a s -> Triangle a s
 valiant one = one
