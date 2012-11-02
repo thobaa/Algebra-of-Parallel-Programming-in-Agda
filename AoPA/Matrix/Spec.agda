@@ -186,6 +186,8 @@ tri1-T-sum-pow-commute' {a} {s1} {s2} {suc n} (two T₁ R T₂) = ≡-begin
     (sum ttadd (sum ttmul (ttgen T₁)) n) ≡∎
 
 
+
+
 tri1-T-sum-pow-commute : ∀ {a s1 s2} -> (T : Tri a (deeper s1 s2)) -> tri1 (T-sum-pow T) ≡ T-sum-pow (tri1 T)
 tri1-T-sum-pow-commute {a} {s1} {s2} (two T₁ R T₂) = ≡-begin 
   tri1
@@ -198,8 +200,20 @@ tri1-T-sum-pow-commute {a} {s1} {s2} (two T₁ R T₂) = ≡-begin
     ≡⟨ {!!} ⟩ -- the last s2 are 0
   sum ttadd (sum ttmul (ttgen T₁)) (splitSize s1) ≡∎
 
+-- same as tri1-T-...
 tri2-T-sum-pow-commute : ∀ {a s1 s2} -> (T : Tri a (deeper s1 s2)) -> tri2 (T-sum-pow T) ≡ T-sum-pow (tri2 T)
 tri2-T-sum-pow-commute = {!!}
+
+
+
+-- or maybe define trt-mul?
+rec-T-sum-pow-kind-of-commute : {a : Ring'} {s1 s2 : Splitting} {T : Tri a (deeper s1 s2)} -> rec {a} {s1} {s2} (sum ttadd (sum ttmul (ttgen T)) (splitSize s1 + splitSize s2)) ≡ 
+                                                                                                                trmul (sum ttadd (sum ttmul (ttgen (tri1 T))) (splitSize s1))
+                                                                                                                      (rtmul (rec T) (sum ttadd (sum ttmul (ttgen (tri2 T))) (splitSize s2)))
+rec-T-sum-pow-kind-of-commute {a} {s1} {s2} {T} = {!!}
+
+
+
 
 valiant-der' : ∀ {a : Ring'} {s1 s2  : Splitting} -> ∃ (λ f → min ≤T ₁∘ (Tis-a-transitive-closure-of {a} {deeper s1 s2}) ⊒ fun f )
 valiant-der' {a} {s1} {s2} = ({!!} , 
@@ -233,4 +247,23 @@ valiant-der' {a} {s1} {s2} = ({!!} ,
                          ≡⟨ x ⟩
                          b ≡∎) ⟩
   fun (unsplit ∘ ⟨ T-sum-pow ∘ tri1 , rec ∘ T-sum-pow , T-sum-pow ∘ tri2 ⟩)
+        ⊒⟨ (λ b a' z → z) ⟩
+  fun (let A' = T-sum-pow ∘ tri1 
+           B' = T-sum-pow ∘ tri2 in unsplit ∘ ⟨ A' , rec ∘ T-sum-pow  , B' ⟩)
+        ⊒⟨ (λ b a' x → ≡-begin 
+                       two (sum ttadd (sum ttmul (ttgen (tri1 a'))) (splitSize s1)) (rec (sum ttadd (sum ttmul (ttgen a')) (splitSize s1 + splitSize s2)))
+                                                                                    (sum ttadd (sum ttmul (ttgen (tri2 a'))) (splitSize s2)) 
+                       ≡⟨ cong (λ x' → two (sum ttadd (sum ttmul (ttgen (tri1 a'))) (splitSize s1)) x'
+                                                                                                    (sum ttadd (sum ttmul (ttgen (tri2 a'))) (splitSize s2))) 
+                          rec-T-sum-pow-kind-of-commute ⟩ 
+                       two (sum ttadd (sum ttmul (ttgen (tri1 a'))) (splitSize s1)) (trmul (sum ttadd (sum ttmul (ttgen (tri1 a'))) (splitSize s1))
+                                                                                      (rtmul (rec a')
+                           (sum ttadd (sum ttmul (ttgen (tri2 a'))) (splitSize s2))))
+                         (sum ttadd (sum ttmul (ttgen (tri2 a'))) (splitSize s2))
+                       ≡⟨ x ⟩ 
+                       b ≡∎) ⟩
+  fun (let A' = T-sum-pow ∘ tri1 
+           B' = T-sum-pow ∘ tri2 in unsplit ∘ ⟨ A' , (λ x → trmul (A' x) (rtmul (rec x) (B' x))) , B' ⟩) -- what about non-associativity???
+        ⊒⟨ {!!} ⟩
+  fun valiant
       ⊒∎))
