@@ -70,6 +70,25 @@ unsplit (T₁ , R , T₂) = two T₁ R T₂
 unsplit∘split≡id : ∀ {a s1 s2} (t : Tri a (deeper s1 s2)) -> unsplit ( split t) ≡ t
 unsplit∘split≡id (two T₁ R T₂) = refl
 
+
+-- the triangles are supposed to be transitively closed!
+valiantOverlap : ∀ {a s1 s2} -> Tri a s1 -> SplitMat a s1 s2 -> Tri a s2 -> SplitMat a s1 s2
+valiantOverlap {a} {one} {one} A' C B' = C
+valiantOverlap {a} {one} {deeper s₁ s₂} A' (RVec v) B' = RVec (vectmul v B')
+valiantOverlap {a} {deeper s₁ s₂} {one} A' (CVec v) B' = CVec (tvecmul A' v)
+valiantOverlap {a} {deeper s₁ s₂} {deeper s₃ s₄} (two A₁ A₂ A₃) (quad C₂ C₄ C₁ C₃) (two B₃ B₂ B₁) = quad X₂ X₄ X₁ X₃
+  where X₁ = valiantOverlap A₃ C₁ B₃
+        X₂ = valiantOverlap A₁ (splitAdd C₂ (splitMul A₂ X₁)) B₃
+        X₃ = valiantOverlap A₃ (splitAdd C₃ (splitMul X₁ B₂)) B₁
+        X₄ = valiantOverlap A₁ (splitAdd (splitMul A₂ X₃) (splitMul X₂ B₂)) B₁
+
+valiant : ∀ {a s} -> Tri a s -> Tri a s
+valiant one = one
+valiant (two A C B) = two A' (valiantOverlap A' C B') B'
+  where A' = (valiant A)
+        B' = (valiant B)
+
+
 -- now, properties: 
 
 -- t₁ (ttadd T₁ T₂) == ttadd (t₁ T₁) (t₁ T₂)
