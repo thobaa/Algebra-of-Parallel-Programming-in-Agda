@@ -1,8 +1,6 @@
-module Matrix.Spec where
-
-open import Matrix.Abstract
-open import Matrix.Tri
-open import Matrix.NewNewSplit
+import Matrix.Abstract
+import Matrix.Tri
+import Matrix.NewNewSplit
 open import Data.Nat hiding (_⊓_)
 open import Data.Product
 open import Relation.Binary.PropositionalEquality
@@ -24,28 +22,41 @@ open import AlgebraicReasoning.Relations
 
 open import AlgebraicReasoning.Equality
 
+-- END AOPA
+open import Level using () renaming (zero to Lzero)
+
+open import Matrix.NonAssociativeRing
+
+module Matrix.Spec (NAR : NonAssociativeRing Lzero Lzero) where
+
+open Matrix.Abstract (NAR)
+open Matrix.Tri (NAR)
+open Matrix.NewNewSplit (NAR)
+
+
 -- summation: takes an addition operator, a generator and 
 sum : {a : Set} -> (plus : a -> a -> a) -> (gen : ℕ -> a) -> ℕ -> a
 sum plus gen zero = gen zero
 sum plus gen (suc n) = plus (gen (suc n)) (sum plus gen n)
 
-matPow : ∀ a {n} -> Matrix a n n -> ℕ -> Matrix a n n
-matPow a {n} mat = sum (Matrix* a) matGen
+
+matPow : ∀ {n} -> Matrix n n -> ℕ -> Matrix n n
+matPow {n} mat = sum (_M*_) matGen
   where
-  matGen : ℕ -> Matrix a n n
-  matGen zero = Id a n
+  matGen : ℕ -> Matrix n n
+  matGen zero = ?
   matGen (suc n') = mat
 
 
-ttgen : ∀ {a s} -> Tri a s -> ℕ -> Tri a s
+ttgen : ∀ {s} -> Tri s -> ℕ -> Tri s
 ttgen _ zero = tZero
 ttgen mat (suc n) = mat
 
-ttPow : ∀ a {s} -> Tri a s -> ℕ -> Tri a s
-ttPow a {s} mat = sum ttmul (ttgen mat)
+ttPow : ∀ {s} -> Tri s -> ℕ -> Tri s
+ttPow {s} mat = sum ttmul (ttgen mat)
 
 postulate 
-  triangPf : ∀ {a} {da db m n p : ℕ} {A : Matrix a m n} {B : Matrix a n p} -> IsTriangular a da A -> IsTriangular a db B -> IsTriangular a (da + db) (Matrix* a A B)
+  triangPf : ∀ {da db m n p : ℕ} {A : Matrix m n} {B : Matrix n p} -> IsTriangular da A -> IsTriangular db B -> IsTriangular (da + db) (A M* B)
  
 -- is finite
 sum-is-finite : {a : Set} -> (plus : a -> a -> a) -> (gen : ℕ -> a) -> Set
@@ -60,32 +71,32 @@ sum-is-finite plus gen = ∃ λ n → ∀ m → sum plus gen n ≡ sum plus gen 
 -- need: relation on matrixes
 -- for it, need relation on elements
 postulate 
-  ≤R : ∀ {R : Ring'} -> RC R ← RC R
+  ≤R : R ← R
 
 -- Indexwise lifting of ≤R. (First matrix less than second.)
-≤M : ∀ {a m n} -> (Matrix a m n) ← Matrix a m n
-≤M {a = a} {m = m} {n = n} A B = (i : Fin m) (j : Fin n) → ≤R {a} (A i j) (B i j)
+≤M : ∀ {m n} -> (Matrix m n) ← Matrix m n
+≤M {m = m} {n = n} A B = (i : Fin m) (j : Fin n) → ≤R (A i j) (B i j)
 
 --matPow : ∀ a {n} -> Matrix a n n -> ℕ -> Matrix a n n
 --sum : {a : Set} -> (plus : a -> a -> a) -> (gen : ℕ -> a) -> ℕ -> a
 -- A is transitive closure of B (B not neccessarily triangular)
-is-a-transitive-closure-of : ∀ {a n} -> Matrix a n n ← Matrix a n n
-is-a-transitive-closure-of {a} A B = ∀ m → ≤M {a} (sum (Matrix+ a) (matPow a B) m) A
+is-a-transitive-closure-of : ∀ {n} -> Matrix n n ← Matrix n n
+is-a-transitive-closure-of A B = ∀ m → ≤M (sum (_M+_) (matPow B) m) A
 
 
-valiant-spec : ∀ {a} {n} -> Matrix a n n ← Matrix a n n
-valiant-spec {a} {n} = min (is-a-transitive-closure-of {a} {n}) ₁∘ (IsTriangular {n} {n} a 1) ¿
+valiant-spec : ∀ {n} -> Matrix n n ← Matrix n n
+valiant-spec {n} = min (is-a-transitive-closure-of {n}) ₁∘ (IsTriangular {n} {n} 1) ¿
 
-triangular⇒finite-sum : ∀ {a n} -> (A : Matrix a n n) -> IsTriangular a 1 A -> sum-is-finite (Matrix+ a) (matPow a A)
+triangular⇒finite-sum : ∀ {n} -> (A : Matrix n n) -> IsTriangular 1 A -> sum-is-finite (_M+_) (matPow A)
 triangular⇒finite-sum = {!!}
 
 
 postulate 
-  proj : ∀ {a s} -> Tri a s -> Matrix a (splitSize s) (splitSize s)
+  proj : ∀ {s} -> Tri s -> Matrix (splitSize s) (splitSize s)
 
 -- does that make sense?
 postulate
-  embed : ∀ {a s} -> Matrix a (splitSize s) (splitSize s) -> Tri a s
+  embed : ∀ {s} -> Matrix (splitSize s) (splitSize s) -> Tri s
 
 
 
@@ -117,36 +128,36 @@ valiant-der {a} {n} = ({!!} ,
 -- show what happens with rect when moving it to other side.
 
 -- transitive closure is sum
-transclosure : ∀ {a n} -> (A : Matrix a n n) -> IsTriangular a 1 A -> Matrix a n n
-transclosure {a} {n} A pf = sum (Matrix+ a) (matPow a A) n
+transclosure : ∀ {n} -> (A : Matrix n n) -> IsTriangular 1 A -> Matrix n n
+transclosure {n} A pf = sum (_M+_) (matPow A) n
 
 
-≤V : ∀ {a s} -> SplitVec a s ← SplitVec a s
-≤V {a} {one} (one x) (one x') = ≤R {a} x x'
-≤V {a} {deeper y y'} (two y0 y1) (two y2 y3) = ≤V {a} y0 y2 × ≤V {a} y1 y3
+≤V : ∀ {s} -> SplitVec s ← SplitVec s
+≤V {one} (one x) (one x') = ≤R x x'
+≤V {deeper y y'} (two y0 y1) (two y2 y3) = ≤V y0 y2 × ≤V y1 y3
 
-≤S : ∀ {a s1 s2} -> SplitMat a s1 s2 ← SplitMat a s1 s2
-≤S {a} {one} {one} (Sing x) (Sing x') = ≤R {a} x x'
-≤S {a} {one} {deeper y y'} (RVec y0) (RVec y1) = ≤V y0 y1
-≤S {a} {deeper y y'} {one} (CVec y0) (CVec y1) = ≤V y0 y1
-≤S {a} {deeper y y'} {deeper y0 y1} (quad y2 y3 y4 y5) (quad y6 y7 y8 y9) = ≤S y2 y6 × ≤S y3 y7 × ≤S y4 y8 × ≤S y5 y9
+≤S : ∀ {s1 s2} -> SplitMat s1 s2 ← SplitMat s1 s2
+≤S {one} {one} (Sing x) (Sing x') = ≤R x x'
+≤S {one} {deeper y y'} (RVec y0) (RVec y1) = ≤V y0 y1
+≤S {deeper y y'} {one} (CVec y0) (CVec y1) = ≤V y0 y1
+≤S {deeper y y'} {deeper y0 y1} (quad y2 y3 y4 y5) (quad y6 y7 y8 y9) = ≤S y2 y6 × ≤S y3 y7 × ≤S y4 y8 × ≤S y5 y9
 
 -- doing the stuff for triangs:
-≤T : ∀ {a s} -> Tri a s ← Tri a s
-≤T {a} {one} one one = ⊤
-≤T {a} {deeper s1 s2} (two y0 y1 y2) (two y3 y4 y5) = (≤T y0 y3 × ≤S y1 y4 × ≤T y2 y5)
+≤T : ∀ {s} -> Tri s ← Tri s
+≤T {one} one one = ⊤
+≤T {deeper s1 s2} (two y0 y1 y2) (two y3 y4 y5) = (≤T y0 y3 × ≤S y1 y4 × ≤T y2 y5)
 
-Tis-a-transitive-closure-of : ∀ {a s} -> Tri a s ← Tri a s
-Tis-a-transitive-closure-of {a} A B = ∀ m → ≤T {a} (sum (ttadd) (ttPow a B) m) A
+Tis-a-transitive-closure-of : ∀ {s} -> Tri s ← Tri s
+Tis-a-transitive-closure-of A B = ∀ m → ≤T (sum (ttadd) (ttPow B) m) A
 
 
-tri1-ttadd-commute : ∀ {a s1 s2} → (T₁ : Tri a (deeper s1 s2)) -> (T₂ : Tri a (deeper s1 s2)) → tri1 (ttadd T₁ T₂) ≡ ttadd (tri1 T₁) (tri1 T₂)
+tri1-ttadd-commute : ∀ {s1 s2} → (T₁ : Tri (deeper s1 s2)) -> (T₂ : Tri (deeper s1 s2)) → tri1 (ttadd T₁ T₂) ≡ ttadd (tri1 T₁) (tri1 T₂)
 tri1-ttadd-commute (two y y' y0) (two y1 y2 y3) = refl
 
-tri1-ttmul-commute : ∀ {a s1 s2} → (T₁ : Tri a (deeper s1 s2)) -> (T₂ : Tri a (deeper s1 s2)) → tri1 (ttmul T₁ T₂) ≡ ttmul (tri1 T₁) (tri1 T₂)
+tri1-ttmul-commute : ∀ {s1 s2} → (T₁ : Tri (deeper s1 s2)) -> (T₂ : Tri (deeper s1 s2)) → tri1 (ttmul T₁ T₂) ≡ ttmul (tri1 T₁) (tri1 T₂)
 tri1-ttmul-commute (two y y' y0) (two y1 y2 y3) = refl
 
-tri1-pow-commute : ∀ {a s1 s2} n → (T : Tri a (deeper s1 s2)) -> tri1 (ttPow a T n) ≡ ttPow a (tri1 T) n
+tri1-pow-commute : ∀ {s1 s2} n → (T : Tri (deeper s1 s2)) -> tri1 (ttPow T n) ≡ ttPow (tri1 T) n
 tri1-pow-commute zero T = refl
 tri1-pow-commute (suc n) T = ≡-begin 
   tri1 (ttmul T (sum ttmul (ttgen T) n)) 
@@ -155,12 +166,12 @@ tri1-pow-commute (suc n) T = ≡-begin
   ≡⟨ cong (λ x → ttmul (tri1 T) x) (tri1-pow-commute n T) ⟩ 
   ttmul (tri1 T) (sum ttmul (ttgen (tri1 T)) n) ≡∎
 
-T-sum-pow : ∀ {a s} -> Tri a s -> Tri a s
-T-sum-pow {a} {s} A = sum ttadd (ttPow a A) (splitSize s)
+T-sum-pow : ∀ {s} -> Tri s -> Tri s
+T-sum-pow {s} A = sum ttadd (ttPow A) (splitSize s)
 
-tri1-T-sum-pow-commute' : ∀ {a s1 s2 n} -> (T : Tri a (deeper s1 s2)) -> tri1 (sum ttadd (ttPow a T) n) ≡ sum ttadd (ttPow a (tri1 T)) n
-tri1-T-sum-pow-commute' {a} {s1} {s2} {zero} (two T₁ R T₂) = refl
-tri1-T-sum-pow-commute' {a} {s1} {s2} {suc n} (two T₁ R T₂) = ≡-begin 
+tri1-T-sum-pow-commute' : ∀ {s1 s2 n} -> (T : Tri (deeper s1 s2)) -> tri1 (sum ttadd (ttPow T) n) ≡ sum ttadd (ttPow (tri1 T)) n
+tri1-T-sum-pow-commute' {s1} {s2} {zero} (two T₁ R T₂) = refl
+tri1-T-sum-pow-commute' {s1} {s2} {suc n} (two T₁ R T₂) = ≡-begin 
   tri1
     (ttadd (ttmul (two T₁ R T₂) (sum ttmul (ttgen (two T₁ R T₂)) n))
      (sum ttadd (sum ttmul (ttgen (two T₁ R T₂))) n))
@@ -181,19 +192,19 @@ tri1-T-sum-pow-commute' {a} {s1} {s2} {suc n} (two T₁ R T₂) = ≡-begin
   ttadd
     (ttmul T₁ (sum ttmul (ttgen T₁) n))
     (tri1 (sum ttadd (sum ttmul (ttgen (two T₁ R T₂))) n))
-  ≡⟨ cong (λ x → ttadd (ttmul T₁ (sum ttmul (ttgen T₁) n)) x) (tri1-T-sum-pow-commute' {a} {s1} {s2} {n} (two T₁ R T₂)) ⟩
+  ≡⟨ cong (λ x → ttadd (ttmul T₁ (sum ttmul (ttgen T₁) n)) x) (tri1-T-sum-pow-commute' {s1} {s2} {n} (two T₁ R T₂)) ⟩
   ttadd (ttmul T₁ (sum ttmul (ttgen T₁) n))
     (sum ttadd (sum ttmul (ttgen T₁)) n) ≡∎
 
 
 
 
-tri1-T-sum-pow-commute : ∀ {a s1 s2} -> (T : Tri a (deeper s1 s2)) -> tri1 (T-sum-pow T) ≡ T-sum-pow (tri1 T)
-tri1-T-sum-pow-commute {a} {s1} {s2} (two T₁ R T₂) = ≡-begin 
+tri1-T-sum-pow-commute : ∀ {s1 s2} -> (T : Tri (deeper s1 s2)) -> tri1 (T-sum-pow T) ≡ T-sum-pow (tri1 T)
+tri1-T-sum-pow-commute {s1} {s2} (two T₁ R T₂) = ≡-begin 
   tri1
     (sum ttadd (sum ttmul (ttgen (two T₁ R T₂)))
      (splitSize s1 + splitSize s2)) 
-    ≡⟨ tri1-T-sum-pow-commute' {a} {s1} {s2} {splitSize s1 + splitSize s2} (two T₁ R T₂) ⟩ 
+    ≡⟨ tri1-T-sum-pow-commute' {s1} {s2} {splitSize s1 + splitSize s2} (two T₁ R T₂) ⟩ 
   sum ttadd (sum ttmul (ttgen (tri1 (two T₁ R T₂)))) (splitSize s1 + splitSize s2)
     ≡⟨ refl ⟩ 
   sum ttadd (sum ttmul (ttgen T₁)) (splitSize s1 + splitSize s2)
@@ -201,24 +212,24 @@ tri1-T-sum-pow-commute {a} {s1} {s2} (two T₁ R T₂) = ≡-begin
   sum ttadd (sum ttmul (ttgen T₁)) (splitSize s1) ≡∎
 
 -- same as tri1-T-...
-tri2-T-sum-pow-commute : ∀ {a s1 s2} -> (T : Tri a (deeper s1 s2)) -> tri2 (T-sum-pow T) ≡ T-sum-pow (tri2 T)
+tri2-T-sum-pow-commute : ∀ {s1 s2} -> (T : Tri (deeper s1 s2)) -> tri2 (T-sum-pow T) ≡ T-sum-pow (tri2 T)
 tri2-T-sum-pow-commute = {!!}
 
 
 
 -- or maybe define trt-mul?
-rec-T-sum-pow-kind-of-commute : {a : Ring'} {s1 s2 : Splitting} {T : Tri a (deeper s1 s2)} -> rec {a} {s1} {s2} (sum ttadd (sum ttmul (ttgen T)) (splitSize s1 + splitSize s2)) ≡ 
+rec-T-sum-pow-kind-of-commute : {s1 s2 : Splitting} {T : Tri (deeper s1 s2)} -> rec {s1} {s2} (sum ttadd (sum ttmul (ttgen T)) (splitSize s1 + splitSize s2)) ≡ 
                                                                                                                 trmul (sum ttadd (sum ttmul (ttgen (tri1 T))) (splitSize s1))
                                                                                                                       (rtmul (rec T) (sum ttadd (sum ttmul (ttgen (tri2 T))) (splitSize s2)))
-rec-T-sum-pow-kind-of-commute {a} {s1} {s2} {T} = {!!}
+rec-T-sum-pow-kind-of-commute {s1} {s2} {T} = {!!}
 
 
 
 
-valiant-der' : ∀ {a : Ring'} {s1 s2  : Splitting} -> ∃ (λ f → min ≤T ₁∘ (Tis-a-transitive-closure-of {a} {deeper s1 s2}) ⊒ fun f )
-valiant-der' {a} {s1} {s2} = ({!!} , 
+valiant-der' : ∀ {s1 s2  : Splitting} -> ∃ (λ f → min ≤T ₁∘ (Tis-a-transitive-closure-of {deeper s1 s2}) ⊒ fun f )
+valiant-der' {s1} {s2} = ({!!} , 
   (⊒-begin
-    min ≤T ₁∘ (Tis-a-transitive-closure-of {a} {deeper s1 s2})
+    min ≤T ₁∘ (Tis-a-transitive-closure-of {deeper s1 s2})
       ⊒⟨ {!!} ⟩ -- ← magic!
   fun T-sum-pow
         ⊒⟨ ⊒-refl ⟩
