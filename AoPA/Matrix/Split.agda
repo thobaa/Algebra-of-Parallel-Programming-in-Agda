@@ -82,11 +82,15 @@ coerce T m n x | no ¬p with cut m n {!!} | cut m m {!!}
 coerce T m .(splitSize (forget proj₁)) x | no ¬p | proj₁ , refl | proj₃ , proj₄ = _ , proj₃ , proj₁ , subst (\x -> T x (splitSize (forget proj₁))) (sym proj₄) x
 
 
+infixr 6 _⊕_
+
 _⊕_ : ∀ {a s1 s2} -> SplitMat a s1 s2 -> SplitMat a s1 s2 -> SplitMat a s1 s2
 x ⊕ zero = {!x!}
 zero ⊕ y = y
 one x ⊕ one x₁ = one {!!}
 quad x x₁ x₂ x₃ ⊕ quad y y₁ y₂ y₃ = quad (x ⊕ y) (x₁ ⊕ y₁) (x₂ ⊕ y₂) (x₃ ⊕ y₃)
+
+infixr 7 _⊗_
 
 _⊗_ : ∀ {a s1 s2 s3} -> SplitMat a s1 s2 -> SplitMat a s2 s3 -> SplitMat a s1 s3
 x ⊗ zero = zero
@@ -112,7 +116,27 @@ valiant (quad A C B) = quad A' (valiantOverlap A' C B') B'
   where A' = valiant A
         B' = valiant B
 
+infixr 4 _⊇_
+postulate _⊇_ : ∀ {a s1 s2} -> SplitMat a s1 s2 -> SplitMat a s1 s2 -> Set
 
+Pow : ∀ {a s} -> ℕ -> Triangle a s -> Triangle a s
+Pow zero r = {!!} -- identity matrix
+Pow (suc n) m = {!m ⊗ Pow n m!}
+
+Pow' : ∀ {a s} -> ℕ -> Triangle a s -> Triangle a s -> Triangle a s
+Pow' zero r b = b
+Pow' (suc n) m b = {!m ⊗ Pow' n m!}
+
+
+
+_IsTransClos_ : ∀ {a s} -> Triangle a s -> Triangle a s -> Set
+A IsTransClos B = {!!} -- ∃ \n -> (Sum n \i -> Pow i B) = A 
+
+_IsBetween[_,_] : ∀ {a s1 s2} ->(C : SplitMat a s1 s2) -> (A : Triangle a s1) -> (B : Triangle a s2) -> Set
+C IsBetween[ A , B ] = ∃ \k -> {! Pow' k A (C ⊗ Pow k B) !}
+
+valiantOverlap' : ∀ {a s1 s2} -> (A : Triangle a s1) -> (C : SplitMat a s1 s2) -> (B : Triangle a s2) -> ∃ \ (X : SplitMat a s1 s2) -> (quad A X B) IsTransClos (quad A C B) -- should use IsBetween
+valiantOverlap' A C B = {!!}
 
 ----------------------------------
 -- seriously, this is ok! (vector with three elements

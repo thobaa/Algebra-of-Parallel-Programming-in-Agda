@@ -91,7 +91,7 @@ valiantOverlap {deeper s₁ s₂} {deeper s₃ s₄} (two A₁ A₂ A₃) (quad 
   where X₁ = valiantOverlap A₃ C₁ B₃
         X₂ = valiantOverlap A₁ (splitAdd C₂ (splitMul A₂ X₁)) B₃
         X₃ = valiantOverlap A₃ (splitAdd C₃ (splitMul X₁ B₂)) B₁
-        X₄ = valiantOverlap A₁ (splitAdd (splitMul A₂ X₃) (splitMul X₂ B₂)) B₁
+        X₄ = valiantOverlap A₁ (splitAdd C₄ (splitAdd (splitMul A₂ X₃) (splitMul X₂ B₂))) B₁
 
 valiant : ∀ {s} -> Tri s -> Tri s
 valiant one = one
