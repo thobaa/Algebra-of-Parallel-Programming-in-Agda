@@ -44,16 +44,16 @@ matPow : ∀ {n} -> Matrix n n -> ℕ -> Matrix n n
 matPow {n} mat = sum (_M*_) matGen
   where
   matGen : ℕ -> Matrix n n
-  matGen zero = ?
+  matGen zero = {!!}
   matGen (suc n') = mat
 
 
 ttgen : ∀ {s} -> Tri s -> ℕ -> Tri s
-ttgen _ zero = tZero
+ttgen _ zero = T0
 ttgen mat (suc n) = mat
 
 ttPow : ∀ {s} -> Tri s -> ℕ -> Tri s
-ttPow {s} mat = sum ttmul (ttgen mat)
+ttPow {s} mat = sum _T*_ (ttgen mat)
 
 postulate 
   triangPf : ∀ {da db m n p : ℕ} {A : Matrix m n} {B : Matrix n p} -> IsTriangular da A -> IsTriangular db B -> IsTriangular (da + db) (A M* B)
@@ -114,7 +114,7 @@ valiant-der {a} {n} = ({!!} ,
     --  ⊒⟨ ⊒-refl ⟩
     --fun (λ A → id (sum (Matrix+ a) (matPow a A) n)) ○ IsTriangular {n} {n} a 1 ¿
       ⊒⟨ {!fun-comp!} ⟩
-    fun (λ A → proj (sum ttadd (ttPow a (embed A)) n))
+    fun (λ A → proj (sum _T+_ (ttPow a (embed A)) n))
       ⊒⟨ {!fun-comp!} ⟩
     fun {!!}
       ⊒∎))
@@ -148,53 +148,52 @@ transclosure {n} A pf = sum (_M+_) (matPow A) n
 ≤T {deeper s1 s2} (two y0 y1 y2) (two y3 y4 y5) = (≤T y0 y3 × ≤S y1 y4 × ≤T y2 y5)
 
 Tis-a-transitive-closure-of : ∀ {s} -> Tri s ← Tri s
-Tis-a-transitive-closure-of A B = ∀ m → ≤T (sum (ttadd) (ttPow B) m) A
+Tis-a-transitive-closure-of A B = ∀ m → ≤T (sum (_T+_) (ttPow B) m) A
 
 
-tri1-ttadd-commute : ∀ {s1 s2} → (T₁ : Tri (deeper s1 s2)) -> (T₂ : Tri (deeper s1 s2)) → tri1 (ttadd T₁ T₂) ≡ ttadd (tri1 T₁) (tri1 T₂)
-tri1-ttadd-commute (two y y' y0) (two y1 y2 y3) = refl
+tri1-T+-commute : ∀ {s1 s2} → (T₁ : Tri (deeper s1 s2)) -> (T₂ : Tri (deeper s1 s2)) → tri1 (T₁ T+ T₂) ≡ (tri1 T₁) T+ (tri1 T₂)
+tri1-T+-commute (two y y' y0) (two y1 y2 y3) = refl
 
-tri1-ttmul-commute : ∀ {s1 s2} → (T₁ : Tri (deeper s1 s2)) -> (T₂ : Tri (deeper s1 s2)) → tri1 (ttmul T₁ T₂) ≡ ttmul (tri1 T₁) (tri1 T₂)
-tri1-ttmul-commute (two y y' y0) (two y1 y2 y3) = refl
+tri1-T*-commute : ∀ {s1 s2} → (T₁ : Tri (deeper s1 s2)) -> (T₂ : Tri (deeper s1 s2)) → tri1 (T₁ T* T₂) ≡ (tri1 T₁) T* (tri1 T₂)
+tri1-T*-commute (two y y' y0) (two y1 y2 y3) = refl
 
 tri1-pow-commute : ∀ {s1 s2} n → (T : Tri (deeper s1 s2)) -> tri1 (ttPow T n) ≡ ttPow (tri1 T) n
 tri1-pow-commute zero T = refl
 tri1-pow-commute (suc n) T = ≡-begin 
-  tri1 (ttmul T (sum ttmul (ttgen T) n)) 
-  ≡⟨ tri1-ttmul-commute T (sum ttmul (ttgen T) n) ⟩ 
-  ttmul (tri1 T) (tri1 (sum ttmul (ttgen T) n)) 
-  ≡⟨ cong (λ x → ttmul (tri1 T) x) (tri1-pow-commute n T) ⟩ 
-  ttmul (tri1 T) (sum ttmul (ttgen (tri1 T)) n) ≡∎
+  tri1 (T T* (sum _T*_ (ttgen T) n)) 
+  ≡⟨ tri1-T*-commute T (sum _T*_ (ttgen T) n) ⟩ 
+  (tri1 T) T* (tri1 (sum _T*_ (ttgen T) n)) 
+  ≡⟨ cong (λ x → (tri1 T) T* x) (tri1-pow-commute n T) ⟩ 
+  (tri1 T) T* (sum _T*_ (ttgen (tri1 T)) n) ≡∎
 
 T-sum-pow : ∀ {s} -> Tri s -> Tri s
-T-sum-pow {s} A = sum ttadd (ttPow A) (splitSize s)
+T-sum-pow {s} A = sum _T+_ (ttPow A) (splitSize s)
 
-tri1-T-sum-pow-commute' : ∀ {s1 s2 n} -> (T : Tri (deeper s1 s2)) -> tri1 (sum ttadd (ttPow T) n) ≡ sum ttadd (ttPow (tri1 T)) n
+tri1-T-sum-pow-commute' : ∀ {s1 s2 n} -> (T : Tri (deeper s1 s2)) -> tri1 (sum _T+_ (ttPow T) n) ≡ sum _T+_ (ttPow (tri1 T)) n
 tri1-T-sum-pow-commute' {s1} {s2} {zero} (two T₁ R T₂) = refl
 tri1-T-sum-pow-commute' {s1} {s2} {suc n} (two T₁ R T₂) = ≡-begin 
   tri1
-    (ttadd (ttmul (two T₁ R T₂) (sum ttmul (ttgen (two T₁ R T₂)) n))
-     (sum ttadd (sum ttmul (ttgen (two T₁ R T₂))) n))
-  ≡⟨ tri1-ttadd-commute (ttmul (two T₁ R T₂) (sum ttmul (ttgen (two T₁ R T₂)) n)) (sum ttadd (sum ttmul (ttgen (two T₁ R T₂))) n) ⟩
-  ttadd
-    (tri1 (ttmul (two T₁ R T₂) (sum ttmul (ttgen (two T₁ R T₂)) n)))
-    (tri1 (sum ttadd (sum ttmul (ttgen (two T₁ R T₂))) n))
-  ≡⟨ cong (λ x → ttadd x (tri1 (sum ttadd (sum ttmul (ttgen (two T₁ R T₂))) n))) (tri1-ttmul-commute (two T₁ R T₂) (sum ttmul (ttgen (two T₁ R T₂)) n)) ⟩
-  ttadd
-    (ttmul T₁ (tri1 (sum ttmul (ttgen (two T₁ R T₂)) n)))
-    (tri1 (sum ttadd (sum ttmul (ttgen (two T₁ R T₂))) n))
-  ≡⟨ cong (λ x → ttadd (ttmul T₁ x)
-                   (tri1 (sum ttadd (sum ttmul (ttgen (two T₁ R T₂))) n))) (tri1-pow-commute n (two T₁ R T₂)) ⟩
-  ttadd
-    (ttmul T₁ (sum ttmul (ttgen (tri1 (two T₁ R T₂))) n))
-    (tri1 (sum ttadd (sum ttmul (ttgen (two T₁ R T₂))) n))
+    (((two T₁ R T₂) T* (sum _T*_ (ttgen (two T₁ R T₂)) n)) T+
+     (sum _T+_ (sum _T*_ (ttgen (two T₁ R T₂))) n))
+  ≡⟨ tri1-T+-commute ((two T₁ R T₂) T* (sum _T*_ (ttgen (two T₁ R T₂)) n)) (sum _T+_ (sum _T*_ (ttgen (two T₁ R T₂))) n) ⟩
+  (tri1 ((two T₁ R T₂) T* (sum _T*_ (ttgen (two T₁ R T₂)) n))) 
+    T+
+  (tri1 (sum _T+_ (sum _T*_ (ttgen (two T₁ R T₂))) n))
+  ≡⟨ cong (λ x → x T+ (tri1 (sum _T+_ (sum _T*_ (ttgen (two T₁ R T₂))) n))) (tri1-T*-commute (two T₁ R T₂) (sum _T*_ (ttgen (two T₁ R T₂)) n)) ⟩
+  (T₁ T* (tri1 (sum _T*_ (ttgen (two T₁ R T₂)) n)))
+    T+
+  (tri1 (sum _T+_ (sum _T*_ (ttgen (two T₁ R T₂))) n))
+  ≡⟨ cong (λ x → (T₁ T* x) T+ (tri1 (sum _T+_ (sum _T*_ (ttgen (two T₁ R T₂))) n))) (tri1-pow-commute n (two T₁ R T₂)) ⟩
+  (T₁ T* (sum _T*_ (ttgen (tri1 (two T₁ R T₂))) n))
+    T+
+  (tri1 (sum _T+_ (sum _T*_ (ttgen (two T₁ R T₂))) n))
   ≡⟨ refl ⟩
-  ttadd
-    (ttmul T₁ (sum ttmul (ttgen T₁) n))
-    (tri1 (sum ttadd (sum ttmul (ttgen (two T₁ R T₂))) n))
-  ≡⟨ cong (λ x → ttadd (ttmul T₁ (sum ttmul (ttgen T₁) n)) x) (tri1-T-sum-pow-commute' {s1} {s2} {n} (two T₁ R T₂)) ⟩
-  ttadd (ttmul T₁ (sum ttmul (ttgen T₁) n))
-    (sum ttadd (sum ttmul (ttgen T₁)) n) ≡∎
+  (T₁ T* (sum _T*_ (ttgen T₁) n))
+    T+
+  (tri1 (sum _T+_ (sum _T*_ (ttgen (two T₁ R T₂))) n))
+  ≡⟨ cong (λ x → (T₁ T* (sum _T*_ (ttgen T₁) n)) T+ x) (tri1-T-sum-pow-commute' {s1} {s2} {n} (two T₁ R T₂)) ⟩
+  (T₁ T* (sum _T*_ (ttgen T₁) n)) T+ (sum _T+_ (sum _T*_ (ttgen T₁)) n) 
+  ≡∎
 
 
 
@@ -202,14 +201,14 @@ tri1-T-sum-pow-commute' {s1} {s2} {suc n} (two T₁ R T₂) = ≡-begin
 tri1-T-sum-pow-commute : ∀ {s1 s2} -> (T : Tri (deeper s1 s2)) -> tri1 (T-sum-pow T) ≡ T-sum-pow (tri1 T)
 tri1-T-sum-pow-commute {s1} {s2} (two T₁ R T₂) = ≡-begin 
   tri1
-    (sum ttadd (sum ttmul (ttgen (two T₁ R T₂)))
+    (sum _T+_ (sum _T*_ (ttgen (two T₁ R T₂)))
      (splitSize s1 + splitSize s2)) 
     ≡⟨ tri1-T-sum-pow-commute' {s1} {s2} {splitSize s1 + splitSize s2} (two T₁ R T₂) ⟩ 
-  sum ttadd (sum ttmul (ttgen (tri1 (two T₁ R T₂)))) (splitSize s1 + splitSize s2)
+  sum _T+_ (sum _T*_ (ttgen (tri1 (two T₁ R T₂)))) (splitSize s1 + splitSize s2)
     ≡⟨ refl ⟩ 
-  sum ttadd (sum ttmul (ttgen T₁)) (splitSize s1 + splitSize s2)
+  sum _T+_ (sum _T*_ (ttgen T₁)) (splitSize s1 + splitSize s2)
     ≡⟨ {!!} ⟩ -- the last s2 are 0
-  sum ttadd (sum ttmul (ttgen T₁)) (splitSize s1) ≡∎
+  sum _T+_ (sum _T*_ (ttgen T₁)) (splitSize s1) ≡∎
 
 -- same as tri1-T-...
 tri2-T-sum-pow-commute : ∀ {s1 s2} -> (T : Tri (deeper s1 s2)) -> tri2 (T-sum-pow T) ≡ T-sum-pow (tri2 T)
@@ -218,12 +217,14 @@ tri2-T-sum-pow-commute = {!!}
 
 
 -- or maybe define trt-mul?
-rec-T-sum-pow-kind-of-commute : {s1 s2 : Splitting} {T : Tri (deeper s1 s2)} -> rec {s1} {s2} (sum ttadd (sum ttmul (ttgen T)) (splitSize s1 + splitSize s2)) ≡ 
-                                                                                                                trmul (sum ttadd (sum ttmul (ttgen (tri1 T))) (splitSize s1))
-                                                                                                                      (rtmul (rec T) (sum ttadd (sum ttmul (ttgen (tri2 T))) (splitSize s2)))
+rec-T-sum-pow-kind-of-commute : {s1 s2 : Splitting} {T : Tri (deeper s1 s2)} -> rec {s1} {s2} (sum _T+_ (sum _T*_ (ttgen T)) (splitSize s1 + splitSize s2)) ≡ 
+                                                                                                                (sum _T+_ (sum _T*_ (ttgen (tri1 T))) (splitSize s1)) TS* ((rec T) ST* (sum _T+_ (sum _T*_ (ttgen (tri2 T))) (splitSize s2)))
 rec-T-sum-pow-kind-of-commute {s1} {s2} {T} = {!!}
 
 
+-- generate all
+
+-- define transitive closure to be a relation between tri and tri. 
 
 
 valiant-der' : ∀ {s1 s2  : Splitting} -> ∃ (λ f → min ≤T ₁∘ (Tis-a-transitive-closure-of {deeper s1 s2}) ⊒ fun f )
@@ -243,18 +244,18 @@ valiant-der' {s1} {s2} = ({!!} ,
         ⊒⟨ (λ b a' x → ≡-begin 
                          two
                            (tri1
-                            (sum ttadd (sum ttmul (ttgen a')) (splitSize s1 + splitSize s2)))
+                            (sum _T+_ (sum _T*_ (ttgen a')) (splitSize s1 + splitSize s2)))
                            (rec
-                            (sum ttadd (sum ttmul (ttgen a')) (splitSize s1 + splitSize s2)))
+                            (sum _T+_ (sum _T*_ (ttgen a')) (splitSize s1 + splitSize s2)))
                            (tri2
-                            (sum ttadd (sum ttmul (ttgen a')) (splitSize s1 + splitSize s2)))
+                            (sum _T+_ (sum _T*_ (ttgen a')) (splitSize s1 + splitSize s2)))
                          ≡⟨ cong₂ (λ x' y' → two x' (rec
-                                                   (sum ttadd (sum ttmul (ttgen a')) (splitSize s1 + splitSize s2))) y') (tri1-T-sum-pow-commute a') (tri2-T-sum-pow-commute a') ⟩
+                                                   (sum _T+_ (sum _T*_ (ttgen a')) (splitSize s1 + splitSize s2))) y') (tri1-T-sum-pow-commute a') (tri2-T-sum-pow-commute a') ⟩
                          two 
-                           (sum ttadd (sum ttmul (ttgen (tri1 a'))) (splitSize s1))
+                           (sum _T+_ (sum _T*_ (ttgen (tri1 a'))) (splitSize s1))
                            (rec
-                            (sum ttadd (sum ttmul (ttgen a')) (splitSize s1 + splitSize s2)))
-                           (sum ttadd (sum ttmul (ttgen (tri2 a'))) (splitSize s2))
+                            (sum _T+_ (sum _T*_ (ttgen a')) (splitSize s1 + splitSize s2)))
+                           (sum _T+_ (sum _T*_ (ttgen (tri2 a'))) (splitSize s2))
                          ≡⟨ x ⟩
                          b ≡∎) ⟩
   fun (unsplit ∘ ⟨ T-sum-pow ∘ tri1 , rec ∘ T-sum-pow , T-sum-pow ∘ tri2 ⟩)
@@ -262,19 +263,18 @@ valiant-der' {s1} {s2} = ({!!} ,
   fun (let A' = T-sum-pow ∘ tri1 
            B' = T-sum-pow ∘ tri2 in unsplit ∘ ⟨ A' , rec ∘ T-sum-pow  , B' ⟩)
         ⊒⟨ (λ b a' x → ≡-begin 
-                       two (sum ttadd (sum ttmul (ttgen (tri1 a'))) (splitSize s1)) (rec (sum ttadd (sum ttmul (ttgen a')) (splitSize s1 + splitSize s2)))
-                                                                                    (sum ttadd (sum ttmul (ttgen (tri2 a'))) (splitSize s2)) 
-                       ≡⟨ cong (λ x' → two (sum ttadd (sum ttmul (ttgen (tri1 a'))) (splitSize s1)) x'
-                                                                                                    (sum ttadd (sum ttmul (ttgen (tri2 a'))) (splitSize s2))) 
+                       two (sum _T+_ (sum _T*_ (ttgen (tri1 a'))) (splitSize s1)) (rec (sum _T+_ (sum _T*_ (ttgen a')) (splitSize s1 + splitSize s2)))
+                                                                                    (sum _T+_ (sum _T*_ (ttgen (tri2 a'))) (splitSize s2)) 
+                       ≡⟨ cong (λ x' → two (sum _T+_ (sum _T*_ (ttgen (tri1 a'))) (splitSize s1)) x'
+                                                                                                    (sum _T+_ (sum _T*_ (ttgen (tri2 a'))) (splitSize s2))) 
                           rec-T-sum-pow-kind-of-commute ⟩ 
-                       two (sum ttadd (sum ttmul (ttgen (tri1 a'))) (splitSize s1)) (trmul (sum ttadd (sum ttmul (ttgen (tri1 a'))) (splitSize s1))
-                                                                                      (rtmul (rec a')
-                           (sum ttadd (sum ttmul (ttgen (tri2 a'))) (splitSize s2))))
-                         (sum ttadd (sum ttmul (ttgen (tri2 a'))) (splitSize s2))
+                       two (sum _T+_ (sum _T*_ (ttgen (tri1 a'))) (splitSize s1)) ((sum _T+_ (sum _T*_ (ttgen (tri1 a'))) (splitSize s1)) TS* ((rec a') ST*
+                           (sum _T+_ (sum _T*_ (ttgen (tri2 a'))) (splitSize s2))))
+                         (sum _T+_ (sum _T*_ (ttgen (tri2 a'))) (splitSize s2))
                        ≡⟨ x ⟩ 
                        b ≡∎) ⟩
   fun (let A' = T-sum-pow ∘ tri1 
-           B' = T-sum-pow ∘ tri2 in unsplit ∘ ⟨ A' , (λ x → trmul (A' x) (rtmul (rec x) (B' x))) , B' ⟩) -- what about non-associativity???
+           B' = T-sum-pow ∘ tri2 in unsplit ∘ ⟨ A' , (λ x → (A' x) TS* ((rec x) ST* (B' x))) , B' ⟩) -- what about non-associativity???
         ⊒⟨ {!!} ⟩
   fun valiant
       ⊒∎))
