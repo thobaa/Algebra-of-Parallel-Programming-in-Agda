@@ -1,20 +1,22 @@
 module Data.Tree.Fold where
 
+-- Fixed by Thomas!
+open import Level using (zero)
 open import Data.Empty using (⊥)
-open import Data.Function using (id)
+open import Function using (id)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _×_; _,_)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 
 open import Sets
      using (ℙ; _⊆_; _⊇_; ⊆-refl; ⊇-refl; singleton;
-            _≡_; ≡-refl; ≡-trans; ≡-cong; ≡-subst; ≡-sym)
+            _≡_; refl; trans; cong; subst; sym)
 open import Relations
 open import Relations.PowerTrans
      using (Λ∈-galois-1; Λ∈-galois-2; Λ-monotonic; ℰ-functor-⊆;
             ℰ-functor-⊇; ℰ-monotonic')
 open import Relations.Product
-     using (Λ₁⨉⨉-monotonic; Λ₁⨉⨉-absorption-⊆; Λ₁⨉⨉-absorption-⊇;
+     using (Λ⨉⨉-monotonic; Λ⨉⨉-absorption-⊆; Λ⨉⨉-absorption-⊇;
             ⨉3-functor-⊑; ⨉3-functor-⊒; ⨉-monotonic; ⨉3-id-⊑)
 open import Relations.CompChain
 
@@ -23,15 +25,14 @@ open import AlgebraicReasoning.Sets
             ⊇-begin_; _⊇⟨_⟩_; _⊇∎)
 open import AlgebraicReasoning.Relations
      using (⊑-begin_; _⊑⟨_⟩_; _⊑∎;
-            ⊒-begin_; _⊒⟨_⟩_; _⊒∎;
-            ⊒₁-begin_; _⊒₁⟨_⟩_; _⊒₁∎ )
+            ⊒-begin_; _⊒⟨_⟩_; _⊒∎)
 open import AlgebraicReasoning.Implications
 
 open import Data.Tree
 
 
 foldT : {A B : Set} → (B ← (A × B × B)) → ℙ B → (B ← Tree A)
-foldT R s = ∈ ₁∘ foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) s
+foldT R s = ∈ ₁∘ foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) s
 
 -- initial algebras
 
@@ -53,15 +54,15 @@ foldT-universal-⊒ S R e S○fork⊒RidSS ℰSnull⊇e =
     (⇐-begin
        foldT R e ⊑ S
      ⇐⟨ ⇐-refl ⟩
-        ∈ ₁∘ foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e ⊑ S
+        ∈ ₁∘ foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e ⊑ S
      ⇐⟨ Λ∈-galois-2 ⟩
-      foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e ⊑ Λ S
+      foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e ⊑ Λ S
      ⇐∎) foldt⊑ΛS
   where
-   foldt⊑ΛS : foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e ⊑ Λ S
+   foldt⊑ΛS : foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e ⊑ Λ S
    foldt⊑ΛS Null = 
       ⊆-begin 
-          foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e Null  
+          foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e Null  
       ⊆⟨ ⊆-refl ⟩
           e 
       ⊆⟨ ℰSnull⊇e ⟩
@@ -70,22 +71,22 @@ foldT-universal-⊒ S R e S○fork⊒RidSS ℰSnull⊇e =
           Λ S Null
       ⊆∎       
      where ℰSnull⊆ΛSNull :  ℰ S null ⊆ Λ S Null
-           ℰSnull⊆ΛSNull b (.Null , ≡-refl , bSNull) = bSNull 
+           ℰSnull⊆ΛSNull b (.Null , refl , bSNull) = bSNull 
 
    foldt⊑ΛS (Fork a t u) = 
      let induction-hypothesis₁ = foldt⊑ΛS t
          induction-hypothesis₂ = foldt⊑ΛS u
      in
         ⊆-begin 
-           foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e (Fork a t u)
+           foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e (Fork a t u)
         ⊆⟨ ⊆-refl ⟩
-           Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))
-             (a ,₁ foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e t ₁,₁
-                   foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e u)
-        ⊆⟨ Λ₁⨉⨉-monotonic R induction-hypothesis₁
+           Λ (R ○ (idR ⨉ ∈ ⨉ ∈))
+             (a , foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e t ,
+                   foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e u)
+        ⊆⟨ Λ⨉⨉-monotonic R induction-hypothesis₁
                              induction-hypothesis₂ a  ⟩
-           Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈)) (a ,₁ Λ S t ₁,₁ Λ S u)
-        ⊆⟨ Λ₁⨉⨉-absorption-⊆ R S S a t u  ⟩
+           Λ (R ○ (idR ⨉ ∈ ⨉ ∈)) (a , Λ S t , Λ S u)
+        ⊆⟨ Λ⨉⨉-absorption-⊆ R S S a t u  ⟩
           Λ (R ○ (idR ⨉ S ⨉ S)) (a , t , u)
         ⊆⟨ Λ-monotonic S○fork⊒RidSS (a , t , u) ⟩
           Λ (S ○ fork) (a , t , u)
@@ -93,7 +94,7 @@ foldT-universal-⊒ S R e S○fork⊒RidSS ℰSnull⊇e =
           Λ S (Fork a t u)
         ⊆∎ 
     where ΛSfork⊆SFork : Λ (S ○ fork) (a , t , u) ⊆ Λ S (Fork a t u)
-          ΛSfork⊆SFork b (._ , ≡-refl , bSFork) = bSFork 
+          ΛSfork⊆SFork b (._ , refl , bSFork) = bSFork 
 
 foldT-universal-⊑ : {A B : Set} →
   (S : B ← Tree A) → (R : B ← (A × B × B)) → (e : ℙ B) →
@@ -103,15 +104,15 @@ foldT-universal-⊑ S R e S○fork⊑RidSS ℰSnull⊆e =
     (⇐-begin
        S ⊑ foldT R e
      ⇐⟨ ⇐-refl ⟩
-       S ⊑ ∈ ₁∘ foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e
+       S ⊑ ∈ ₁∘ foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e
      ⇐⟨ Λ∈-galois-1 ⟩
-       Λ S ⊑ foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e
+       Λ S ⊑ foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e
      ⇐∎) ΛS⊑foldt
  where 
-   ΛS⊑foldt : Λ S ⊑ foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e
+   ΛS⊑foldt : Λ S ⊑ foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e
    ΛS⊑foldt Null = 
       ⊇-begin 
-          foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e Null  
+          foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e Null  
       ⊇⟨ ⊇-refl ⟩
           e 
       ⊇⟨ ℰSnull⊆e ⟩
@@ -120,7 +121,7 @@ foldT-universal-⊑ S R e S○fork⊑RidSS ℰSnull⊆e =
           Λ S Null
       ⊇∎       
      where ΛSNull⊆ℰSnull :  Λ S Null ⊆ ℰ S null 
-           ΛSNull⊆ℰSnull b bSNull = (Null , ≡-refl , bSNull) 
+           ΛSNull⊆ℰSnull b bSNull = (Null , refl , bSNull) 
    ΛS⊑foldt (Fork a t u) = 
      let induction-hypothesis₁ = ΛS⊑foldt t
          induction-hypothesis₂ = ΛS⊑foldt u
@@ -131,42 +132,42 @@ foldT-universal-⊑ S R e S○fork⊑RidSS ℰSnull⊆e =
           Λ (S ○ fork) (a , t , u)
         ⊆⟨ Λ-monotonic S○fork⊑RidSS (a , t , u) ⟩
           Λ (R ○ (idR ⨉ S ⨉ S)) (a , t , u)
-        ⊆⟨ Λ₁⨉⨉-absorption-⊇ R S S a t u  ⟩
-           Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈)) (a ,₁ Λ S t ₁,₁ Λ S u)
-        ⊆⟨ Λ₁⨉⨉-monotonic R induction-hypothesis₁
+        ⊆⟨ Λ⨉⨉-absorption-⊇ R S S a t u  ⟩
+           Λ (R ○ (idR ⨉ ∈ ⨉ ∈)) (a , Λ S t , Λ S u)
+        ⊆⟨ Λ⨉⨉-monotonic R induction-hypothesis₁
                              induction-hypothesis₂ a  ⟩
-           Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))
-             (a ,₁ foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e t ₁,₁
-                   foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e u)
+           Λ (R ○ (idR ⨉ ∈ ⨉ ∈))
+             (a , foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e t ,
+                   foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e u)
         ⊆⟨ ⊆-refl ⟩
-           foldt₁ (Λ₁ (R ○₁ (idR ⨉₁ ∈ ₁⨉₁ ∈))) e (Fork a t u)
+           foldt (Λ (R ○ (idR ⨉ ∈ ⨉ ∈))) e (Fork a t u)
         ⊆∎ 
     where SFork⊆ΛSfork : Λ S (Fork a t u) ⊆ Λ (S ○ fork) (a , t , u)
-          SFork⊆ΛSfork b bSFork = (Fork a t u , ≡-refl , bSFork)
+          SFork⊆ΛSfork b bSFork = (Fork a t u , refl , bSFork)
 
 -- computation rules
 
 foldT-computation-null-⊆ : {A B : Set} {R : B ← (A × B × B)} {e : ℙ B} →
     ℰ (foldT R e) null ⊆ e
-foldT-computation-null-⊆ b (.Null , ≡-refl , b∈e) = b∈e
+foldT-computation-null-⊆ b (.Null , refl , b∈e) = b∈e
 
 foldT-computation-null-⊇ : {A B : Set} {R : B ← (A × B × B)} {e : ℙ B} →
     ℰ (foldT R e) null ⊇ e
-foldT-computation-null-⊇ b b∈e = (Null , ≡-refl , b∈e)
+foldT-computation-null-⊇ b b∈e = (Null , refl , b∈e)
 
 foldT-computation-fork-⊑ : {A B : Set} (R : B ← (A × B × B)) {e : ℙ B} →
     foldT R e ○ fork ⊑ R ○ (idR ⨉ foldT R e ⨉ foldT R e)
 foldT-computation-fork-⊑ R b (a , t , u)
-  (._ , ≡-refl , (.a , b₁ , b₂) , (≡-refl , b₁foldTt , b₂foldTu) , bR<ab₁b₂>) =
-   ((a , b₁ , b₂) , (≡-refl , b₁foldTt , b₂foldTu) , bR<ab₁b₂>)  
+  (._ , refl , (.a , b₁ , b₂) , (refl , b₁foldTt , b₂foldTu) , bR<ab₁b₂>) =
+   ((a , b₁ , b₂) , (refl , b₁foldTt , b₂foldTu) , bR<ab₁b₂>)  
 
 foldT-computation-fork-⊒ : {A B : Set} (R : B ← (A × B × B)) {e : ℙ B} →
     foldT R e ○ fork ⊒ R ○ (idR ⨉ foldT R e ⨉ foldT R e)
 foldT-computation-fork-⊒ R b (a , t , u)
-       ((.a , b₁ , b₂) , (≡-refl , b₁foldTt , b₂foldTu) , bR<ab₁b₂>)
+       ((.a , b₁ , b₂) , (refl , b₁foldTt , b₂foldTu) , bR<ab₁b₂>)
    = (Fork a t u ,  
-       (≡-refl , ((a , b₁ , b₂), 
-          (≡-refl , b₁foldTt , b₂foldTu) ,  bR<ab₁b₂>))) 
+       (refl , ((a , b₁ , b₂), 
+          (refl , b₁foldTt , b₂foldTu) ,  bR<ab₁b₂>))) 
 
 -- foldt fusion
 
@@ -176,7 +177,7 @@ foldT-fusion-⊒ : {A B C : Set} →
         (R ○ S) ⊒ (T ○ (idR ⨉ R ⨉ R)) → 
               ℰ R u ⊇ v → 
                (R ○ foldT S u) ⊒ foldT T v
-foldT-fusion-⊒ R {S} {T} {u} {v} RS⊒TFR Ru⊇v =
+foldT-fusion-⊒ {A} {B} {C} R {S} {T} {u} {v} RS⊒TFR Ru⊇v =
     foldT-universal-⊒ (R ○ foldT S u) T v step-cond base-cond 
   where step-cond : (R ○ foldT S u) ○ fork ⊒
                       T ○ (idR ⨉ (R ○ foldT S u) ⨉ (R ○ foldT S u))
@@ -189,9 +190,9 @@ foldT-fusion-⊒ R {S} {T} {u} {v} RS⊒TFR Ru⊇v =
              R ○ S ○ (idR ⨉ foldT S u ⨉ foldT S u)
          ⊒⟨ ⇦-mono-l (T ● (idR ⨉ R ⨉ R) ‥) (R ● S ‥) RS⊒TFR  ⟩
              T ○ (idR ⨉ R ⨉ R) ○ (idR ⨉ foldT S u ⨉ foldT S u)
-         ⊒⟨ ○-monotonic-r ⨉3-functor-⊒ ⟩
+         ⊒⟨ ○-monotonic-r (⨉3-functor-⊒ {R = idR} {S = R} {T = R} {U = idR} {V = foldT S u} {W = foldT S u}) ⟩
              T ○ ((idR ○ idR) ⨉ (R ○ foldT S u) ⨉ (R ○ foldT S u))
-         ⊒⟨ ○-monotonic-r (⨉-monotonic id-idempotent-⊒ ⊒-refl) ⟩
+         ⊒⟨ ○-monotonic-r (⨉-monotonic {T = R ○ foldT S u ⨉ R ○ foldT S u} id-idempotent-⊒ ⊒-refl) ⟩
              T ○ (idR ⨉ (R ○ foldT S u) ⨉ (R ○ foldT S u))
          ⊒∎ 
 
@@ -226,9 +227,9 @@ foldT-fusion-⊑ R {S} {T} {u} {v} RS⊑TFR Ru⊆v =
              R ○ S ○ (idR ⨉ foldT S u ⨉ foldT S u)
          ⊑⟨ ⇦-mono-l (R ● S ‥) (T ● (idR ⨉ R ⨉ R) ‥) RS⊑TFR  ⟩
              T ○ (idR ⨉ R ⨉ R) ○ (idR ⨉ foldT S u ⨉ foldT S u)
-         ⊑⟨ ○-monotonic-r ⨉3-functor-⊑ ⟩
+         ⊑⟨ ○-monotonic-r (⨉3-functor-⊑ {R = idR} {S = R} {T = R} {U = idR} {V = foldT S u} {W = foldT S u})⟩
              T ○ ((idR ○ idR) ⨉ (R ○ foldT S u) ⨉ (R ○ foldT S u))
-         ⊑⟨ ○-monotonic-r (⨉-monotonic id-idempotent-⊑ ⊑-refl) ⟩
+         ⊑⟨ ○-monotonic-r (⨉-monotonic {T = R ○ foldT S u ⨉ R ○ foldT S u} id-idempotent-⊑ ⊑-refl) ⟩
              T ○ (idR ⨉ (R ○ foldT S u) ⨉ (R ○ foldT S u))
          ⊑∎ 
  
@@ -251,10 +252,10 @@ foldT-to-foldt : {A B : Set} → (f : (A × B × B) → B) → (e : B) →
 foldT-to-foldt f e b Null         e≡b        =  e≡b
 foldT-to-foldt f e b (Fork a t u) foldt$x≡b  =
    ((a , foldt f e t , foldt f e u) , 
-     ((≡-refl , foldT-to-foldt f e (foldt f e t) t
-                  (≡-cong (λ g → foldt g e t) ≡-refl) ,
+     ((refl , foldT-to-foldt f e (foldt f e t) t
+                  (cong (λ g → foldt g e t) refl) ,
                 foldT-to-foldt f e (foldt f e u) u
-                  (≡-cong (λ g → foldt g e u) ≡-refl)) , 
+                  (cong (λ g → foldt g e u) refl)) , 
       foldt$x≡b)) 
 
 foldt-to-foldT : {A B : Set} → (f : (A × B × B) → B) → (e : B) →
@@ -265,12 +266,12 @@ foldt-to-foldT f e =
   where univ1 : fun f ○ (idR ⨉ fun (foldt f e) ⨉ fun (foldt f e)) ⊑
                  fun (foldt f e) ○ fork
         univ1 b (a , t , u)
-              ((.a , b₁ , b₂) , (≡-refl , foldtt≡b₁ , foldtu≡b₂), fab₁b₂≡b) = 
-          (Fork a t u , ≡-refl , 
-           ≡-subst (λ b₂ → f (a , foldt f e t , b₂) ≡ b) (≡-sym foldtu≡b₂)
-             (≡-subst (λ b₁ → f (a , b₁ , b₂) ≡ b) (≡-sym foldtt≡b₁) fab₁b₂≡b) ) 
+              ((.a , b₁ , b₂) , (refl , foldtt≡b₁ , foldtu≡b₂), fab₁b₂≡b) = 
+          (Fork a t u , refl , 
+           subst (λ b₂ → f (a , foldt f e t , b₂) ≡ b) (sym foldtu≡b₂)
+             (subst (λ b₁ → f (a , b₁ , b₂) ≡ b) (sym foldtt≡b₁) fab₁b₂≡b) ) 
         univ2 : singleton e ⊆ ℰ (fun (foldt f e)) null
-        univ2 .e ≡-refl = (Null , ≡-refl , ≡-refl) 
+        univ2 .e refl = (Null , refl , refl) 
 
 -- id is a fold
 
@@ -279,7 +280,7 @@ idR⊑foldT y Null Null≡y = Null≡y
 idR⊑foldT Null (Fork _ _ _) ()
 idR⊑foldT (Fork b v w) (Fork a t u) atu≡bvw with Fork-injective atu≡bvw
 ... | (a≡b , t≡v , u≡w) = ((b , v , w) , 
-             (a≡b , idR⊑foldT v t t≡v , idR⊑foldT w u u≡w) , ≡-refl)
+             (a≡b , idR⊑foldT v t t≡v , idR⊑foldT w u u≡w) , refl)
 
 idR⊒foldT : {A : Set} → idR ⊒ foldT {A} fork null
 idR⊒foldT = foldT-universal-⊒ idR fork null id○fork⊒fork○Fid ℰidnull⊇null
@@ -295,7 +296,7 @@ idR⊒foldT = foldT-universal-⊒ idR fork null id○fork⊒fork○Fid ℰidnull
              fork ○ (idR ⨉ idR ⨉ idR)
           ⊒∎ 
         ℰidnull⊇null : ℰ idR null ⊇ null
-        ℰidnull⊇null xs Null≡xs = (xs , Null≡xs , ≡-refl) 
+        ℰidnull⊇null xs Null≡xs = (xs , Null≡xs , refl) 
 
 
 -- refinement of relational fold
@@ -313,12 +314,12 @@ foldT-monotonic {A}{B}{R₁}{R₂}{S₁}{S₂} R₁⊒R₂ S₁⊇S₂ =
     ⊒⟨ foldT-fusion-⊒ (foldT R₁ S₁) fuse-step fuse-base ⟩
        foldT R₂ S₂
     ⊒∎
-  where fuse-base : Λ₁ (foldT R₁ S₁ ○₁ ∈) null ⊇ S₂
-        fuse-base b S₂b = (Null , ≡-refl , S₁⊇S₂ b S₂b) 
+  where fuse-base : Λ (foldT R₁ S₁ ○ ∈) null ⊇ S₂
+        fuse-base b S₂b = (Null , refl , S₁⊇S₂ b S₂b) 
 
         fuse-step : (foldT R₁ S₁ ○ fork) ⊒ (R₂ ○ (idR ⨉ foldT R₁ S₁ ⨉ foldT R₁ S₁))
         fuse-step b (a , t , u)
             ((a' , b₁ , b₂) , (a≡a' , b₁foldTt , b₂foldTu) , bR₂a'b₁b₂) =
-          (Fork a t u , ≡-refl , 
+          (Fork a t u , refl , 
               (a' , b₁ , b₂) , (a≡a' , b₁foldTt , b₂foldTu) ,
                                      R₁⊒R₂ b (a' , b₁ , b₂) bR₂a'b₁b₂)
