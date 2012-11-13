@@ -21,16 +21,13 @@ open Relation.Binary.PropositionalEquality.≡-Reasoning
 open import Matrix.NonAssociativeRing
 
 open import Level using () renaming (zero to Lzero)
+open import Matrix.STree
+
 module Matrix.NewNewSplit (NAR : NonAssociativeRing Lzero Lzero) where
 import Matrix.Abstract
 open Matrix.Abstract (NAR)
 f1 : ∀ {n} -> Fin (suc (suc n))
 f1 = fsuc f0
-
-
-data Splitting : Set where
-  one : Splitting
-  deeper  : Splitting -> Splitting -> Splitting
 
 
 splitSize : Splitting -> ℕ

@@ -3,17 +3,21 @@ open import Data.Product
 
 import Matrix.Abstract
 import Matrix.NewNewSplit
-
+open import Matrix.STree
 
 open import Matrix.NonAssociativeRing
 
 open import Level using () renaming (zero to Lzero)
+
+
 
 module Matrix.Tri (NAR : NonAssociativeRing Lzero Lzero) where
 
 
 open Matrix.Abstract (NAR)
 open Matrix.NewNewSplit (NAR)
+
+
 
 data Tri : Splitting → Set where
   one : Tri one

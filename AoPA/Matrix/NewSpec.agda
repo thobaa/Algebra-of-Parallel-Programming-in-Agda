@@ -65,6 +65,9 @@ valiant-sum-is-finite A = sum-is-finite _T+_ (λ n → A T^[1+ n ])
 valiant-sum : ∀ {s} → (A : Tri s) → valiant-sum-is-finite A → Tri s
 valiant-sum A (n , pf) = ⨁ _T+_ n (λ k → A T^[1+ k ])
 
+valiant-sum-n : ∀ {s} → ℕ → Tri s → Tri s
+valiant-sum-n n A = ⨁ _T+_ n (λ k → A T^[1+ k ])
+
 has-transitive-closure : ∀ {s} → ℙ (Tri s)
 has-transitive-closure = valiant-sum-is-finite 
 
@@ -79,9 +82,54 @@ corefl-has-transitive-closure = has-transitive-closure ¿
 
 -- check 
 -- A⁺ A
+aaa : ∀ {s} → (Tri s × ℕ) ← Tri s
+aaa (T₁ , n) T₂ = n-is-enough n _T+_ (λ k → T₂ T^[1+ k ]) × T₁ ≡ T₂
+
+bbb : ∀ {s} → Tri s ← (Tri s × ℕ)
+bbb = {!!}
+
+-- takes a relation A → A and a 
+
+-- takes a predicate and filters a thing by it.
+-- _¿ 
+-- in this case, predicate valiant-sum-is-finite.
+-- want it to be input into function (λ pf → valiant-sum
+
+
+-- skulle kunna ha valiant-sum-is-finite A = (Tri s × pf)
+
+-- alternatives
+--valiantwrapper : ∀ {s} → Σ (Tri s) valiant-sum-is-finite ← Tri s
+--valiantwrapper = {!!}
+
+specif : ∀ {s} → Tri s ← Tri s
+specif A⁺ A = Σ (valiant-sum-is-finite A) (λ pf → valiant-sum A pf ≡ A⁺)
+
+
+-- relation från Tri till Tri och n, och Tri och n 
+-- inkludera n i 
 transitiveclosure : ∀ {s} → Tri s ← Tri s
 transitiveclosure {s} A⁺ A = ({!!} ○ corefl-has-transitive-closure) A⁺ A
 -- sum-is-finite + 
 
-valiant-der : {!!} 
-valiant-der = {!!}
+--foldTri : {s : Splitting} {b : Splitting -> Set} → (one' : b one) → (two' : ∀ {s1 s2} -> b s1 -> SplitMat s1 s2 -> b s2 -> b (deeper s1 s2) ) → Tri s → b s
+--foldTri one' two' one = one'
+--foldTri one' two' (two T₁ R T₂) = two' (foldTri one' two' T₁) R (foldTri one' two' T₂)
+
+-- valiantOverlap' : ∀ {s1 s2} -> Tri s1 -> SplitMat s1 s2 -> Tri s2 -> Tri (deeper s1 s2)
+-- valiantOverlap' T₁ R T₂ = two T₁ (valiantOverlap T₁ R T₂) T₂
+
+valiant-der : ∀ {s} → ∃ (λ f → specif {s} ⊒ fun f) 
+valiant-der {s} = (_ , (
+            ⊒-begin 
+              specif 
+            ⊒⟨ {!!} ⟩ -- kind of uninteresting, depends on specification
+              fun (valiant-sum-n (splitSize s))
+            ⊒⟨ {!!} ⟩
+              fun (foldTri one valiantOverlap') 
+            ⊒∎))
+
+-- to create a fold, should prove that 
+-- valiant-sum-n one           == g one
+-- valiant-sum-n (two T₁ S T₂) == g (valiant-sum-n T₁) S (valiant-sum-n T₂)
+-- I.e., Uniqueness prop for fold.
