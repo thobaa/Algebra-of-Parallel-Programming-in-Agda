@@ -1,0 +1,69 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                    PAKET                                   %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%
+\usepackage{amsmath,amssymb}  %% matte
+\usepackage{ae,aecompl}       %% snygg pdf-fil
+\usepackage{units}            %% rättar till enheter
+\usepackage{color}            %% ???
+\usepackage{graphicx}         %% ???
+%\usepackage{bbm}             %% annorlunda fetstilsbokstäver (än mathbb)
+%\usepackage{parskip}         %% för mellanrum mellan stycken
+%\setlength{\topsep}{\parskip}%% ändrar mellanrum mellan satser
+%\usepackage[lowtilde]{url}
+%\usepackage{mathtools}        %% matriser med vänsterjusterade kolonner
+%\usepackage{amsthm}           %% satser
+%\usepackage{thmtools}         %% mer avancerade satser
+%\usepackage{thm-restate}      %% restatera
+%\usepackage{hyperref}         %% *klickbara länkar i pdf-filen
+                               %% *ska vara sist bland paketen 
+                               %% *hidelinks gömmer dem
+                               %% *använd \autoref{<label>} för att referera 
+                               %% till en sats (lemma osv)!
+%\usepackage{breakurl}         %% låter dvi bryta urler
+
+
+\newcommand{\N}{\mathbf{N}}
+\newcommand{\Z}{\mathbf{Z}}
+\newcommand{\Q}{\mathbf{Q}}
+\newcommand{\R}{\mathbf{R}}
+\newcommand{\C}{\mathbf{C}}
+
+\newcommand{\ph}{\varphi}
+%\renewcommand{\phi}{\varphi}
+\newcommand{\eps}{\varepsilon}
+%\renewcommand{\epsilon}{\varepsilon}
+
+\newcommand{\gf}[1]{\mathbb{F}_{#1}}
+
+\renewcommand{\subset}{\subseteq}
+\renewcommand{\supset}{\supseteq}
+\newcommand{\abs}[1]{\lvert#1\rvert}
+\newcommand{\absbig}[1]{\left \vert#1\right \vert}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+\newcommand{\floor}[1]{\lfloor#1\rfloor}
+
+\newcommand{\st}{:}
+\newcommand{\fc}{\colon}
+\newcommand{\comp}{\circ}
+\DeclareMathOperator{\sgd}{SGD}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\ring}[1]{(#1, +, \cdot\,)}
+
+\newcommand{\mat}[1]{\mathbf{#1}}   %% matrix
+\newcommand{\s}[1]{\mathcal{#1}} % Script
+\newcommand{\sB}{\s{B}}   % Script b
+\newcommand{\cl}[1]{\bar{#1}} % Closure
+
+\newcommand{\opt}[1]{#1^*} % A star! \opt X = X^*
+
+\newcommand{\size}[1]{\abs{#1}}
+\newcommand{\dotp}[1]{\langle#1\rangle}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\p}{\mathbb{P}}
+
+\newcommand{\ceil}[1]{\lceil#1\rceil}
+
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
