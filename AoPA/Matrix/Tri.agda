@@ -1,5 +1,6 @@
-open import Relation.Binary.PropositionalEquality
+open import Relation.Binary.PropositionalEquality hiding ([_])
 open import Data.Product
+open import Data.Sum
 
 import Matrix.Abstract
 import Matrix.NewNewSplit
@@ -21,8 +22,8 @@ open Matrix.NewNewSplit (NAR)
 
 data Tri : Splitting → Set where
   one : Tri one
-  two : ∀ {s1 s2} -> Tri s1 -> SplitMat s1 s2 -> 
-                                 Tri s2 -> 
+  two : ∀ {s1 s2} → Tri s1 → SplitMat s1 s2 → 
+                                 Tri s2 → 
                      Tri (deeper s1 s2)
 
 T0 : ∀ {s} -> Tri s
@@ -103,7 +104,7 @@ valiant (two A C B) = two A' (valiantOverlap A' C B') B'
   where A' = (valiant A)
         B' = (valiant B)
 
-foldTri : {s : Splitting} {b : Splitting -> Set} → (one' : b one) → (two' : ∀ {s1 s2} -> b s1 -> SplitMat s1 s2 -> b s2 -> b (deeper s1 s2) ) → Tri s → b s
+foldTri : ∀ {b} {s : Splitting} {B : Splitting -> Set b} → (one' : B one) → (two' : ∀ {s1 s2} -> B s1 -> SplitMat s1 s2 -> B s2 -> B (deeper s1 s2) ) → Tri s → B s
 foldTri one' two' one = one'
 foldTri one' two' (two T₁ R T₂) = two' (foldTri one' two' T₁) R (foldTri one' two' T₂)
 
@@ -115,6 +116,16 @@ valiantOverlap' T₁ R T₂ = two T₁ (valiantOverlap T₁ R T₂) T₂
 valiantFold : ∀ {s} → Tri s → Tri s
 valiantFold = foldTri one valiantOverlap'
 
+
+-- splitmat is fixed pt of F A = [R + Vec R + Vec R + A × A × A × A]
+-- vo is fixedpt of 
+-- 
+-- X (two T1 R T2) = [ id , ? , ? , quad  ] 
+
+-- X (two (T1, R, T2)) = 
+-- X = 
+-- input en ((T × A × T) × (A × A × A × A) × (T × A × T))
+-- säg quad : A × A × A × A → SplitMat
 
 -- now, properties: 
 

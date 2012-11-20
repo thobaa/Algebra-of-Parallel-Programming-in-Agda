@@ -132,4 +132,18 @@ valiant-der {s} = (_ , (
 -- to create a fold, should prove that 
 -- valiant-sum-n one           == g one
 -- valiant-sum-n (two T₁ S T₂) == g (valiant-sum-n T₁) S (valiant-sum-n T₂)
--- I.e., Uniqueness prop for fold.
+-- I.e., Uniqueness prop for fold. (universal property!)
+
+-- actually 
+-- valiant-sum-n α 
+-- h = 《 f 》 ≡ h ∘ α = f ∘ F h
+-- där α är det som gör en tripel till en tri. 
+-- vill alltså visa att 
+-- h one = f one
+-- h (two t1 r t2) = f (two (h t1) r (h t2))
+
+
+
+-- för F h (one) = one
+-- F h (two t1 r t2) = two (h t1) r (h t2)
+-- one 
