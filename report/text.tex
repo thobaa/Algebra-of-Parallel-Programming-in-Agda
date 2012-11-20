@@ -1,0 +1,187 @@
+\documentclass{article}
+\usepackage{thesis}
+\begin{document}
+
+\title{Algebra of Parallel Programming in Agda -- Text!}
+\author{Thomas B\aa\aa th Sj\"{o}blom}
+\date{September 4, 2012}
+\maketitle
+\section{Introduction}
+[TODO: Safety]
+[TODO: Easier (maybe) to prove correctness along the way]
+[TODO: Parallel]
+[TODO: Parsing]
+\section{Introduction stuff}
+\subsection{Agda}
+Agda is a dependently typed programming language invented at Chalmers \cite{norell_agda_invented_2007}.
+\subsection{Category theory}
+Category theory is a theory for unifying mathematics by placing importance on things that are kind of like functions.
+
+There are two reasons for introducing category theory. 
+The first is that it will give us a clean and point-free way of reasoning about programs.
+The second is that it provides a semantics for the 
+[TODO: develop above sentences, AoP works in $\Set$, but what is up with the initial algebra semantics? are lists thought of as sets $\subset \Set$, the set of all lists with elements in $A$ is obviously a set, but is it the best view, what. no wait, nothing important here D:]
+
+The presentation here is based on (the early chapters of) \cite{Awodey} and \cite{MacLane}. The material can also be found in \cite{AoP}, but the authors have reversed the function arrows and writes $f : Y \ot X$ for $f : X \to Y$, something that we feel actually reduces the readability a great deal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                             CATEGORIES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{Def}
+A category $\cat$ is a collection $\obj_{\cat}$ of objects and a collection $\arr_{\cat}$ of arrows $f : X \to Y$, where $X \in \obj_{\cat}$ is the domain of $f$ and $Y \in \obj_{\cat}$ is the codomain of $f$. 
+The collections $\obj_{\cat}$ and $\arr_{\cat}$ are required to satisfy the following:
+\begin{itemize}
+\item For every object $X \in \obj$, there is an identity arrow $\id_X : X \to X$.
+\item For every pair $f : A \to B$ and $g : B \to C$ of arrows, there is an arrow $g \comp f : A \to C$
+\item For every three arrows $f : A \to B$, $g : B \to C$ and $h : C \to D$, we have $h \comp (g \comp f) = (h \comp g) \comp f$
+\item For every arrow $f : A \to B$, we have $f \comp id_A = id_B \comp f = f$. 
+\end{itemize}
+\end{Def}
+
+These requirements just say that the arrows should behave as functions with compositions and identity functions.
+
+\begin{Ex}
+Indeed, the basic example we will work with is the category $\Set$ where the objects are sets and the arrows are functions. This is a category because [TODO: fulfils the axioms].
+\end{Ex}
+
+Traditionally in category theory (see for example \cite{Awodey} and \cite{MacLane}), this category is called $\namedcat{Set}$, but we will call it $\Set$ for three reasons: 
+\begin{enumerate}
+\item It's the name used in \cite{AoP}.
+\item In category theory, the arrows are usually the most importand part of a category.
+\item Both it and the next category we will introduce have the same objects.
+\end{enumerate}
+\begin{Ex}
+A second example of a category which we will expand on is the category $\Rel$ where the objects are again sets, but this time, the arrows are relations. 
+We write $R : Y \ot X$, where $X$ is the domain and $Y$ the codomain of $R$, following the notation for relations used in \cite{AoPA}. 
+Here, composition of $R : Z \ot Y$ and $S : Y \ot X$ is defined as $R \comp S = \{(a, c) \st \exists b : a R b \}$ 
+\end{Ex}
+
+Concretely, relations are defined as subsets of $Y \times X$ [TODO or other way around?], but this is a view that we try to avoid with by introducing category theory 
+
+More examples of categories include sets with some structure:
+\begin{Ex}
+  In the category $\Grp$, the objects are groups and the arrows are group homomorphisms, i.e., functions $\phi$ that respect the group operations: $\phi : \grp{G}{+} \to \grp{H}{\times}$ such that $\phi(x + y) = \phi(x) \times \phi(y)$ and $\phi(-x) = \phi(x)^{-1}$.
+\end{Ex}
+\begin{Ex}
+Other examples in the same vein include for example the category $\Rng$ of rings, and the category $\Mon$ of monoids, in both of which the arrows are the [TODO word] homomorphisms. One can also go further and add other kinds of structure, to get for exampl $\Top$, the category of topological groups, where the objects are topological groups (groups where the operations are continous)
+\end{Ex}
+[TODO two more examples: poset and matrixes]
+And finally, we present two examples that are quite unlike the previous ones, which present the kind of things that are included in the category definition. Since they are very different from functions, they motivate further specialization of the category definition. We also note that they (like all the categories we have mentioned) have some relation to the later chapters in this thesis.
+\begin{Ex}
+The first strange example is a so called poset category. Let $X$ be any partially ordered set, that is, a set with an 
+\end{Ex}
+\begin{Ex}
+Let the objects be the natural numbers $\N$, and let the arrows be matrixes with coefficients in some (associative) ring. This forms a category.
+\end{Ex}
+[TODO subcategory, important for defining datatypes in $\Rel$, example of $\Ab$ ]
+[TODO : Examples of categories:
+There are a number of operations that can be performed to create new categories:
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                             FUNCTORS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{Def}
+A \emph{functor} $F : \cat[C] \to \cat[D]$ is a pair of mappings:  $F_{\obj} : \obj_{\cat[C]} \to \obj_{\cat[D]}$ and $F_{\arr} : \arr_{\cat[C]} \to \arr_{\cat[D]}$ satisfying
+\begin{itemize}
+\item If $f : X \to Y$, then $F_{\arr} f : F_{\obj} X \to F_{\obj}$.
+\item If $f : X \to Y$ and $g : Y \to Z$, then $F_{\arr} (g \comp f) = (F_{\arr} g) \comp (F_{\arr} f$).
+\item The identity arrow $\id_X : X \to X$ is mapped to the identity arrow in $F_{\obj} X$: i.e., $F_{\arr} \id = \id_{F_{\obj}X}$
+\end{itemize}
+\end{Def}
+In what follows, we will refer to both mappings $F_{\obj}$ and $F_{\arr}$ with just $F$.
+
+Some 
+\begin{Def}
+  A funtor $F : \cat{C} \to \cat{C}$ is called an \emph{endofunctor}.
+\end{Def}
+[TODO: Examples of functors: product, sum, expand to polynomial functors => regular functors? what are they and are they included in GADT-paper]
+[TODO: Natural transformation]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                             ALGEBRAS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+[TODO: Algebra]
+\begin{Def}
+  An algebra is 
+\end{Def}
+\subsection{Algebra of Programming}
+One point of the introduction of category theory was to allow us to generalize som common list functions to arbitrary datatypes.
+
+An inductive datatype is a 
+
+[TODO: What happens to algebra of programming when using dependent types? There are the papers: \cite{gambino_hyland_2004} and \cite{gadt_semantics_2011}  
+\subsection{Parsing}
+Parsing is the process of turning a sequence of tokens (for example a string contianing a computer program [TODO]) into a data structure suitable for [something]. It is an important step in compilation. [TODO : need to learn more about basic parsing stuff]
+
+However, in this thesis, we will not focus much on the parsing stuff. This chapter is here mainly as a motivation for what is to come (and so that I will learn some real world stuff!)
+[TODO: Example]
+\subsubsection{Grammar}
+A grammar is a collection of rules, called productions, that 
+The productions are made up of terminals and nonterminals.
+Additionally, there is a start symbol that specifies [TODO WHAT]
+\begin{Def}
+  A \emph{grammar} is a tuple $(N, T, S, P)$ where $N$ is the set of nonterminals, $T$ is the set of terminals, $S$ is the start symbol, and $P$ is the set of productions. A \emph{production} is a [TODO thing] sequence of terminals and nonterminals followed by and arrow and another sequence of terminals and nonterminals. [TODO write in symbols] $t_1 \dotsb t_n \to s_1 \dotsb s_m$, $t_i$, $s_i \in N \cup T$
+\end{Def}
+We will only consider context free grammars. These are grammars 
+A language generated by a context free grammar is called a context free language. It is well known that every context free grammar can be turned into a 
+\subsubsection{Special kind of grammar -- Chomsky normal form}
+It is well known [cite?] that any context free grammar can be turned into one in Chomsky normal form, that is a grammar where [TODO WHAT IS THIS?]. For grammars in Chomsky normal form, it is possible to
+\subsection{Transitive Closure}
+The result of the parse is the set of all [TODO expand]
+\subsection{CYK Algorithm}
+[TODO what is it? valiant is related to it, or they wouldn't be on same wikipedia page!]
+
+\subsection{Valiants Algorithm}
+Valiant's algorithm was initially introduced to show that parsing could be done as quickly as matrix multiplication. It turns out to be an algorithm where most of the work happens in parallel, and this might be useful for developing parallel parsers.
+
+The algorithm takes as input an upper triangular $n \times n$ matrix $A$ (with $0$:s on the diagonal): 
+\begin{equation}
+A = 
+\begin{pmatrix}
+0 & a_{1\, 2} & \hdots & a_{1\, n} \\
+\vdots & 0 & a_{2\,3} &  \hdots & a_{2\,n}\\
+\vdots &
+\end{pmatrix}
+\end{equation}
+and splits the matrix into four parts $A_{1\, 1}$, $A_{1\,2}$, $A_{2\,1}$ and $A_{2\,2}$ along the diagonal: 
+\begin{equation}
+A = 
+\end{equation}
+$A_{1\, 1}$, $A_{1\,2}$, $A_{2\,1}$ and $A_{2\,2}$. works by splitting the matrix into 
+
+[TODO requirements on the operations, is it enough to have the ring stuff, does $+$ need to be idempotent? (like union) because otherwise, it seems like the algorithm will fail when applied to a non-associative ring (there will be $k\cdot (x_1\cdots x_k)$ instead of $(x_1\cdots x_k)$). So I don't think the algorithm actually works even on non-associative rings, because we can't have inverses for addition (since $x + x = x$ we get that $x = x + (x - x) = (x + x) - x = x - x = 0$ for all $x$, bad. ]
+
+\section{Work}
+Our goal is to prove the correctness of Valiant's algorithm, and to do this by presenting a derivation of it from a sensible specification. The first step to do this is to actually formulate the algorithm in Agda, in a way that avoids explicit recursion (using ideas from \cite{AoP}. The next (and final) step is then to find a derivation from the specification to the algorithm. [TODO : related to real programming? not very maybe since we know the final algorithm]
+\subsection{Formulation}
+The algorithm is made up of two parts, what we refer to as the recursion step and the overlap step. We note that the overlap step is also recursive, and that it is there that the most work is needed to find an appropriate formulation.
+
+We introduce two main recursive datatypes, $\Tri$ and $\SplitMat$. 
+The datatype $\Tri$ is esentially a binary tree with a $\SplitMat$ in each splitting, and empty leaves. It is used to represent upper triangular matrixes with zero diagonal and elements from $\R$.
+The type $\SplitMat$ on the other hand is essentialy a tree with four subtrees at each splitting (and some extra stuff to make the matrix dimensions fit) and information in the leaves. It is to represent 
+. [TODO why the different tree formats?].
+In Agda, they are defined as 
+\begin{verbatim}
+data Tri : Splitting -> Set where
+  one : Tri one
+  two : ∀ {s1 s2} -> Tri s1 -> SplitMat s1 s2 -> 
+                                 Tri s2 -> 
+                     Tri (deeper s1 s2)
+\end{verbatim}
+and 
+
+,
+where $\Splitting$ is another datatype, that allows us to define 
+\subsection{Derivation}
+\subsection{Method 1}
+
+\section{Other stuff}
+%What about the Floyd Warshall algorithm?
+``Bird and Moor'' or ``Bird and de Moor''
+\newpage
+\bibliography{references}
+\bibliographystyle{plainnat}
+\end{document}

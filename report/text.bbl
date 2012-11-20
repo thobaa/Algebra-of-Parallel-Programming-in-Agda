@@ -1,0 +1,60 @@
+\begin{thebibliography}{7}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Awodey(2010)]{Awodey}
+Steve Awodey.
+\newblock \emph{Category theory}.
+\newblock Oxford University Press, Oxford, 2nd ed. edition, 2010.
+\newblock ISBN 978-0-19-958736-0 (hbk.).
+
+\bibitem[Bird and Moor(1997)]{AoP}
+Richard Bird and Oege~de Moor.
+\newblock \emph{Algebra of programming}.
+\newblock Prentice Hall, London, 1997.
+\newblock ISBN 0-13-507245-X.
+
+\bibitem[Gambino and Hyland(2004)]{gambino_hyland_2004}
+Nicola Gambino and Martin Hyland.
+\newblock Wellfounded trees and dependent polynomial functors.
+\newblock In \emph{Types for proofs and programs}, volume 3085 of \emph{Lecture
+  Notes in Comput. Sci.}, pages 210--225. Springer, Berlin, 2004.
+\newblock \doi{10.1007/978-3-540-24849-1_14}.
+\newblock URL \url{http://dx.doi.org/10.1007/978-3-540-24849-1_14}.
+
+\bibitem[Hamana and Fiore(2011)]{gadt_semantics_2011}
+Makoto Hamana and Marcelo Fiore.
+\newblock A foundation for gadts and inductive families: dependent polynomial
+  functor approach.
+\newblock In \emph{Proceedings of the seventh ACM SIGPLAN workshop on Generic
+  programming}, WGP '11, pages 59--70, New York, NY, USA, 2011. ACM.
+\newblock ISBN 978-1-4503-0861-8.
+\newblock \doi{10.1145/2036918.2036927}.
+\newblock URL \url{http://doi.acm.org/10.1145/2036918.2036927}.
+
+\bibitem[Mac~Lane(1998)]{MacLane}
+Saunders Mac~Lane.
+\newblock \emph{Categories for the working mathematician}.
+\newblock Springer, New York, 2. ed. edition, 1998.
+\newblock ISBN 0-387-98403-8 (hardcover : alk. paper) ;.
+
+\bibitem[Mu et~al.(2009)Mu, Ko, and Jansson]{AoPA}
+Shin-Cheng Mu, Hsiang-Shang Ko, and Patrik Jansson.
+\newblock Algebra of programming in agda: Dependent types for relational
+  program derivation.
+\newblock \emph{Journal of Functional Programming}, 19\penalty0 (05):\penalty0
+  545--579, 2009.
+\newblock \doi{10.1017/S0956796809007345}.
+
+\bibitem[Norell(2007)]{norell_agda_invented_2007}
+Ulf Norell.
+\newblock \emph{Towards a practical programming language based on dependent
+  type theory}.
+\newblock Chalmers University of Technology, G{\"o}teborg, 2007.
+\newblock ISBN 978-91-7291-996-9.
+\newblock Diss. G{\"o}teborg : Chalmers tekniska h{\"o}gskola, 2007.
+
+\end{thebibliography}

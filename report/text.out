@@ -1,0 +1,16 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}
+\BOOKMARK [1][-]{section.2}{Introduction stuff}{}
+\BOOKMARK [2][-]{subsection.2.1}{Agda}{section.2}
+\BOOKMARK [2][-]{subsection.2.2}{Category theory}{section.2}
+\BOOKMARK [2][-]{subsection.2.3}{Algebra of Programming}{section.2}
+\BOOKMARK [2][-]{subsection.2.4}{Parsing}{section.2}
+\BOOKMARK [3][-]{subsubsection.2.4.1}{Grammar}{subsection.2.4}
+\BOOKMARK [3][-]{subsubsection.2.4.2}{Special kind of grammar -- Chomsky normal form}{subsection.2.4}
+\BOOKMARK [2][-]{subsection.2.5}{Transitive Closure}{section.2}
+\BOOKMARK [2][-]{subsection.2.6}{CYK Algorithm}{section.2}
+\BOOKMARK [2][-]{subsection.2.7}{Valiants Algorithm}{section.2}
+\BOOKMARK [1][-]{section.3}{Work}{}
+\BOOKMARK [2][-]{subsection.3.1}{Formulation}{section.3}
+\BOOKMARK [2][-]{subsection.3.2}{Derivation}{section.3}
+\BOOKMARK [2][-]{subsection.3.3}{Method 1}{section.3}
+\BOOKMARK [1][-]{section.4}{Other stuff}{}
