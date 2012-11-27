@@ -1,5 +1,11 @@
 \documentclass{article}
 \usepackage{thesis}
+\usepackage{ucs}
+\include{unicodedefs}
+
+\def\textmu{}
+%include agda.fmt
+
 \begin{document}
 
 \title{Algebra of Parallel Programming in Agda -- Text!}
@@ -45,7 +51,7 @@ These requirements just say that the arrows should behave as functions with comp
 Indeed, the basic example we will work with is the category $\Set$ where the objects are sets and the arrows are functions. This is a category because [TODO: fulfils the axioms].
 \end{Ex}
 
-Traditionally in category theory (see for example \cite{Awodey} and \cite{MacLane}), this category is called $\namedcat{Set}$, but we will call it $\Set$ for three reasons: 
+Traditionally in category theory (see for example \cite{Awodey} and \cite{MacLane}), this category is called $\namedcat{Set}$, but we will call it $\Set$ for three main reasons: 
 \begin{enumerate}
 \item It's the name used in \cite{AoP}.
 \item In category theory, the arrows are usually the most importand part of a category.
@@ -64,18 +70,24 @@ More examples of categories include sets with some structure:
   In the category $\Grp$, the objects are groups and the arrows are group homomorphisms, i.e., functions $\phi$ that respect the group operations: $\phi : \grp{G}{+} \to \grp{H}{\times}$ such that $\phi(x + y) = \phi(x) \times \phi(y)$ and $\phi(-x) = \phi(x)^{-1}$.
 \end{Ex}
 \begin{Ex}
-Other examples in the same vein include for example the category $\Rng$ of rings, and the category $\Mon$ of monoids, in both of which the arrows are the [TODO word] homomorphisms. One can also go further and add other kinds of structure, to get for exampl $\Top$, the category of topological groups, where the objects are topological groups (groups where the operations are continous)
+Other examples along the same lines include for example the category $\Rng$ of rings, and the category $\Mon$ of monoids, in both of which the arrows are the [TODO word] homomorphisms. One can also go further and add other kinds of structure, to get for exampl $\Top$, the category of topological groups, where the objects are topological groups (groups where the operations are continous) [TODO continue]
 \end{Ex}
 [TODO two more examples: poset and matrixes]
 And finally, we present two examples that are quite unlike the previous ones, which present the kind of things that are included in the category definition. Since they are very different from functions, they motivate further specialization of the category definition. We also note that they (like all the categories we have mentioned) have some relation to the later chapters in this thesis.
 \begin{Ex}
-The first strange example is a so called poset category. Let $X$ be any partially ordered set, that is, a set with an 
+The first strange example is a so called poset category. Let $X$ be any partially ordered set, that is, a set with a partial order, that is a relation ${}\le{} : Y \ot X$ satisfying the following: 
+\begin{enumerate}
+\item \label{partial1} For every $x \in X$, $x \le x$.
+\item \label{partial2} For every $x$, $y$, if $x \le y$ and $y \le x$, then $x = y$.
+\item \label{partial3} For every $x$, $y$, $z$, if $x \le y$ and $y \le z$, then $x \le z$.
+\end{enumerate}
+Then we get a category if we take as objects elements $x \in X$ and include an arrow $x \to y$ if and only if $x \le y$. By \ref{partial1}, there is an identity arrow for every object. By \ref{partial3}, if there are arrows $x \to y$ and $y \to z$, there is an arrow $x \to z$. Finally, we note that [?]. Hence This satisfies the axioms for a category. Requirement \ref{partial2} guarantees that [?]
 \end{Ex}
 \begin{Ex}
-Let the objects be the natural numbers $\N$, and let the arrows be matrixes with coefficients in some (associative) ring. This forms a category.
+In our final example, we let the objects be the natural numbers $\N$, and let the arrows be matrixes with coefficients in some (associative) ring. Hence this, too, forms a category.
 \end{Ex}
 [TODO subcategory, important for defining datatypes in $\Rel$, example of $\Ab$ ]
-[TODO : Examples of categories:
+
 There are a number of operations that can be performed to create new categories:
 
 
@@ -134,6 +146,56 @@ The result of the parse is the set of all [TODO expand]
 \subsection{CYK Algorithm}
 [TODO what is it? valiant is related to it, or they wouldn't be on same wikipedia page!]
 
+\subsection{Matrices}
+We define a type of abstract matrices, 
+\begin{Def}
+A matrix $A = (\melt{a}{i}{j})$ is functions $\Fin \to \Fin \to R$
+\end{Def}
+or, in Agda
+
+\begin{code}
+Matrix : ℕ → ℕ → Set
+Matrix m n = (i : Fin m) → (j : Fin n) → R
+\end{code}
+
+We include also our definitions of addition and multiplication of matrices as examples of how things look.
+
+\begin{code}
+-- Matrix addition
+_M+_ : ∀ {m n} -> Matrix m n -> Matrix m n -> Matrix m n
+_M+_ A B = λ i j → (A i j) R+ (B i j)
+
+-- Matrix multiplication
+_M*_ : ∀ {m n p} → Matrix m n → Matrix n p → Matrix m p
+A M* B = λ i j → (λ k → A i k) ⊙ (λ k → B k j)
+\end{code}
+\subsection{Triangular matrices}
+One of the main objects we will work with in this thesis is triangular matrices, and we will only ever consider upper triangular matrices with only zeros on the diagonal. For brevity, and because of the similarity with the Agda code we will present soon, we therefore make the following definition.
+\begin{Def}
+  A matrix $A = (\melt{a}{i}{j})$ is \emph{triangular} if all its entries on or below the diagonal are $0$. That is, $A$ is triagular if $i \ge j$ implies that $\melt{a}{i}{j} = 0$.
+\end{Def}
+We generalize this to the following.
+\begin{Def}
+  A matrix $A = (\melt{a}{i}{j})$ is \emph{triangular of degree $d$} if all its entries fewer than $d$ steps above the diagonal are $0$. That is, $A$ is triangular if $d > j - i$ implies that $\melt{a}{i}{j} = 0$.
+\end{Def}
+\begin{Remark}
+  Note that an $n \times n$ matrix that is triangular of degree $d \ge n$ equals the zero matrix. [TODO: Insert agda proof]
+\end{Remark}
+
+We prove the following lemma both formally and informally
+\begin{Lemma}
+  If $A$ is an $m \times n$ matrix that is triangular of degree $d_1$ and $B$ is and $n \times p$ matrix that is triangular of degree $d_2$, then the product $AB$ is an $m \times p$ matrix that is triangular of degree $d_1 + d_2$.
+\end{Lemma}
+\begin{proof}
+  Let $(\melt{c}{i}{j}) = AB$, and let $k$ and $l$ be such that $d_1 + d_2 > k - l$. We have that 
+\begin{equation}
+  \melt{c}{k}{l} = \sum_{i = 1}^n\melt{a}{k}{i}\melt{b}{i}{l}
+\end{equation}
+ We want to show that $\melt{c}{k}{l} = 0$.
+
+  
+\end{proof}
+Heh, triangularity is a homomorphism from matrices with multiplication to $\Z$ with addition
 \subsection{Valiants Algorithm}
 Valiant's algorithm was initially introduced to show that parsing could be done as quickly as matrix multiplication. It turns out to be an algorithm where most of the work happens in parallel, and this might be useful for developing parallel parsers.
 
@@ -146,11 +208,17 @@ A =
 \vdots &
 \end{pmatrix}
 \end{equation}
-and splits the matrix into four parts $A_{1\, 1}$, $A_{1\,2}$, $A_{2\,1}$ and $A_{2\,2}$ along the diagonal: 
+and splits the matrix into four parts $\smat{A}{1}{1}$, $\smat{A}{1}{2}$, $\smat{A}{2}{1}$ and $\smat{A}{2}{2}$ along the diagonal: 
 \begin{equation}
-A = 
+A = \begin{pmatrix}
+  \smat{A}{1}{1} & \smat{A}{1}{2} \\
+  \smat{A}{2}{1} & \smat{A}{2}{2}
+\end{pmatrix} = \begin{pmatrix}
+  \smat{A}{1}{1} & \smat{A}{1}{2} \\
+  0 & \smat{A}{2}{2}
+\end{pmatrix}
 \end{equation}
-$A_{1\, 1}$, $A_{1\,2}$, $A_{2\,1}$ and $A_{2\,2}$. works by splitting the matrix into 
+so that $\smat{A}{1}{1}$ and $\smat{A}{2}{2}$ are both upper triangular
 
 [TODO requirements on the operations, is it enough to have the ring stuff, does $+$ need to be idempotent? (like union) because otherwise, it seems like the algorithm will fail when applied to a non-associative ring (there will be $k\cdot (x_1\cdots x_k)$ instead of $(x_1\cdots x_k)$). So I don't think the algorithm actually works even on non-associative rings, because we can't have inverses for addition (since $x + x = x$ we get that $x = x + (x - x) = (x + x) - x = x - x = 0$ for all $x$, bad. ]
 
@@ -163,18 +231,78 @@ We introduce two main recursive datatypes, $\Tri$ and $\SplitMat$.
 The datatype $\Tri$ is esentially a binary tree with a $\SplitMat$ in each splitting, and empty leaves. It is used to represent upper triangular matrixes with zero diagonal and elements from $\R$.
 The type $\SplitMat$ on the other hand is essentialy a tree with four subtrees at each splitting (and some extra stuff to make the matrix dimensions fit) and information in the leaves. It is to represent 
 . [TODO why the different tree formats?].
-In Agda, they are defined as 
-\begin{verbatim}
-data Tri : Splitting -> Set where
-  one : Tri one
-  two : ∀ {s1 s2} -> Tri s1 -> SplitMat s1 s2 -> 
-                                 Tri s2 -> 
-                     Tri (deeper s1 s2)
-\end{verbatim}
-and 
+In Agda, they are defined by
 
-,
-where $\Splitting$ is another datatype, that allows us to define 
+\begin{code}
+data SplitVec : Splitting → Set where
+  one : (x : R)   → SplitVec one
+  two : ∀ {s₁ s₂} → SplitVec s₁  → SplitVec s₂ → SplitVec (deeper s₁ s₂)
+
+data SplitMat : Splitting → Splitting → Set where
+  Sing : (x : R)  → SplitMat one one
+  RVec : ∀{s₁ s₂} → SplitVec (deeper s₁ s₂) → SplitMat one (deeper s₁ s₂)
+  CVec : ∀{s₁ s₂} → SplitVec (deeper s₁ s₂) → SplitMat (deeper s₁ s₂) one
+  quad : ∀{r₁ r₂ c₁ c₂} → SplitMat r₁ c₁ → SplitMat r₁ c₂ → 
+                          SplitMat r₂ c₁ → SplitMat r₂ c₂ → 
+                          SplitMat (deeper r₁ r₂) (deeper c₁ c₂)
+
+data Tri : Splitting → Set where
+  one : Tri one
+  two : ∀ {s₁ s₂} → Tri s₁ → SplitMat s₁ s₂ → 
+                             Tri s₂ → 
+                    Tri (deeper s₁ s₂)
+\end{code}
+
+If we allow arbitrary recursion, we can express the algorithm as:
+
+\begin{code}
+-- Recursion step:
+valiant : ∀ {s} -> Tri s -> Tri s
+valiant one = one
+valiant (two A C B) = two A' (valiantOverlap A' C B') B'
+  where A' = (valiant A)
+        B' = (valiant B)
+
+-- Overlap step:
+valiantOverlap : ∀ {s₁ s₂} -> Tri s₁ -> SplitMat s₁ s₂ -> Tri s₂ -> SplitMat s₁ s₂
+valiantOverlap {one} {one} A' C B' = C
+valiantOverlap {one} {deeper s₁ s₂} A' (RVec v) B' = RVec (vectmul v B')
+valiantOverlap {deeper s₁ s₂} {one} A' (CVec v) B' = CVec (tvecmul A' v)
+valiantOverlap {deeper s₁ s₂} {deeper s₃ s₄} (two A₁ A₂ A₃) (quad C₂ C₄ C₁ C₃) (two B₃ B₂ B₁) = quad X₂ X₄ X₁ X₃
+  where X₁ = valiantOverlap A₃ C₁ B₃
+        X₂ = valiantOverlap A₁ (splitAdd C₂ (splitMul A₂ X₁)) B₃
+        X₃ = valiantOverlap A₃ (splitAdd C₃ (splitMul X₁ B₂)) B₁
+        X₄ = valiantOverlap A₁ (splitAdd C₄ (splitAdd (splitMul A₂ X₃) (splitMul X₂ B₂))) B₁
+\end{code}
+
+Immediately, it is fairly obvious that the recursion step is simply a catamorphism. That is, we define a function $foldTri$:
+
+\begin{code}
+foldTri : ∀ {b} {s : Splitting} {B : Splitting -> Set b} → (one' : B one) → (two' : ∀ {s₁ s₂} -> B s₁ -> SplitMat s₁ s₂ -> B s₂ -> B (deeper s₁ s₂) ) → Tri s → B s
+foldTri one' two' one = one'
+foldTri one' two' (two T₁ R T₂) = two' (foldTri one' two' T₁) R (foldTri one' two' T₂)
+\end{code}
+
+Which allows us to express the recursion step as 
+
+\begin{code}
+-- Helper function for overlap
+valiantOverlap' : ∀ {s₁ s₂} -> Tri s₁ -> SplitMat s₁ s₂ -> Tri s₂ -> Tri (deeper s₁ s₂)
+valiantOverlap' T₁ R T₂ = two T₁ (valiantOverlap T₁ R T₂) T₂
+
+valiantFold : ∀ {s} → Tri s → Tri s
+valiantFold = foldTri one valiantOverlap'
+\end{code}
+
+The overlap step on the other hand requires quite a bit of work. 
+First we note that the result of computing the transitive closure $X_1$ of $C_1$ is required when computing the closures $X_2$ and $X_3$ of $C_2$ and $C_3$ respectively. And that $X_2$ and $X_3$ are required for computing the transitive closure $X_4$ of $C_4$.
+
+\subsubsection{Nested Recursion}
+Even if we ignore the problem of sharing -- ideally, we do not want to recompute the value of $X_1$ in the calculation of both $X_2$ and $X_3$, we still have the problem that we need to include a nested recursive call somehow in the algorithm (we want to compute $f (g(f(x)))$ for some particular $f$ and $g$). For the computation of $X_4$ we actually need another level of nested recursion.
+
+This seems similar to course-of-value recursion [thanks Patrik], which has been studied by \cite{histomorphism1}. However, in that case, the components involved are all sub structures of the input structure. Here, the recursion proceeds on elements that are structurally smaller but not sub structures (even though they are shaped like them). Another thing to note is that course-of-value recursion is equivalent to primitive recursion [WIKIPEDIA (only natural numbers)].
+
+Since the recursive calls all happen on smaller structures, we can be sure that the function terminates. Maybe this is something that needs dependent types to work properly?
 \subsection{Derivation}
 \subsection{Method 1}
 
