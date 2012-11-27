@@ -1,0 +1,83 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                   THESIS                                   %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%
+%%
+%%
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                    PACKAGES                                %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%
+\usepackage{en_basic}
+\usepackage{listings}
+
+\usepackage{natbib}
+
+\usepackage{amsthm}
+\usepackage{thmtools}         %% mer avancerade satser
+\usepackage{thm-restate}      %% restatera
+\usepackage{hyperref}         %% klickbara länkar i pdf-filen
+                              %% ska ligga sist
+\usepackage{breakurl}         %% låter dvi bryta urler
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                         DEFINITION AV SATSER                               %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\declaretheorem[name=Definition,
+  refname={definition,definitions},
+  Refname={Definition,Definitions},
+  style=definition,
+  numberwithin=section]{Def}
+\declaretheorem[name=Example,
+  refname={example,example},
+  Refname={Example,Exampele},
+  style=definition,
+  numberwithin=section]{Ex}
+\declaretheorem[name=Theorem,
+  refname={theorem,theorems},
+  Refname={Theorem,Theorems},
+  numberlike=Def]{Thm}
+\declaretheorem[name=Lemma,
+  refname={lemma,lemman},
+  Refname={Lemma,Lemman},
+  numberlike=Thm]{Lemma}
+\declaretheorem[name=Corollary,
+  refname={Corollary,Corollary},
+  Refname={Corollary,Corollary},
+  numberlike=Thm]{Corr}
+\declaretheorem[name=Remark,
+  numbered=no,
+  style=remark]{Remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                               Category Theory                              %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\namedcat}[1]{\mathbf{#1}}
+\newcommand{\Set}{\namedcat{Fun}}
+\newcommand{\Rel}{\namedcat{Rel}}
+\newcommand{\Grp}{\namedcat{Grp}}
+\newcommand{\Ab}{\namedcat{Ab}}
+\newcommand{\Rng}{\namedcat{Rng}}
+\newcommand{\Mon}{\namedcat{Mon}}
+\newcommand{\Top}{\namedcat{Top}}
+\newcommand{\cat}[1][C]{\s{#1}} % Category
+\newcommand{\catC}{\cat{C}}
+\newcommand{\obj}[1][O]{\s{#1}} % set of objects
+\newcommand{\arr}[1][A]{\s{#1}} % set of arrows
+\newcommand{\ot}{\leftarrow}
+\DeclareMathOperator{\id}{id}
+
+\newcommand{\grp}[2]{(#1, #2)}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                               Agda stuff                                   %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\SplitMat}{}
+\newcommand{\Splitting}{}
+\newcommand{\Tri}{}
