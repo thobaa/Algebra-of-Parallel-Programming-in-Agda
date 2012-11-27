@@ -1,4 +1,4 @@
-open import Definitions
+open import Matrix.Definitions
 
 
 open import Data.Vec
@@ -12,7 +12,7 @@ open import Relation.Binary
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl; _≗_)
 open import Relation.Binary.HeterogeneousEquality using (_≅_; refl)
 
-module VecLemmas where
+module Matrix.VecLemmas where
 
 -- Lookup and map work together!
 lookup-map : {n : ℕ} {A B : Set} -> (i : Fin n) -> (v : Vec A n) -> 
