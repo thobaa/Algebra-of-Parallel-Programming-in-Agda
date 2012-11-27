@@ -20,22 +20,22 @@ open import Relation.Nullary.Core
 
 open import Level using () renaming (zero to Lzero)
 
-open import Matrix.NonAssociativeRing
+open import Matrix.NonAssociativeNonRing
 
-module Matrix.Abstract (NAR : NonAssociativeRing Lzero Lzero) where
+module Matrix.Abstract (NAR : NonAssociativeNonRing Lzero Lzero) where
 
 R : Set
-R = NonAssociativeRing.Carrier NAR
+R = NonAssociativeNonRing.Carrier NAR
 
 _R+_ : R → R → R
-_R+_ = NonAssociativeRing._+_ NAR
+_R+_ = NonAssociativeNonRing._+_ NAR
 
 _R*_ : R → R → R
-_R*_ = NonAssociativeRing._*_ NAR
+_R*_ = NonAssociativeNonRing._*_ NAR
 
 
 R0 : R
-R0 = NonAssociativeRing.0# NAR
+R0 = NonAssociativeNonRing.0# NAR
 
 
 
@@ -92,7 +92,6 @@ _M+_ : ∀ {m n} -> Matrix m n -> Matrix m n -> Matrix m n
 _M+_ A B = λ i j → (A i j) R+ (B i j)
 
 -- Matrix multiplication
-
 _M*_ : ∀ {m n p} → Matrix m n → Matrix n p → Matrix m p
 A M* B = λ i j → (λ k → A i k) ⊙ (λ k → B k j)
 

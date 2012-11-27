@@ -27,30 +27,36 @@
 %%                         DEFINITION AV SATSER                               %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \declaretheorem[name=Definition,
-  refname={definition,definitions},
-  Refname={Definition,Definitions},
+ % refname={definition,definitions},
+ % Refname={Definition,Definitions},
   style=definition,
   numberwithin=section]{Def}
 \declaretheorem[name=Example,
-  refname={example,example},
-  Refname={Example,Exampele},
+%  refname={example,example},
+%  Refname={Example,Exampele},
   style=definition,
   numberwithin=section]{Ex}
 \declaretheorem[name=Theorem,
-  refname={theorem,theorems},
-  Refname={Theorem,Theorems},
+%  refname={theorem,theorems},
+%  Refname={Theorem,Theorems},
   numberlike=Def]{Thm}
 \declaretheorem[name=Lemma,
-  refname={lemma,lemman},
-  Refname={Lemma,Lemman},
+%  refname={lemma,lemman},
+%  Refname={Lemma,Lemman},
   numberlike=Thm]{Lemma}
 \declaretheorem[name=Corollary,
-  refname={Corollary,Corollary},
-  Refname={Corollary,Corollary},
+%  refname={Corollary,Corollary},
+%  Refname={Corollary,Corollary},
   numberlike=Thm]{Corr}
 \declaretheorem[name=Remark,
   numbered=no,
   style=remark]{Remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                               General stuff                                %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\smat}[3]{#1_{#2\,#3}}   % sub matrix
+\newcommand{\melt}[3]{#1_{#2#3}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               Category Theory                              %%
@@ -78,6 +84,7 @@
 %%                               Agda stuff                                   %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newcommand{\SplitMat}{}
-\newcommand{\Splitting}{}
-\newcommand{\Tri}{}
+\newcommand{\SplitMat}{SplitMat}
+\newcommand{\Splitting}{Splitting}
+\newcommand{\Tri}{Tri}
+\newcommand{\Fin}{Fin}

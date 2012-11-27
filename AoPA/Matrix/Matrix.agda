@@ -1,6 +1,6 @@
 -- own files
 --open import Definitions using ()
-open import VecLemmas    using (rowIndices; lookRowInd; lookup-map)
+open import Matrix.VecLemmas    using (rowIndices; lookRowInd; lookup-map)
 
 
 -- standard library:

@@ -1,0 +1,659 @@
+\documentclass{article}
+\usepackage{thesis}
+\usepackage{ucs}
+\include{unicodedefs}
+
+\def\textmu{}
+%% ODER: format ==         = "\mathrel{==}"
+%% ODER: format /=         = "\neq "
+%
+%
+\makeatletter
+\@ifundefined{lhs2tex.lhs2tex.sty.read}%
+  {\@namedef{lhs2tex.lhs2tex.sty.read}{}%
+   \newcommand\SkipToFmtEnd{}%
+   \newcommand\EndFmtInput{}%
+   \long\def\SkipToFmtEnd#1\EndFmtInput{}%
+  }\SkipToFmtEnd
+
+\newcommand\ReadOnlyOnce[1]{\@ifundefined{#1}{\@namedef{#1}{}}\SkipToFmtEnd}
+\usepackage{amstext}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\DeclareFontFamily{OT1}{cmtex}{}
+\DeclareFontShape{OT1}{cmtex}{m}{n}
+  {<5><6><7><8>cmtex8
+   <9>cmtex9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmtex10}{}
+\DeclareFontShape{OT1}{cmtex}{m}{it}
+  {<-> ssub * cmtt/m/it}{}
+\newcommand{\texfamily}{\fontfamily{cmtex}\selectfont}
+\DeclareFontShape{OT1}{cmtt}{bx}{n}
+  {<5><6><7><8>cmtt8
+   <9>cmbtt9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmbtt10}{}
+\DeclareFontShape{OT1}{cmtex}{bx}{n}
+  {<-> ssub * cmtt/bx/n}{}
+\newcommand{\tex}[1]{\text{\texfamily#1}}	% NEU
+
+\newcommand{\Sp}{\hskip.33334em\relax}
+
+
+\newcommand{\Conid}[1]{\mathit{#1}}
+\newcommand{\Varid}[1]{\mathit{#1}}
+\newcommand{\anonymous}{\kern0.06em \vbox{\hrule\@width.5em}}
+\newcommand{\plus}{\mathbin{+\!\!\!+}}
+\newcommand{\bind}{\mathbin{>\!\!\!>\mkern-6.7mu=}}
+\newcommand{\rbind}{\mathbin{=\mkern-6.7mu<\!\!\!<}}% suggested by Neil Mitchell
+\newcommand{\sequ}{\mathbin{>\!\!\!>}}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+\usepackage{polytable}
+
+%mathindent has to be defined
+\@ifundefined{mathindent}%
+  {\newdimen\mathindent\mathindent\leftmargini}%
+  {}%
+
+\def\resethooks{%
+  \global\let\SaveRestoreHook\empty
+  \global\let\ColumnHook\empty}
+\newcommand*{\savecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\savecolumns[#1]}}
+\newcommand*{\restorecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\restorecolumns[#1]}}
+\newcommand*{\aligncolumn}[2]%
+  {\g@addto@macro\ColumnHook{\column{#1}{#2}}}
+
+\resethooks
+
+\newcommand{\onelinecommentchars}{\quad-{}- }
+\newcommand{\commentbeginchars}{\enskip\{-}
+\newcommand{\commentendchars}{-\}\enskip}
+
+\newcommand{\visiblecomments}{%
+  \let\onelinecomment=\onelinecommentchars
+  \let\commentbegin=\commentbeginchars
+  \let\commentend=\commentendchars}
+
+\newcommand{\invisiblecomments}{%
+  \let\onelinecomment=\empty
+  \let\commentbegin=\empty
+  \let\commentend=\empty}
+
+\visiblecomments
+
+\newlength{\blanklineskip}
+\setlength{\blanklineskip}{0.66084ex}
+
+\newcommand{\hsindent}[1]{\quad}% default is fixed indentation
+\let\hspre\empty
+\let\hspost\empty
+\newcommand{\NB}{\textbf{NB}}
+\newcommand{\Todo}[1]{$\langle$\textbf{To do:}~#1$\rangle$}
+
+\EndFmtInput
+\makeatother
+%
+%
+%
+%
+%
+%
+% This package provides two environments suitable to take the place
+% of hscode, called "plainhscode" and "arrayhscode". 
+%
+% The plain environment surrounds each code block by vertical space,
+% and it uses \abovedisplayskip and \belowdisplayskip to get spacing
+% similar to formulas. Note that if these dimensions are changed,
+% the spacing around displayed math formulas changes as well.
+% All code is indented using \leftskip.
+%
+% Changed 19.08.2004 to reflect changes in colorcode. Should work with
+% CodeGroup.sty.
+%
+\ReadOnlyOnce{polycode.fmt}%
+\makeatletter
+
+\newcommand{\hsnewpar}[1]%
+  {{\parskip=0pt\parindent=0pt\par\vskip #1\noindent}}
+
+% can be used, for instance, to redefine the code size, by setting the
+% command to \small or something alike
+\newcommand{\hscodestyle}{}
+
+% The command \sethscode can be used to switch the code formatting
+% behaviour by mapping the hscode environment in the subst directive
+% to a new LaTeX environment.
+
+\newcommand{\sethscode}[1]%
+  {\expandafter\let\expandafter\hscode\csname #1\endcsname
+   \expandafter\let\expandafter\endhscode\csname end#1\endcsname}
+
+% "compatibility" mode restores the non-polycode.fmt layout.
+
+\newenvironment{compathscode}%
+  {\par\noindent
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \let\hspre\(\let\hspost\)%
+   \pboxed}%
+  {\endpboxed\)%
+   \par\noindent
+   \ignorespacesafterend}
+
+\newcommand{\compaths}{\sethscode{compathscode}}
+
+% "plain" mode is the proposed default.
+% It should now work with \centering.
+% This required some changes. The old version
+% is still available for reference as oldplainhscode.
+
+\newenvironment{plainhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\hspre\(\let\hspost\)%
+   \pboxed}%
+  {\endpboxed%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+\newenvironment{oldplainhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \(\pboxed}%
+  {\endpboxed\)%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+% Here, we make plainhscode the default environment.
+
+\newcommand{\plainhs}{\sethscode{plainhscode}}
+\newcommand{\oldplainhs}{\sethscode{oldplainhscode}}
+\plainhs
+
+% The arrayhscode is like plain, but makes use of polytable's
+% parray environment which disallows page breaks in code blocks.
+
+\newenvironment{arrayhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \(\parray}%
+  {\endparray\)%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+\newcommand{\arrayhs}{\sethscode{arrayhscode}}
+
+% The mathhscode environment also makes use of polytable's parray 
+% environment. It is supposed to be used only inside math mode 
+% (I used it to typeset the type rules in my thesis).
+
+\newenvironment{mathhscode}%
+  {\parray}{\endparray}
+
+\newcommand{\mathhs}{\sethscode{mathhscode}}
+
+% texths is similar to mathhs, but works in text mode.
+
+\newenvironment{texthscode}%
+  {\(\parray}{\endparray\)}
+
+\newcommand{\texths}{\sethscode{texthscode}}
+
+% The framed environment places code in a framed box.
+
+\def\codeframewidth{\arrayrulewidth}
+\RequirePackage{calc}
+
+\newenvironment{framedhscode}%
+  {\parskip=\abovedisplayskip\par\noindent
+   \hscodestyle
+   \arrayrulewidth=\codeframewidth
+   \tabular{@{}|p{\linewidth-2\arraycolsep-2\arrayrulewidth-2pt}|@{}}%
+   \hline\framedhslinecorrect\\{-1.5ex}%
+   \let\endoflinesave=\\
+   \let\\=\@normalcr
+   \(\pboxed}%
+  {\endpboxed\)%
+   \framedhslinecorrect\endoflinesave{.5ex}\hline
+   \endtabular
+   \parskip=\belowdisplayskip\par\noindent
+   \ignorespacesafterend}
+
+\newcommand{\framedhslinecorrect}[2]%
+  {#1[#2]}
+
+\newcommand{\framedhs}{\sethscode{framedhscode}}
+
+% The inlinehscode environment is an experimental environment
+% that can be used to typeset displayed code inline.
+
+\newenvironment{inlinehscode}%
+  {\(\def\column##1##2{}%
+   \let\>\undefined\let\<\undefined\let\\\undefined
+   \newcommand\>[1][]{}\newcommand\<[1][]{}\newcommand\\[1][]{}%
+   \def\fromto##1##2##3{##3}%
+   \def\nextline{}}{\) }%
+
+\newcommand{\inlinehs}{\sethscode{inlinehscode}}
+
+% The joincode environment is a separate environment that
+% can be used to surround and thereby connect multiple code
+% blocks.
+
+\newenvironment{joincode}%
+  {\let\orighscode=\hscode
+   \let\origendhscode=\endhscode
+   \def\endhscode{\def\hscode{\endgroup\def\@currenvir{hscode}\\}\begingroup}
+   %\let\SaveRestoreHook=\empty
+   %\let\ColumnHook=\empty
+   %\let\resethooks=\empty
+   \orighscode\def\hscode{\endgroup\def\@currenvir{hscode}}}%
+  {\origendhscode
+   \global\let\hscode=\orighscode
+   \global\let\endhscode=\origendhscode}%
+
+\makeatother
+\EndFmtInput
+%
+%
+\ReadOnlyOnce{agda.fmt}%
+
+
+\begin{document}
+
+\title{Algebra of Parallel Programming in Agda -- Text!}
+\author{Thomas B\aa\aa th Sj\"{o}blom}
+\date{September 4, 2012}
+\maketitle
+\section{Introduction}
+[TODO: Safety]
+[TODO: Easier (maybe) to prove correctness along the way]
+[TODO: Parallel]
+[TODO: Parsing]
+\section{Introduction stuff}
+\subsection{Agda}
+Agda is a dependently typed programming language invented at Chalmers \cite{norell_agda_invented_2007}.
+\subsection{Category theory}
+Category theory is a theory for unifying mathematics by placing importance on things that are kind of like functions.
+
+There are two reasons for introducing category theory. 
+The first is that it will give us a clean and point-free way of reasoning about programs.
+The second is that it provides a semantics for the 
+[TODO: develop above sentences, AoP works in $\Set$, but what is up with the initial algebra semantics? are lists thought of as sets $\subset \Set$, the set of all lists with elements in $A$ is obviously a set, but is it the best view, what. no wait, nothing important here D:]
+
+The presentation here is based on (the early chapters of) \cite{Awodey} and \cite{MacLane}. The material can also be found in \cite{AoP}, but the authors have reversed the function arrows and writes $f : Y \ot X$ for $f : X \to Y$, something that we feel actually reduces the readability a great deal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                             CATEGORIES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{Def}
+A category $\cat$ is a collection $\obj_{\cat}$ of objects and a collection $\arr_{\cat}$ of arrows $f : X \to Y$, where $X \in \obj_{\cat}$ is the domain of $f$ and $Y \in \obj_{\cat}$ is the codomain of $f$. 
+The collections $\obj_{\cat}$ and $\arr_{\cat}$ are required to satisfy the following:
+\begin{itemize}
+\item For every object $X \in \obj$, there is an identity arrow $\id_X : X \to X$.
+\item For every pair $f : A \to B$ and $g : B \to C$ of arrows, there is an arrow $g \comp f : A \to C$
+\item For every three arrows $f : A \to B$, $g : B \to C$ and $h : C \to D$, we have $h \comp (g \comp f) = (h \comp g) \comp f$
+\item For every arrow $f : A \to B$, we have $f \comp id_A = id_B \comp f = f$. 
+\end{itemize}
+\end{Def}
+
+These requirements just say that the arrows should behave as functions with compositions and identity functions.
+
+\begin{Ex}
+Indeed, the basic example we will work with is the category $\Set$ where the objects are sets and the arrows are functions. This is a category because [TODO: fulfils the axioms].
+\end{Ex}
+
+Traditionally in category theory (see for example \cite{Awodey} and \cite{MacLane}), this category is called $\namedcat{Set}$, but we will call it $\Set$ for three main reasons: 
+\begin{enumerate}
+\item It's the name used in \cite{AoP}.
+\item In category theory, the arrows are usually the most importand part of a category.
+\item Both it and the next category we will introduce have the same objects.
+\end{enumerate}
+\begin{Ex}
+A second example of a category which we will expand on is the category $\Rel$ where the objects are again sets, but this time, the arrows are relations. 
+We write $R : Y \ot X$, where $X$ is the domain and $Y$ the codomain of $R$, following the notation for relations used in \cite{AoPA}. 
+Here, composition of $R : Z \ot Y$ and $S : Y \ot X$ is defined as $R \comp S = \{(a, c) \st \exists b : a R b \}$ 
+\end{Ex}
+
+Concretely, relations are defined as subsets of $Y \times X$ [TODO or other way around?], but this is a view that we try to avoid with by introducing category theory 
+
+More examples of categories include sets with some structure:
+\begin{Ex}
+  In the category $\Grp$, the objects are groups and the arrows are group homomorphisms, i.e., functions $\phi$ that respect the group operations: $\phi : \grp{G}{+} \to \grp{H}{\times}$ such that $\phi(x + y) = \phi(x) \times \phi(y)$ and $\phi(-x) = \phi(x)^{-1}$.
+\end{Ex}
+\begin{Ex}
+Other examples along the same lines include for example the category $\Rng$ of rings, and the category $\Mon$ of monoids, in both of which the arrows are the [TODO word] homomorphisms. One can also go further and add other kinds of structure, to get for exampl $\Top$, the category of topological groups, where the objects are topological groups (groups where the operations are continous) [TODO continue]
+\end{Ex}
+[TODO two more examples: poset and matrixes]
+And finally, we present two examples that are quite unlike the previous ones, which present the kind of things that are included in the category definition. Since they are very different from functions, they motivate further specialization of the category definition. We also note that they (like all the categories we have mentioned) have some relation to the later chapters in this thesis.
+\begin{Ex}
+The first strange example is a so called poset category. Let $X$ be any partially ordered set, that is, a set with a partial order, that is a relation ${}\le{} : Y \ot X$ satisfying the following: 
+\begin{enumerate}
+\item \label{partial1} For every $x \in X$, $x \le x$.
+\item \label{partial2} For every $x$, $y$, if $x \le y$ and $y \le x$, then $x = y$.
+\item \label{partial3} For every $x$, $y$, $z$, if $x \le y$ and $y \le z$, then $x \le z$.
+\end{enumerate}
+Then we get a category if we take as objects elements $x \in X$ and include an arrow $x \to y$ if and only if $x \le y$. By \ref{partial1}, there is an identity arrow for every object. By \ref{partial3}, if there are arrows $x \to y$ and $y \to z$, there is an arrow $x \to z$. Finally, we note that [?]. Hence This satisfies the axioms for a category. Requirement \ref{partial2} guarantees that [?]
+\end{Ex}
+\begin{Ex}
+In our final example, we let the objects be the natural numbers $\N$, and let the arrows be matrixes with coefficients in some (associative) ring. Hence this, too, forms a category.
+\end{Ex}
+[TODO subcategory, important for defining datatypes in $\Rel$, example of $\Ab$ ]
+
+There are a number of operations that can be performed to create new categories:
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                             FUNCTORS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{Def}
+A \emph{functor} $F : \cat[C] \to \cat[D]$ is a pair of mappings:  $F_{\obj} : \obj_{\cat[C]} \to \obj_{\cat[D]}$ and $F_{\arr} : \arr_{\cat[C]} \to \arr_{\cat[D]}$ satisfying
+\begin{itemize}
+\item If $f : X \to Y$, then $F_{\arr} f : F_{\obj} X \to F_{\obj}$.
+\item If $f : X \to Y$ and $g : Y \to Z$, then $F_{\arr} (g \comp f) = (F_{\arr} g) \comp (F_{\arr} f$).
+\item The identity arrow $\id_X : X \to X$ is mapped to the identity arrow in $F_{\obj} X$: i.e., $F_{\arr} \id = \id_{F_{\obj}X}$
+\end{itemize}
+\end{Def}
+In what follows, we will refer to both mappings $F_{\obj}$ and $F_{\arr}$ with just $F$.
+
+Some 
+\begin{Def}
+  A funtor $F : \cat{C} \to \cat{C}$ is called an \emph{endofunctor}.
+\end{Def}
+[TODO: Examples of functors: product, sum, expand to polynomial functors => regular functors? what are they and are they included in GADT-paper]
+[TODO: Natural transformation]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                             ALGEBRAS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+[TODO: Algebra]
+\begin{Def}
+  An algebra is 
+\end{Def}
+\subsection{Algebra of Programming}
+One point of the introduction of category theory was to allow us to generalize som common list functions to arbitrary datatypes.
+
+An inductive datatype is a 
+
+[TODO: What happens to algebra of programming when using dependent types? There are the papers: \cite{gambino_hyland_2004} and \cite{gadt_semantics_2011}  
+\subsection{Parsing}
+Parsing is the process of turning a sequence of tokens (for example a string contianing a computer program [TODO]) into a data structure suitable for [something]. It is an important step in compilation. [TODO : need to learn more about basic parsing stuff]
+
+However, in this thesis, we will not focus much on the parsing stuff. This chapter is here mainly as a motivation for what is to come (and so that I will learn some real world stuff!)
+[TODO: Example]
+\subsubsection{Grammar}
+A grammar is a collection of rules, called productions, that 
+The productions are made up of terminals and nonterminals.
+Additionally, there is a start symbol that specifies [TODO WHAT]
+\begin{Def}
+  A \emph{grammar} is a tuple $(N, T, S, P)$ where $N$ is the set of nonterminals, $T$ is the set of terminals, $S$ is the start symbol, and $P$ is the set of productions. A \emph{production} is a [TODO thing] sequence of terminals and nonterminals followed by and arrow and another sequence of terminals and nonterminals. [TODO write in symbols] $t_1 \dotsb t_n \to s_1 \dotsb s_m$, $t_i$, $s_i \in N \cup T$
+\end{Def}
+We will only consider context free grammars. These are grammars 
+A language generated by a context free grammar is called a context free language. It is well known that every context free grammar can be turned into a 
+\subsubsection{Special kind of grammar -- Chomsky normal form}
+It is well known [cite?] that any context free grammar can be turned into one in Chomsky normal form, that is a grammar where [TODO WHAT IS THIS?]. For grammars in Chomsky normal form, it is possible to
+\subsection{Transitive Closure}
+The result of the parse is the set of all [TODO expand]
+\subsection{CYK Algorithm}
+[TODO what is it? valiant is related to it, or they wouldn't be on same wikipedia page!]
+
+\subsection{Matrices}
+We define a type of abstract matrices, 
+\begin{Def}
+A matrix $A = (\melt{a}{i}{j})$ is functions $\Fin \to \Fin \to R$
+\end{Def}
+or, in Agda
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{Matrix}\mathbin{:}\Conid{ℕ}\mathbin{→}\Conid{ℕ}\mathbin{→}\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Conid{Matrix}\;\Varid{m}\;\Varid{n}\mathrel{=}(\Varid{i}\mathbin{:}\Conid{Fin}\;\Varid{m})\mathbin{→}(\Varid{j}\mathbin{:}\Conid{Fin}\;\Varid{n})\mathbin{→}\Conid{R}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+We include also our definitions of addition and multiplication of matrices as examples of how things look.
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mbox{\onelinecomment  Matrix addition}{}\<[E]%
+\\
+\>[B]{}\Varid{\char95 M}\mathbin{+\char95 }\mathbin{:}\mathbin{∀}\{\mskip1.5mu \Varid{m}\;\Varid{n}\mskip1.5mu\}\to \Conid{Matrix}\;\Varid{m}\;\Varid{n}\to \Conid{Matrix}\;\Varid{m}\;\Varid{n}\to \Conid{Matrix}\;\Varid{m}\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\Varid{\char95 M}\mathbin{+\char95 }\Conid{A}\;\Conid{B}\mathrel{=}\Varid{λ}\;\Varid{i}\;\Varid{j}\mathbin{→}(\Conid{A}\;\Varid{i}\;\Varid{j})\;\Conid{R}\mathbin{+}(\Conid{B}\;\Varid{i}\;\Varid{j}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mbox{\onelinecomment  Matrix multiplication}{}\<[E]%
+\\
+\>[B]{}\Varid{\char95 M}\mathbin{*\char95 }\mathbin{:}\mathbin{∀}\{\mskip1.5mu \Varid{m}\;\Varid{n}\;\Varid{p}\mskip1.5mu\}\mathbin{→}\Conid{Matrix}\;\Varid{m}\;\Varid{n}\mathbin{→}\Conid{Matrix}\;\Varid{n}\;\Varid{p}\mathbin{→}\Conid{Matrix}\;\Varid{m}\;\Varid{p}{}\<[E]%
+\\
+\>[B]{}\Conid{A}\;\Conid{M}\mathbin{*}\Conid{B}\mathrel{=}\Varid{λ}\;\Varid{i}\;\Varid{j}\mathbin{→}(\Varid{λ}\;\Varid{k}\mathbin{→}\Conid{A}\;\Varid{i}\;\Varid{k})\mathbin{⊙}(\Varid{λ}\;\Varid{k}\mathbin{→}\Conid{B}\;\Varid{k}\;\Varid{j}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\subsection{Triangular matrices}
+One of the main objects we will work with in this thesis is triangular matrices, and we will only ever consider upper triangular matrices with only zeros on the diagonal. For brevity, and because of the similarity with the Agda code we will present soon, we therefore make the following definition.
+\begin{Def}
+  A matrix $A = (\melt{a}{i}{j})$ is \emph{triangular} if all its entries on or below the diagonal are $0$. That is, $A$ is triagular if $i \ge j$ implies that $\melt{a}{i}{j} = 0$.
+\end{Def}
+We generalize this to the following.
+\begin{Def}
+  A matrix $A = (\melt{a}{i}{j})$ is \emph{triangular of degree $d$} if all its entries fewer than $d$ steps above the diagonal are $0$. That is, $A$ is triangular if $d > j - i$ implies that $\melt{a}{i}{j} = 0$.
+\end{Def}
+\begin{Remark}
+  Note that an $n \times n$ matrix that is triangular of degree $d \ge n$ equals the zero matrix. [TODO: Insert agda proof]
+\end{Remark}
+
+We prove the following lemma both formally and informally
+\begin{Lemma}
+  If $A$ is an $m \times n$ matrix that is triangular of degree $d_1$ and $B$ is and $n \times p$ matrix that is triangular of degree $d_2$, then the product $AB$ is an $m \times p$ matrix that is triangular of degree $d_1 + d_2$.
+\end{Lemma}
+\begin{proof}
+  Let $(\melt{c}{i}{j}) = AB$, and let $k$ and $l$ be such that $d_1 + d_2 > k - l$. We have that 
+\begin{equation}
+  \melt{c}{k}{l} = \sum_{i = 1}^n\melt{a}{k}{i}\melt{b}{i}{l}
+\end{equation}
+ We want to show that $\melt{c}{k}{l} = 0$.
+
+  
+\end{proof}
+Heh, triangularity is a homomorphism from matrices with multiplication to $\Z$ with addition
+\subsection{Valiants Algorithm}
+Valiant's algorithm was initially introduced to show that parsing could be done as quickly as matrix multiplication. It turns out to be an algorithm where most of the work happens in parallel, and this might be useful for developing parallel parsers.
+
+The algorithm takes as input an upper triangular $n \times n$ matrix $A$ (with $0$:s on the diagonal): 
+\begin{equation}
+A = 
+\begin{pmatrix}
+0 & a_{1\, 2} & \hdots & a_{1\, n} \\
+\vdots & 0 & a_{2\,3} &  \hdots & a_{2\,n}\\
+\vdots &
+\end{pmatrix}
+\end{equation}
+and splits the matrix into four parts $\smat{A}{1}{1}$, $\smat{A}{1}{2}$, $\smat{A}{2}{1}$ and $\smat{A}{2}{2}$ along the diagonal: 
+\begin{equation}
+A = \begin{pmatrix}
+  \smat{A}{1}{1} & \smat{A}{1}{2} \\
+  \smat{A}{2}{1} & \smat{A}{2}{2}
+\end{pmatrix} = \begin{pmatrix}
+  \smat{A}{1}{1} & \smat{A}{1}{2} \\
+  0 & \smat{A}{2}{2}
+\end{pmatrix}
+\end{equation}
+so that $\smat{A}{1}{1}$ and $\smat{A}{2}{2}$ are both upper triangular
+
+[TODO requirements on the operations, is it enough to have the ring stuff, does $+$ need to be idempotent? (like union) because otherwise, it seems like the algorithm will fail when applied to a non-associative ring (there will be $k\cdot (x_1\cdots x_k)$ instead of $(x_1\cdots x_k)$). So I don't think the algorithm actually works even on non-associative rings, because we can't have inverses for addition (since $x + x = x$ we get that $x = x + (x - x) = (x + x) - x = x - x = 0$ for all $x$, bad. ]
+
+\section{Work}
+Our goal is to prove the correctness of Valiant's algorithm, and to do this by presenting a derivation of it from a sensible specification. The first step to do this is to actually formulate the algorithm in Agda, in a way that avoids explicit recursion (using ideas from \cite{AoP}. The next (and final) step is then to find a derivation from the specification to the algorithm. [TODO : related to real programming? not very maybe since we know the final algorithm]
+\subsection{Formulation}
+The algorithm is made up of two parts, what we refer to as the recursion step and the overlap step. We note that the overlap step is also recursive, and that it is there that the most work is needed to find an appropriate formulation.
+
+We introduce two main recursive datatypes, $\Tri$ and $\SplitMat$. 
+The datatype $\Tri$ is esentially a binary tree with a $\SplitMat$ in each splitting, and empty leaves. It is used to represent upper triangular matrixes with zero diagonal and elements from $\R$.
+The type $\SplitMat$ on the other hand is essentialy a tree with four subtrees at each splitting (and some extra stuff to make the matrix dimensions fit) and information in the leaves. It is to represent 
+. [TODO why the different tree formats?].
+In Agda, they are defined by
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{19}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{21}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{30}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{34}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{data}\;\Conid{SplitVec}\mathbin{:}\Conid{Splitting}\mathbin{→}\Conid{Set}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{one}\mathbin{:}(\Varid{x}\mathbin{:}\Conid{R}){}\<[19]%
+\>[19]{}\mathbin{→}\Conid{SplitVec}\;\Varid{one}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{two}\mathbin{:}\mathbin{∀}\{\mskip1.5mu \Varid{s₁}\;\Varid{s₂}\mskip1.5mu\}\mathbin{→}\Conid{SplitVec}\;\Varid{s₁}{}\<[34]%
+\>[34]{}\mathbin{→}\Conid{SplitVec}\;\Varid{s₂}\mathbin{→}\Conid{SplitVec}\;(\Varid{deeper}\;\Varid{s₁}\;\Varid{s₂}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{data}\;\Conid{SplitMat}\mathbin{:}\Conid{Splitting}\mathbin{→}\Conid{Splitting}\mathbin{→}\Conid{Set}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Conid{Sing}\mathbin{:}(\Varid{x}\mathbin{:}\Conid{R}){}\<[19]%
+\>[19]{}\mathbin{→}\Conid{SplitMat}\;\Varid{one}\;\Varid{one}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Conid{RVec}\mathbin{:}\mathbin{∀}\{\mskip1.5mu \Varid{s₁}\;\Varid{s₂}\mskip1.5mu\}\mathbin{→}\Conid{SplitVec}\;(\Varid{deeper}\;\Varid{s₁}\;\Varid{s₂})\mathbin{→}\Conid{SplitMat}\;\Varid{one}\;(\Varid{deeper}\;\Varid{s₁}\;\Varid{s₂}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Conid{CVec}\mathbin{:}\mathbin{∀}\{\mskip1.5mu \Varid{s₁}\;\Varid{s₂}\mskip1.5mu\}\mathbin{→}\Conid{SplitVec}\;(\Varid{deeper}\;\Varid{s₁}\;\Varid{s₂})\mathbin{→}\Conid{SplitMat}\;(\Varid{deeper}\;\Varid{s₁}\;\Varid{s₂})\;\Varid{one}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{quad}\mathbin{:}\mathbin{∀}\{\mskip1.5mu \Varid{r₁}\;\Varid{r₂}\;\Varid{c₁}\;\Varid{c₂}\mskip1.5mu\}\mathbin{→}\Conid{SplitMat}\;\Varid{r₁}\;\Varid{c₁}\mathbin{→}\Conid{SplitMat}\;\Varid{r₁}\;\Varid{c₂}\mathbin{→}{}\<[E]%
+\\
+\>[3]{}\hsindent{24}{}\<[27]%
+\>[27]{}\Conid{SplitMat}\;\Varid{r₂}\;\Varid{c₁}\mathbin{→}\Conid{SplitMat}\;\Varid{r₂}\;\Varid{c₂}\mathbin{→}{}\<[E]%
+\\
+\>[3]{}\hsindent{24}{}\<[27]%
+\>[27]{}\Conid{SplitMat}\;(\Varid{deeper}\;\Varid{r₁}\;\Varid{r₂})\;(\Varid{deeper}\;\Varid{c₁}\;\Varid{c₂}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{data}\;\Conid{Tri}\mathbin{:}\Conid{Splitting}\mathbin{→}\Conid{Set}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{one}\mathbin{:}\Conid{Tri}\;\Varid{one}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{two}\mathbin{:}\mathbin{∀}\{\mskip1.5mu \Varid{s₁}\;\Varid{s₂}\mskip1.5mu\}\mathbin{→}\Conid{Tri}\;\Varid{s₁}\mathbin{→}\Conid{SplitMat}\;\Varid{s₁}\;\Varid{s₂}\mathbin{→}{}\<[E]%
+\\
+\>[3]{}\hsindent{27}{}\<[30]%
+\>[30]{}\Conid{Tri}\;\Varid{s₂}\mathbin{→}{}\<[E]%
+\\
+\>[3]{}\hsindent{18}{}\<[21]%
+\>[21]{}\Conid{Tri}\;(\Varid{deeper}\;\Varid{s₁}\;\Varid{s₂}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+If we allow arbitrary recursion, we can express the algorithm as:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mbox{\onelinecomment  Recursion step:}{}\<[E]%
+\\
+\>[B]{}\Varid{valiant}\mathbin{:}\mathbin{∀}\{\mskip1.5mu \Varid{s}\mskip1.5mu\}\to \Conid{Tri}\;\Varid{s}\to \Conid{Tri}\;\Varid{s}{}\<[E]%
+\\
+\>[B]{}\Varid{valiant}\;\Varid{one}\mathrel{=}\Varid{one}{}\<[E]%
+\\
+\>[B]{}\Varid{valiant}\;(\Varid{two}\;\Conid{A}\;\Conid{C}\;\Conid{B})\mathrel{=}\Varid{two}\;\Conid{A'}\;(\Varid{valiantOverlap}\;\Conid{A'}\;\Conid{C}\;\Conid{B'})\;\Conid{B'}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{where}\;\Conid{A'}\mathrel{=}(\Varid{valiant}\;\Conid{A}){}\<[E]%
+\\
+\>[3]{}\hsindent{6}{}\<[9]%
+\>[9]{}\Conid{B'}\mathrel{=}(\Varid{valiant}\;\Conid{B}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mbox{\onelinecomment  Overlap step:}{}\<[E]%
+\\
+\>[B]{}\Varid{valiantOverlap}\mathbin{:}\mathbin{∀}\{\mskip1.5mu \Varid{s₁}\;\Varid{s₂}\mskip1.5mu\}\to \Conid{Tri}\;\Varid{s₁}\to \Conid{SplitMat}\;\Varid{s₁}\;\Varid{s₂}\to \Conid{Tri}\;\Varid{s₂}\to \Conid{SplitMat}\;\Varid{s₁}\;\Varid{s₂}{}\<[E]%
+\\
+\>[B]{}\Varid{valiantOverlap}\;\{\mskip1.5mu \Varid{one}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{one}\mskip1.5mu\}\;\Conid{A'}\;\Conid{C}\;\Conid{B'}\mathrel{=}\Conid{C}{}\<[E]%
+\\
+\>[B]{}\Varid{valiantOverlap}\;\{\mskip1.5mu \Varid{one}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{deeper}\;\Varid{s₁}\;\Varid{s₂}\mskip1.5mu\}\;\Conid{A'}\;(\Conid{RVec}\;\Varid{v})\;\Conid{B'}\mathrel{=}\Conid{RVec}\;(\Varid{vectmul}\;\Varid{v}\;\Conid{B'}){}\<[E]%
+\\
+\>[B]{}\Varid{valiantOverlap}\;\{\mskip1.5mu \Varid{deeper}\;\Varid{s₁}\;\Varid{s₂}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{one}\mskip1.5mu\}\;\Conid{A'}\;(\Conid{CVec}\;\Varid{v})\;\Conid{B'}\mathrel{=}\Conid{CVec}\;(\Varid{tvecmul}\;\Conid{A'}\;\Varid{v}){}\<[E]%
+\\
+\>[B]{}\Varid{valiantOverlap}\;\{\mskip1.5mu \Varid{deeper}\;\Varid{s₁}\;\Varid{s₂}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{deeper}\;\Varid{s₃}\;\Varid{s₄}\mskip1.5mu\}\;(\Varid{two}\;\Conid{A₁}\;\Conid{A₂}\;\Conid{A₃})\;(\Varid{quad}\;\Conid{C₂}\;\Conid{C₄}\;\Conid{C₁}\;\Conid{C₃})\;(\Varid{two}\;\Conid{B₃}\;\Conid{B₂}\;\Conid{B₁})\mathrel{=}\Varid{quad}\;\Conid{X₂}\;\Conid{X₄}\;\Conid{X₁}\;\Conid{X₃}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{where}\;\Conid{X₁}\mathrel{=}\Varid{valiantOverlap}\;\Conid{A₃}\;\Conid{C₁}\;\Conid{B₃}{}\<[E]%
+\\
+\>[3]{}\hsindent{6}{}\<[9]%
+\>[9]{}\Conid{X₂}\mathrel{=}\Varid{valiantOverlap}\;\Conid{A₁}\;(\Varid{splitAdd}\;\Conid{C₂}\;(\Varid{splitMul}\;\Conid{A₂}\;\Conid{X₁}))\;\Conid{B₃}{}\<[E]%
+\\
+\>[3]{}\hsindent{6}{}\<[9]%
+\>[9]{}\Conid{X₃}\mathrel{=}\Varid{valiantOverlap}\;\Conid{A₃}\;(\Varid{splitAdd}\;\Conid{C₃}\;(\Varid{splitMul}\;\Conid{X₁}\;\Conid{B₂}))\;\Conid{B₁}{}\<[E]%
+\\
+\>[3]{}\hsindent{6}{}\<[9]%
+\>[9]{}\Conid{X₄}\mathrel{=}\Varid{valiantOverlap}\;\Conid{A₁}\;(\Varid{splitAdd}\;\Conid{C₄}\;(\Varid{splitAdd}\;(\Varid{splitMul}\;\Conid{A₂}\;\Conid{X₃})\;(\Varid{splitMul}\;\Conid{X₂}\;\Conid{B₂})))\;\Conid{B₁}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Immediately, it is fairly obvious that the recursion step is simply a catamorphism. That is, we define a function $foldTri$:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{foldTri}\mathbin{:}\mathbin{∀}\{\mskip1.5mu \Varid{b}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{s}\mathbin{:}\Conid{Splitting}\mskip1.5mu\}\;\{\mskip1.5mu \Conid{B}\mathbin{:}\Conid{Splitting}\to \Conid{Set}\;\Varid{b}\mskip1.5mu\}\mathbin{→}(\Varid{one'}\mathbin{:}\Conid{B}\;\Varid{one})\mathbin{→}(\Varid{two'}\mathbin{:}\mathbin{∀}\{\mskip1.5mu \Varid{s₁}\;\Varid{s₂}\mskip1.5mu\}\to \Conid{B}\;\Varid{s₁}\to \Conid{SplitMat}\;\Varid{s₁}\;\Varid{s₂}\to \Conid{B}\;\Varid{s₂}\to \Conid{B}\;(\Varid{deeper}\;\Varid{s₁}\;\Varid{s₂}))\mathbin{→}\Conid{Tri}\;\Varid{s}\mathbin{→}\Conid{B}\;\Varid{s}{}\<[E]%
+\\
+\>[B]{}\Varid{foldTri}\;\Varid{one'}\;\Varid{two'}\;\Varid{one}\mathrel{=}\Varid{one'}{}\<[E]%
+\\
+\>[B]{}\Varid{foldTri}\;\Varid{one'}\;\Varid{two'}\;(\Varid{two}\;\Conid{T₁}\;\Conid{R}\;\Conid{T₂})\mathrel{=}\Varid{two'}\;(\Varid{foldTri}\;\Varid{one'}\;\Varid{two'}\;\Conid{T₁})\;\Conid{R}\;(\Varid{foldTri}\;\Varid{one'}\;\Varid{two'}\;\Conid{T₂}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Which allows us to express the recursion step as 
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mbox{\onelinecomment  Helper function for overlap}{}\<[E]%
+\\
+\>[B]{}\Varid{valiantOverlap'}\mathbin{:}\mathbin{∀}\{\mskip1.5mu \Varid{s₁}\;\Varid{s₂}\mskip1.5mu\}\to \Conid{Tri}\;\Varid{s₁}\to \Conid{SplitMat}\;\Varid{s₁}\;\Varid{s₂}\to \Conid{Tri}\;\Varid{s₂}\to \Conid{Tri}\;(\Varid{deeper}\;\Varid{s₁}\;\Varid{s₂}){}\<[E]%
+\\
+\>[B]{}\Varid{valiantOverlap'}\;\Conid{T₁}\;\Conid{R}\;\Conid{T₂}\mathrel{=}\Varid{two}\;\Conid{T₁}\;(\Varid{valiantOverlap}\;\Conid{T₁}\;\Conid{R}\;\Conid{T₂})\;\Conid{T₂}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{valiantFold}\mathbin{:}\mathbin{∀}\{\mskip1.5mu \Varid{s}\mskip1.5mu\}\mathbin{→}\Conid{Tri}\;\Varid{s}\mathbin{→}\Conid{Tri}\;\Varid{s}{}\<[E]%
+\\
+\>[B]{}\Varid{valiantFold}\mathrel{=}\Varid{foldTri}\;\Varid{one}\;\Varid{valiantOverlap'}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+The overlap step on the other hand requires quite a bit of work. 
+First we note that the result of computing the transitive closure $X_1$ of $C_1$ is required when computing the closures $X_2$ and $X_3$ of $C_2$ and $C_3$ respectively. And that $X_2$ and $X_3$ are required for computing the transitive closure $X_4$ of $C_4$.
+
+\subsubsection{Nested Recursion}
+Even if we ignore the problem of sharing -- ideally, we do not want to recompute the value of $X_1$ in the calculation of both $X_2$ and $X_3$, we still have the problem that we need to include a nested recursive call somehow in the algorithm (we want to compute $f (g(f(x)))$ for some particular $f$ and $g$). For the computation of $X_4$ we actually need another level of nested recursion.
+
+This seems similar to course-of-value recursion [thanks Patrik], which has been studied by \cite{histomorphism1}. However, in that case, the components involved are all sub structures of the input structure. Here, the recursion proceeds on elements that are structurally smaller but not sub structures (even though they are shaped like them). Another thing to note is that course-of-value recursion is equivalent to primitive recursion [WIKIPEDIA (only natural numbers)].
+
+Since the recursive calls all happen on smaller structures, we can be sure that the function terminates. Maybe this is something that needs dependent types to work properly?
+\subsection{Derivation}
+\subsection{Method 1}
+
+\section{Other stuff}
+%What about the Floyd Warshall algorithm?
+``Bird and Moor'' or ``Bird and de Moor''
+\newpage
+\bibliography{references}
+\bibliographystyle{plainnat}
+\end{document}
