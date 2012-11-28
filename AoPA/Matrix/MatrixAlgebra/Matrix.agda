@@ -27,7 +27,7 @@ import Relation.Binary.EqReasoning as EqR
 open import Relation.Binary.PropositionalEquality as P 
             using (_≡_; refl; sym; cong)
 
-module Matrix 
+module Matrix.MatrixAlgebra.Matrix
   (A : Ring zeroL zeroL) -- is this ok??? 
 where
 

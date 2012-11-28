@@ -1,4 +1,4 @@
-module Matrix.TwoThree where
+module Matrix.JP.TwoThree where
 
 open import Data.Nat
 open import Data.Fin using (Fin; fromℕ; fromℕ≤; toℕ;  raise; reduce≥) 

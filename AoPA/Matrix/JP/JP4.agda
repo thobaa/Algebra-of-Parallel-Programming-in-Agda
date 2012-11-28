@@ -1,4 +1,4 @@
-module Matrix.JP4
+module Matrix.JP.JP4
    a
    ( _+_ : a -> a -> a )
    ( _·_ : a -> a -> a ) 
