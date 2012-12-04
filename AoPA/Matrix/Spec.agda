@@ -25,9 +25,9 @@ open import AlgebraicReasoning.Equality
 -- END AOPA
 open import Level using () renaming (zero to Lzero)
 
-open import Matrix.NonAssociativeRing
+open import Matrix.NonAssociativeNonRing
 
-module Matrix.Spec (NAR : NonAssociativeRing Lzero Lzero) where
+module Matrix.Spec (NAR : NonAssociativeNonRing Lzero Lzero) where
 
 open Matrix.Abstract (NAR)
 open Matrix.Tri (NAR)

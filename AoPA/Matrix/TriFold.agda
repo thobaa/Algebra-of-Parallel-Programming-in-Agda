@@ -7,7 +7,7 @@ import Matrix.NewNewSplit
 import Matrix.Tri
 open import Matrix.STree
 
-open import Matrix.NonAssociativeRing
+open import Matrix.NonAssociativeNonRing
 
 open import Level using () renaming (zero to Lzero)
 
@@ -16,7 +16,7 @@ open import Function
 
 
 open Relation.Binary.PropositionalEquality.≡-Reasoning
-module Matrix.TriFold (NAR : NonAssociativeRing Lzero Lzero) where
+module Matrix.TriFold (NAR : NonAssociativeNonRing Lzero Lzero) where
 
 
 open Matrix.Abstract (NAR)

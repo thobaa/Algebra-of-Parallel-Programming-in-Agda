@@ -7,7 +7,7 @@ open import Data.Fin using (Fin; fromℕ; fromℕ≤; toℕ;  raise; reduce≥)
 open import Data.Integer using (ℤ; +_; _-_)
                         -- renaming (≥ to z≥)
 open import Data.Vec renaming (Vec to SVec; [_] to <_>)
-open import Matrix.Definitions using (toℤ) renaming (_≥_ to _z≥_; _<_ to _z<_)
+open import Matrix.MatrixAlgebra.Definitions using (toℤ) renaming (_≥_ to _z≥_; _<_ to _z<_)
 open import Data.Empty
 open import Algebra
 open import Algebra.Structures
