@@ -23,11 +23,9 @@ valiantOverlap {deeper s₁ s₂} {deeper s₃ s₄} (two A₁ A₂ A₃) (quad 
         X₃ = valiantOverlap A₃ (C₃ + (X₁ * B₂)) B₁
         X₄ = valiantOverlap A₁ (C₄ + ((A₂ * X₃) + (X₂ * B₂))) B₁
 
-
-
 valiant : ∀ {s} -> Tri s -> Tri s
-valiant one = one
-valiant (two A C B) = two A' (valiantOverlap A' C B') B'
+valiant one          = one
+valiant (two A C B)  = two A' (valiantOverlap A' C B') B'
   where A' = (valiant A)
         B' = (valiant B)
 

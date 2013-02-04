@@ -77,6 +77,7 @@ valiant-der = ({!!} , {!!})
 -- different spec:
 TC : ∀ {s} → Tri s ← Tri s
 TC C X = X ◂ X ◂+ C ≡ X
+-- TODO: perhaps replace ◂ with ▴ 
 
 -- spec for rectangle
 SubTC : ∀ {s₁ s₂} → Tri (deeper s₁ s₂) ← Mat s₁ s₂
@@ -108,8 +109,12 @@ lemma-plus = {!!}
 valiant-sub-correctness : ∀ {s₁ s₂} {U : Tri s₁} {R : Mat s₁ s₂} {L : Tri s₂ } → SubTC (two U R L) (valiantOverlap U R L)
 valiant-sub-correctness = {!!}
 
+-- TODO: my (Patrik's) intuition is that this lemma should be
+-- subdivided to have a "non-recursive" φ
 
-
+-- TODO: JPB: I would first solve valiant-corretness with explicit
+-- recursion, then try to refactor into using a recursion operator
+-- later.
 
 lemma : ∀ {s₁ s₂} {U : Tri s₁} {R : Mat s₁ s₂} {L : Tri s₂} → 
   φ (two U R L) ≡ valiantOverlap' (φ U) R (φ L)
@@ -142,7 +147,7 @@ lemma {_} {_} {U} {R} {L} = begin
           + R)
           (φ L)
         ≡⟨ cong (λ X → two (φ U) X (φ L)) {!valiant-sub-correctness!} ⟩
-      -- GAP IS HERE!
+      -- GAP IS HERE!    
       -- 
       -- !!! 
       two (φ U) (valiantOverlap (φ U) R (φ L)) (φ L)
