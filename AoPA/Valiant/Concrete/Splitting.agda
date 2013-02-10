@@ -6,8 +6,8 @@ open import Data.Fin using (Fin)
 module Valiant.Concrete.Splitting where
 
 data Splitting : Set where
-  one : Splitting
-  deeper  : Splitting -> Splitting -> Splitting
+  one     : Splitting
+  deeper  : (s₁ : Splitting) → (s₂ : Splitting) → Splitting
 
 
 splitSize : Splitting → ℕ

@@ -1,9 +1,10 @@
 open import Valiant.Abstract.NonAssociativeNonRing
+open import Valiant.Abstract.NonAssociativeNonRing.Structure using (IsNonAssociativeNonRing)
 
-open import Relations
-open import Data.Product
-open import Data.Unit
-open import Relation.Binary.PropositionalEquality
+open import Relations using (_←_)
+open import Data.Product using ()
+open import Data.Unit using ()
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong₂; sym)
 
 open Relation.Binary.PropositionalEquality.≡-Reasoning
 
@@ -13,9 +14,9 @@ open import Valiant.Concrete.Splitting
 
 module Valiant.Specs.JPSpec {l₂} (NAR : NonAssociativeNonRing lZero l₂) where
 
-import Valiant.Concrete.Tri
+import Valiant.Concrete.Tri using (Tri; foldTri-intro; one; two)
 import Valiant.Concrete.Tri.Operations
-import Valiant.Concrete.Mat
+import Valiant.Concrete.Mat using (Mat; Sing; RVec; CVec; quad)
 import Valiant.Concrete.Mat.Operations
 import Valiant.Helper.Definitions
 import Valiant.Algorithm.Algorithm
@@ -71,30 +72,39 @@ valiant-der = ({!!} , {!!})
 
 -}
 
+open NonAssociativeNonRing NAR using (_≈_)
 
+infix 4 _∼_
+_∼_ : ∀ {s} → Tri s → Tri s → Set
+_∼_ {one} A B = {!!}
+_∼_ {deeper y y'} A B = {!!}
 
+infix 4 _≃_
+_≃_ : ∀ {s₁ s₂} → Mat s₁ s₂ → Mat s₁ s₂ → Set
+A ≃ B = {!!}
 
 -- different spec:
 TC : ∀ {s} → Tri s ← Tri s
-TC C X = X ◂ X ◂+ C ≡ X
+TC C X = X ◂ X ◂+ C ∼ X
 -- TODO: perhaps replace ◂ with ▴ 
 
 -- spec for rectangle
 SubTC : ∀ {s₁ s₂} → Tri (deeper s₁ s₂) ← Mat s₁ s₂
-SubTC (two U R L) X = U ◂* X + (X *◂ L + R) ≡ X
+SubTC (two U R L) X = (U ◂* X + X *◂ L) + R ≡ X
 
 -- give name to valiant eq
 φ : ∀ {s} → Tri s → Tri s
 φ X = valiantFold X ◂ valiantFold X ◂+ X
 
 -- these two are not very important.
-lemma-mul : ∀ {s₁ s₂} (U₁ U₂ : Tri s₁) (L₁ L₂ : Tri s₂) (R₁ R₂ : Mat s₁ s₂) → 
+-- ska det vara ≡ ? eller extension av ringolikhet
+lemma-mul : ∀ {s₁ s₂} (U₁ U₂ : Tri s₁) (R₁ R₂ : Mat s₁ s₂) (L₁ L₂ : Tri s₂)  → 
   two U₁ R₁ L₁ ◂ two U₂ R₂ L₂ ≡ two (U₁ ◂ U₂) (U₁ ◂* R₂ + R₁ *◂ L₂) (L₁ ◂ L₂)
-lemma-mul = {!!}
+lemma-mul U₁ U₂ R₁ R₂ L₁ L₂ = refl
 
-lemma-plus : ∀ {s₁ s₂} (U₁ U₂ : Tri s₁) (L₁ L₂ : Tri s₂) (R₁ R₂ : Mat s₁ s₂) → 
+lemma-plus : ∀ {s₁ s₂} (U₁ U₂ : Tri s₁) (R₁ R₂ : Mat s₁ s₂) (L₁ L₂ : Tri s₂) → 
   two U₁ R₁ L₁ ◂+ two U₂ R₂ L₂ ≡ two (U₁ ◂+ U₂) (R₁ + R₂) (L₁ ◂+ L₂)
-lemma-plus = {!!}
+lemma-plus U₁ U₂ R₁ R₂ L₁ L₂ = refl
 
 -- this is specifying equation for rectangle:
 {-lemma-rect : ∀ {
@@ -106,8 +116,21 @@ lemma-plus = {!!}
 
 -- valiantOverlap satisfies the SubTC:
 -- this is an important part of the proof!
-valiant-sub-correctness : ∀ {s₁ s₂} {U : Tri s₁} {R : Mat s₁ s₂} {L : Tri s₂ } → SubTC (two U R L) (valiantOverlap U R L)
-valiant-sub-correctness = {!!}
+-- 
+
+
+-- proof that U * (ol U R L) + (ol U R L) * L + R = (ol U R L)
+-- assuming that U and L are transitively closed.
+valiant-sub-correctness : ∀ {s₁ s₂} (U : Tri s₁) (R : Mat s₁ s₂) (L : Tri s₂) → SubTC (two U R L) (valiantOverlap U R L)
+valiant-sub-correctness one (Sing x) one = {!!}
+valiant-sub-correctness U (RVec v) L = {!!}
+valiant-sub-correctness U (CVec v) L = {!!}
+valiant-sub-correctness U (quad A B C D) L = {!!}
+
+
+
+sub-correct : {s₁ s₂ : Splitting} → (U : Tri s₁) → (R : Mat s₁ s₂) → (L : Tri s₂) → two U ((U ◂* (valiantOverlap U R L) + (valiantOverlap U R L) *◂ L) + R) L ≡ two U (valiantOverlap U R L) L 
+sub-correct U R L = cong (λ X → two U X L) (valiant-sub-correctness U R L)
 
 -- TODO: my (Patrik's) intuition is that this lemma should be
 -- subdivided to have a "non-recursive" φ
@@ -116,9 +139,48 @@ valiant-sub-correctness = {!!}
 -- recursion, then try to refactor into using a recursion operator
 -- later.
 
-lemma : ∀ {s₁ s₂} {U : Tri s₁} {R : Mat s₁ s₂} {L : Tri s₂} → 
-  φ (two U R L) ≡ valiantOverlap' (φ U) R (φ L)
-lemma {_} {_} {U} {R} {L} = begin 
+
+          
+
+-- correctness proof of valiant:
+-- the goal is to prove that: φ is a fold (in particular, that φ is valiantFold)
+v-c : ∀ {s} (C : Tri s) → TC C (valiantFold C)
+v-c {one} one = refl
+v-c {deeper s₁ s₂} (two U R L) = lemma
+  where 
+    lemma : ∀ {s₁ s₂} {U : Tri s₁} {R : Mat s₁ s₂} {L : Tri s₂} → φ (two U R L) ≡ valiantOverlap' (valiantFold U) R (valiantFold L)
+    lemma {_} {_} {U} {R} {L} = begin 
+      φ (two U R L) 
+        ≡⟨ refl ⟩ -- definition
+      valiantFold (two U R L) ◂ valiantFold (two U R L) ◂+ two U R L
+        ≡⟨ refl ⟩ -- consider triangular parts of product
+      two U⁺ R⁺ L⁺ 
+      ◂ 
+      two U⁺ R⁺ L⁺ 
+      ◂+ 
+      two U R L
+        ≡⟨ cong (λ x → x ◂+ two U R L) (lemma-mul U⁺ U⁺ R⁺ R⁺ L⁺ L⁺) ⟩
+      two (U⁺ ◂ U⁺) (U⁺ ◂* R⁺ + R⁺ *◂ L⁺) (L⁺ ◂ L⁺) 
+      ◂+ 
+      two U R L
+        ≡⟨ lemma-plus (U⁺ ◂ U⁺) U (U⁺ ◂* R⁺ + R⁺ *◂ L⁺) R (L⁺ ◂ L⁺) L ⟩
+      two (U⁺ ◂ U⁺ ◂+ U) ((U⁺ ◂* R⁺ + R⁺ *◂ L⁺) + R) (L⁺ ◂ L⁺ ◂+ L)
+        ≡⟨ refl ⟩
+      two (φ U) ((U⁺ ◂* R⁺ + R⁺ *◂ L⁺) + R) (φ L)
+        ≡⟨ cong₂ (λ X Y → two X ((U⁺ ◂* R⁺ + R⁺ *◂ L⁺) + R) Y) {!!} {!!} ⟩ --(v-c U) (v-c L) ⟩
+      two U⁺ ((U⁺ ◂* R⁺ + R⁺ *◂ L⁺) + R) L⁺
+        ≡⟨ sub-correct U⁺ R L⁺ ⟩ 
+      two U⁺ (valiantOverlap U⁺ R L⁺) L⁺
+        ≡⟨ refl ⟩
+      valiantOverlap' U⁺ R L⁺  ∎
+        where U⁺ = valiantFold U
+              L⁺ = valiantFold L
+              R⁺ = valiantOverlap U⁺ R L⁺
+
+
+{-
+    lemma : ∀ {s₁ s₂} {U : Tri s₁} {R : Mat s₁ s₂} {L : Tri s₂} → φ (two U R L) ≡ valiantOverlap' (φ U) R (φ L)
+    lemma {_} {_} {U} {R} {L} = begin 
       φ (two U R L) 
         ≡⟨ refl ⟩ -- definition
       valiantFold (two U R L) ◂ valiantFold (two U R L) ◂+ two U R L
@@ -146,25 +208,76 @@ lemma {_} {_} {U} {R} {L} = begin
           R⁺ *◂ L⁺)
           + R)
           (φ L)
-        ≡⟨ cong (λ X → two (φ U) X (φ L)) {!valiant-sub-correctness!} ⟩
-      -- GAP IS HERE!    
-      -- 
-      -- !!! 
+        ≡⟨ cong₂ (λ X Y → two (φ U) ((X ◂* (valiantOverlap X R Y) + (valiantOverlap X R Y) *◂ Y) + R) (φ L)) (sym (v-c U)) (sym (v-c L)) ⟩
+
+
+      two (φ U)
+        (((φ U) ◂* (valiantOverlap (φ U) R (φ L))
+          +
+          (valiantOverlap (φ U) R (φ L)) *◂ (φ L))
+          + R)
+          (φ L)
+        ≡⟨ sub-correct (φ U) R (φ L) ⟩ 
       two (φ U) (valiantOverlap (φ U) R (φ L)) (φ L)
         ≡⟨ refl ⟩
-      {!!}
-      --valiantOverlap' (φ U) R (φ L)  ∎
+      valiantOverlap' (φ U) R (φ L)  ∎
+        where U⁺ = valiantFold U
+              L⁺ = valiantFold L
+              R⁺ = valiantOverlap U⁺ R L⁺-}
+
+{-valiant-correctness : ∀ {s} (C : Tri s) → TC C (valiantFold C)
+valiant-correctness {s} C = foldTri-intro {lZero} {Tri} {one} {valiantOverlap'} {φ} {s} {C} refl lemma
+  where 
+    lemma : ∀ {s₁ s₂} {U : Tri s₁} {R : Mat s₁ s₂} {L : Tri s₂} → φ (two U R L) ≡ valiantOverlap' (φ U) R (φ L)
+    lemma {_} {_} {U} {R} {L} = begin 
+      φ (two U R L) 
+        ≡⟨ refl ⟩ -- definition
+      valiantFold (two U R L) ◂ valiantFold (two U R L) ◂+ two U R L
+        ≡⟨ refl ⟩ -- consider triangular parts of product
+      two U⁺ R⁺ L⁺ 
+      ◂ 
+      two U⁺ R⁺ L⁺ 
+      ◂+ 
+      two U R L
+        ≡⟨ cong (λ x → x ◂+ two U R L) (lemma-mul U⁺ U⁺ L⁺ L⁺ R⁺ R⁺) ⟩
+      two (U⁺ ◂ U⁺) (U⁺ ◂* R⁺ + R⁺ *◂ L⁺) (L⁺ ◂ L⁺) 
+      ◂+ 
+      two U R L
+        ≡⟨ lemma-plus (U⁺ ◂ U⁺) U (L⁺ ◂ L⁺) L (U⁺ ◂* R⁺ + R⁺ *◂ L⁺) R ⟩
+      two (U⁺ ◂ U⁺ ◂+ U) 
+          ((U⁺ ◂* R⁺
+          +
+          R⁺ *◂ L⁺)              
+          + R) 
+          (L⁺ ◂ L⁺ ◂+ L)
+        ≡⟨ refl ⟩
+      two (φ U)
+        ((U⁺ ◂* R⁺
+          +
+          R⁺ *◂ L⁺)
+          + R)
+          (φ L)
+        ≡⟨ cong₂ (λ X Y → two (φ U) ((X ◂* (valiantOverlap X R Y) + (valiantOverlap X R Y) *◂ Y) + R) (φ L)) (sym (valiant-correctness U)) {!!} ⟩
+
+--((λ X Y → two (φ U) ((X ◂* R⁺ + R⁺ *◂ Y) + R) (φ L)) valiant-correctness valiant-correctness) -- (X ◂* (valiantOverlap X R Y) + (valiantOverlap X R Y) *◂ Y) + R
+
+      two (φ U)
+        (((φ U) ◂* (valiantOverlap (φ U) R (φ L))
+          +
+          (valiantOverlap (φ U) R (φ L)) *◂ (φ L))
+          + R)
+          (φ L)
+        ≡⟨ sub-correct (φ U) R (φ L) ⟩ 
+      two (φ U) (valiantOverlap (φ U) R (φ L)) (φ L)
+        ≡⟨ refl ⟩
+      valiantOverlap' (φ U) R (φ L)  ∎
         where U⁺ = valiantFold U
               L⁺ = valiantFold L
               R⁺ = valiantOverlap U⁺ R L⁺
-          
-
--- correctness proof of valiant:
-valiant-correctness : ∀ {s} {C : Tri s} → TC C (valiantFold C)
-valiant-correctness {s} {C} = foldTri-intro {lZero} {Tri} {one} {valiantOverlap'} {φ} {s} {C} refl lemma
 -- should prove 
 
 -- second proof is that 
 -- begin with "fold introduction" (should be used backwards in derivation)
 
 -- if
+-}

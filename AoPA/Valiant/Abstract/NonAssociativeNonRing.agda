@@ -1,10 +1,14 @@
 ------------------------------------------------------------------------
 -- Nonassocitive non-rings:
 -- 
--- Addition not group :(,
+-- * Addition not group.
+--   . is commutative.
+--   . is associative.
+--   . has zero
+--   . does not have inverse -> Commutative Monoid
 -- Multiplication linear
 -- not neccessarily multiplicative identity.
--- but annihilating 0 follows from axioms!
+-- Should have annihilating zero.
 ------------------------------------------------------------------------
 
 module Valiant.Abstract.NonAssociativeNonRing where
@@ -22,7 +26,6 @@ open import Valiant.Abstract.NonAssociativeNonRing.Structure
 
 
 record NonAssociativeNonRing c ℓ : Set (suc (c ⊔ ℓ)) where
-  infix  8 -_
   infixl 7 _*_
   infixl 6 _+_
   infix  4 _≈_
@@ -31,13 +34,12 @@ record NonAssociativeNonRing c ℓ : Set (suc (c ⊔ ℓ)) where
     _≈_     : Rel Carrier ℓ
     _+_     : Op₂ Carrier
     _*_     : Op₂ Carrier
-    -_      : Op₁ Carrier
     0#      : Carrier
-    isNonAssociativeNonRing  : IsNonAssociativeNonRing _≈_ _+_ _*_ -_ 0#
+    isNonAssociativeNonRing  : IsNonAssociativeNonRing _≈_ _+_ _*_ 0#
 
   open IsNonAssociativeNonRing isNonAssociativeNonRing public 
-  +-abelianGroup : AbelianGroup _ _
-  +-abelianGroup = record { isAbelianGroup = +-isAbelianGroup }
+  +-commutativeMonoid : CommutativeMonoid _ _
+  +-commutativeMonoid = record { isCommutativeMonoid = +-isCommutativeMonoid }
 
-  open AbelianGroup +-abelianGroup public
-         using () renaming (group to +-group)
+  open CommutativeMonoid +-commutativeMonoid public
+         using () -- renaming (group to +-group)
