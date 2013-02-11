@@ -1,0 +1,11 @@
+TODO: explain the top level structure of the code
+
+Abstract/
+
+Concrete/
+
+MatrixAlgebra - TODO: remove (move into other parts, reformulated)
+
+Helpers/ -- simple helper functions
+
+Specs/ -- started proving the top level property

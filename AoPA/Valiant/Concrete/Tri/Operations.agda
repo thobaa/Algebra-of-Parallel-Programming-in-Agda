@@ -46,7 +46,7 @@ _*◂_ {deeper s₁ s₂} {deeper t₁ t₂} (quad A B C D) (two T₁ R T₂) = 
 infix 6 _◂_
 _◂_ : ∀ {s} -> Tri s -> Tri s -> Tri s
 _◂_ one one = one
-_◂_ (two T₁₁ R₁ T₁₂) (two T₂₁ R₂ T₂₂) = two (T₁₁ ◂ T₂₁) (T₁₁ ◂* R₁  +  R₁ *◂ T₂₂) (T₁₂ ◂ T₂₂)
+_◂_ (two T₁₁ R₁ T₁₂) (two T₂₁ R₂ T₂₂) = two (T₁₁ ◂ T₂₁) (T₁₁ ◂* R₂  +  R₁ *◂ T₂₂) (T₁₂ ◂ T₂₂)
 
 infix 5 _◂+_
 _◂+_ : ∀ {s} -> Tri s -> Tri s -> Tri s

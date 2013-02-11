@@ -14,26 +14,23 @@ open FunctionProperties using (Op₁; Op₂)
 
 record IsNonAssociativeNonRing
          {a ℓ} {A : Set a} (≈ : Rel A ℓ)
-         (_+_ _*_ : Op₂ A) (-_ : Op₁ A) (0# : A) : Set (a ⊔ ℓ) where
+         (_+_ _*_ : Op₂ A) (0# : A) : Set (a ⊔ ℓ) where
   open FunctionProperties ≈
   field
-    +-isAbelianGroup : IsAbelianGroup ≈ _+_ 0# -_
-    *-cong           : _*_ Preserves₂ ≈ ⟶ ≈ ⟶ ≈
-    distrib          : _*_ DistributesOver _+_
+    +-isCommutativeMonoid : IsCommutativeMonoid ≈ _+_ 0#
+    *-cong                : _*_ Preserves₂ ≈ ⟶ ≈ ⟶ ≈
+    distrib               : _*_ DistributesOver _+_
+    zero                  : Zero 0# _*_
 
-  open IsAbelianGroup +-isAbelianGroup public
+  open IsCommutativeMonoid +-isCommutativeMonoid public
          renaming ( assoc               to +-assoc
                   ; ∙-cong              to +-cong
                   ; isSemigroup         to +-isSemigroup
                   ; identity            to +-identity
                   ; isMonoid            to +-isMonoid
-                  ; inverse             to -‿inverse
-                  ; ⁻¹-cong             to -‿cong
-                  ; isGroup             to +-isGroup
                   ; comm                to +-comm
-                  ; isCommutativeMonoid to +-isCommutativeMonoid
                   )
-
+{-
   zero : Zero 0# _*_
   zero = (zeroˡ , zeroʳ)
     where
@@ -62,5 +59,4 @@ record IsNonAssociativeNonRing
                                              refl ⟩
       (x * 0#) + - (x * 0#)               ≈⟨ proj₂ -‿inverse _ ⟩
       0#                                  ∎
-
--- maybe add one with multiplicative 1 also.
+-}

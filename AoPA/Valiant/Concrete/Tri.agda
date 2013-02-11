@@ -19,13 +19,13 @@ open Valiant.Helper.Definitions NAR
  
 data Tri : Splitting → Set l₁ where
   one : Tri one
-  two : ∀ {s₁ s₂} → Tri s₁ → Mat s₁ s₂ → 
-                             Tri s₂ → 
+  two : ∀ {s₁ s₂} → (U : Tri s₁) → (R : Mat s₁ s₂) → 
+                                   (L : Tri s₂) → 
                     Tri (deeper s₁ s₂)
 
-T0 : ∀ {s} -> Tri s
-T0 {one} = one
-T0 {deeper y y'} = two T0 zeroMat T0
+zeroTri : ∀ {s} -> Tri s
+zeroTri {one} = one
+zeroTri {deeper y y'} = two zeroTri zeroMat zeroTri
 
 tri1 : ∀ {s₁ s₂} -> Tri (deeper s₁ s₂) -> Tri s₁
 tri1 (two y y' y0) = y
