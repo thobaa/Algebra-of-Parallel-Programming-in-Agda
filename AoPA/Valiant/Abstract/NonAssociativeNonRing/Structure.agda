@@ -18,6 +18,7 @@ record IsNonAssociativeNonRing
   open FunctionProperties ≈
   field
     +-isCommutativeMonoid : IsCommutativeMonoid ≈ _+_ 0#
+    +-idempotent          : Idempotent _+_
     *-cong                : _*_ Preserves₂ ≈ ⟶ ≈ ⟶ ≈
     distrib               : _*_ DistributesOver _+_
     zero                  : Zero 0# _*_
