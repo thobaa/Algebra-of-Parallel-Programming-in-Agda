@@ -22,7 +22,7 @@ open Valiant.Helper.Definitions NAR
 infix 6 _∙_
 _∙_ : ∀ {t1} → Vec t1 → Vec t1 → R
 _∙_ {one} (one x) (one x') = x R* x'
-_∙_ {deeper y y'} (two y0 y1) (two y2 y3) = y0 ∙ y2  R+  y1 ∙ y3
+_∙_ {deeper y y'} (two y0 y1) (two y2 y3) = (y0 ∙ y2)  R+  (y1 ∙ y3)
 
 
 

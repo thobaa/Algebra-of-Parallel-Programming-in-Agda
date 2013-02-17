@@ -23,9 +23,12 @@ module Valiant.Helper.Definitions {l₁ l₂} (NAR : NonAssociativeNonRing l₁ 
 
 open Algebra.CommutativeSemiring commutativeSemiring using (+-identity; +-comm)
 
--- Ring stuff
+-- Ring stuff. better for agda to rename stuff when including.
 R : Set l₁
 R = NonAssociativeNonRing.Carrier NAR
+
+R0 : R
+R0 = NonAssociativeNonRing.0# NAR
 
 infix 5 _R+_
 _R+_ : R → R → R
@@ -35,9 +38,6 @@ infix 6 _R*_
 _R*_ : R → R → R
 _R*_ = NonAssociativeNonRing._*_ NAR
 
-
-R0 : R
-R0 = NonAssociativeNonRing.0# NAR
 
 rearrangeLemma : ∀ {a b}{cm : CommutativeMonoid a b} (x y z å : CommutativeMonoid.Carrier cm) → 
                let _+'_ = CommutativeMonoid._∙_ cm ; _≈'_ = (CommutativeMonoid._≈_ cm) in
@@ -121,7 +121,7 @@ raise' {m} i (suc n) = subst Fin (begin suc (m + n)
 ≰to> {suc n} {suc n'} pf = s≤s (≰to> (λ z → pf (s≤s z)))
 
 -- Pair stuff
-⟨_,_,_⟩ : {a b c d : Set l₁} -> 
+⟨_,_,_⟩ : ∀ {x} {a b c d : Set x} -> 
         (a → b) → (a → c) → (a → d) →
         a → (b × c × d)
 ⟨ f , g , h ⟩ x = f x , g x , h x
