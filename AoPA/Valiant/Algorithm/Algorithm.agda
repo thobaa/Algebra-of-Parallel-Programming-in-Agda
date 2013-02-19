@@ -21,20 +21,21 @@ open Valiant.Concrete.Mat NAR
 
 --3ov : ∀ {s₁ s₂} → Tri  → Vec s₁ → Vec s₂ → Tri (deeper s₁ s₂) → Vec (deeper s₁ s₂)
 
-
+open NonAssociativeNonRing NAR renaming (_+_ to _R+_; _*_ to _R*_)
 
 -- första vec klar.
 extendRow : ∀ {s₁ s₂} → Vec s₁ → Mat s₁ s₂ → Tri s₂ → Vec s₂ → Vec s₂
-extendRow {s₁} {one} u⁺ R L v = u⁺ |* R ⊕ v
+extendRow {one} {one} (one x) (Sing y) L (one z) = one (x R* y R+ z)
+extendRow {deeper s₁ s₂} {one} (two u v) (CVec (two u' v')) L (one x) = Valiant.Concrete.Mat.one ((u ∙ u') R+ (v ∙ v') R+ x) --u⁺ |* R ⊕ v
 extendRow u⁺ R' (two U R L) (two u v) = two u' v'
   where u' = extendRow u⁺ (left R') U u
         v' = extendRow (two u⁺ u') (right R' over R) L v
 
 overlapRow : ∀ {s} → Vec s → Tri s → Vec s
 overlapRow (one x) one = one x
-overlapRow (two u v) (two U R L) = two u' v'
-  where u' = overlapRow u U -- sedan ska denna extendas till v
-        v' = extendRow u' R L v
+overlapRow (two u v) (two U R L) = two u⁺ v⁺
+  where u⁺ = overlapRow u U -- sedan ska denna extendas till v
+        v⁺ = overlapRow (u⁺ |* R ⊕ v) L --extendRow u' R L v
 
 
 -- these work from down and up!
@@ -47,11 +48,19 @@ extendCol (two U R L) R' (two u v) v⁺ = two u'' v''
   where v'' = extendCol L (lower R') v v⁺ -- saknas det inte något här?
         u'' = extendCol U (R M++ upper R') u (two v'' v⁺)
 
+-- U R⁺ + R = R⁺  , R = (u v)', R⁺ = (u⁺ v⁺)'
+-- U = A B
+--       C
+-- A B |u⁺| = |A u⁺ + B v⁺| 
+--   C |v⁺|   |C v⁺       |
+-- så: 
+-- A u⁺ + B v⁺ + u = u⁺
+-- C v⁺ +        v = v⁺
 overlapCol : ∀ {s} → Tri s → Vec s → Vec s
 overlapCol one (one x) = one x
-overlapCol (two U R L) (two u v) = two u'' v''
-  where v'' = overlapCol L v
-        u'' = extendCol U R u v''
+overlapCol (two U R L) (two u v) = two u⁺ v⁺
+  where v⁺ = overlapCol L v
+        u⁺ = overlapCol U (R *| v⁺ ⊕ u) --extendCol U R u v'
         
 
 -- the triangles are supposed to be transitively closed!

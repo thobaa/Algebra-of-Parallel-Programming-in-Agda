@@ -1,14 +1,13 @@
 open import Valiant.Abstract.NonAssociativeNonRing
 open import Valiant.Abstract.NonAssociativeNonRing.Structure using (IsNonAssociativeNonRing)
+open import Algebra
 
---open import Relations using (_←_)
-open import Data.Product using (proj₁)
+open import Data.Product using (proj₁; proj₂)
 open import Data.Unit using ()
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong₂; sym)
 
 import Relation.Binary.EqReasoning as EqR
 
---open Relation.Binary.PropositionalEquality.≡-Reasoning
 
 open import Level using (Level) renaming (zero to lzero; _⊔_ to _l⊔_; suc to lsuc)
 
@@ -41,6 +40,9 @@ open Valiant.Concrete.Tri.Congruences NAR
 open Valiant.Concrete.Tri.CommutativeMonoid NAR
 open Valiant.Concrete.Tri.Distributivities NAR
 
+
+import Valiant.Specs.Overlap
+open Valiant.Specs.Overlap NAR
 -- spec is: 
 -- TC C = TC C * C + TC C
 
@@ -131,10 +133,10 @@ lemma-plus U₁ U₂ R₁ R₂ L₁ L₂ = refl
 -- proof that U * (ol U R L) + (ol U R L) * L + R = (ol U R L),                                   (U ◂* X + X *◂ L) + R m≈ X
 -- We seem to need that U and L are transitively closed.
 
-valiant-row-correctness1 : ∀ {s} → (u : Vec s) (U : Tri s) → (zeroVec ⊕ overlapRow u U |◂ U) ⊕ u v≈ overlapRow u U 
-valiant-row-correctness1 = {!!}
+--valiant-row-correctness1 : ∀ {s} → (u : Vec s) (U : Tri s) → (zeroVec ⊕ overlapRow u U |◂ U) ⊕ u v≈ overlapRow u U 
+--valiant-row-correctness1 = {!!}
 
--- is matrix vector multiplication associative?
+
 valiant-sub-correctness : ∀ {s₁ s₂} (U : Tri s₁) (R : Mat s₁ s₂) (L : Tri s₂) → SubTC (two U R L) (valiantOverlap U R L)
 valiant-sub-correctness one (Sing x) one = Valiant.Concrete.Tri.Equalities.Sing-eq (begin 
    (R0 R+ R0) R+ x 
@@ -143,29 +145,78 @@ valiant-sub-correctness one (Sing x) one = Valiant.Concrete.Tri.Equalities.Sing-
      ≈⟨ proj₁ R+-identity x ⟩
    x ∎)
   where open EqR (record { Carrier = R; _≈_ = _≈_; isEquivalence = isEquivalenceR })
-valiant-sub-correctness {one} {deeper s₁ s₂} one (RVec (two u v)) (two U R L) = RVec-eq (Valiant.Concrete.Tri.Equalities.two-eq {!!} {!!}) -- vi behöver att a är tc, a = a + a*a
-  where lemma₁ : ∀ {s} {v : Vec s} {a : Tri s} → (zeroVec ⊕ (v ⊕ v |◂ a) |◂ a) ⊕ v v≈ v ⊕ v |◂ a
-        lemma₁ {s} {v} {a} = begin 
-          (zeroVec ⊕ (v ⊕ v |◂ a) |◂ a) ⊕ v 
-            ≈⟨ assocV zeroVec ((v ⊕ v |◂ a) |◂ a) v ⟩ 
-         zeroVec ⊕ ((v ⊕ v |◂ a) |◂ a ⊕ v)
-            ≈⟨ identityˡV ((v ⊕ v |◂ a) |◂ a ⊕ v) ⟩ 
-         (v ⊕ v |◂ a) |◂ a ⊕ v
-            ≈⟨ commV ((v ⊕ v |◂ a) |◂ a) v ⟩    
-          v ⊕ (v ⊕ v |◂ a) |◂ a
-            ≈⟨ ⊕-cong reflV (|◂-distribʳ v (v |◂ a) a) ⟩     
-          v ⊕ (v |◂ a ⊕ (v |◂ a) |◂ a)
-            ≈⟨ {!commV!} ⟩    
-          v ⊕ v |◂ a ∎
-          where open EqR (record { Carrier = Vec s; _≈_ = _v≈_; isEquivalence = isEquivalenceV })
-                postulate 
-                  pf : (a ◂ a) ◂+ a t≈ a
-        lemma₂ :  ∀ {s₁ s₂} {u : Vec s₁} {v : Vec s₂} {U : Tri s₁} {R : Mat s₁ s₂} {L : Tri s₂} → (zeroVec ⊕ ((u ⊕ u |◂ U) |* R ⊕ (v ⊕ (u |* R ⊕ v |◂ L)) |◂ L)) ⊕ v v≈ v ⊕ (u |* R ⊕ v |◂ L)
-        lemma₂ = {!!}
-valiant-sub-correctness (Valiant.Concrete.Tri.two U R L) (Valiant.Concrete.Mat.CVec (Valiant.Concrete.Mat.two u v)) Valiant.Concrete.Tri.one = Valiant.Concrete.Tri.Equalities.CVec-eq (Valiant.Concrete.Tri.Equalities.two-eq {!!} {!!})
--- need to combine recursive step, up to three times!
+valiant-sub-correctness {one} {deeper s₁ s₂} one (RVec (two u v)) (two U R L) = RVec-eq (Valiant.Concrete.Tri.Equalities.two-eq pf1 pf2) -- vi behöver att a är tc, a = a + a*a
+  where pf1 : (zeroVec ⊕ overlapRow u U |◂ U) ⊕ u v≈ overlapRow u U
+        pf1 = begin 
+            (zeroVec ⊕ overlapRow u U |◂ U) ⊕ u
+              ≈⟨ assocV zeroVec (overlapRow u U |◂ U) u ⟩ 
+            zeroVec ⊕ (overlapRow u U |◂ U ⊕ u)
+              ≈⟨ identityˡV (overlapRow u U |◂ U ⊕ u) ⟩ 
+            overlapRow u U |◂ U ⊕ u
+              ≈⟨ overlapRow-corr u U ⟩ 
+            (overlapRow u U ∎)
+          where open EqR (record { Carrier = Vec s₁; _≈_ = _v≈_; isEquivalence = isEquivalenceV }) 
+        pf2 : (zeroVec ⊕
+                 (overlapRow u U |* R ⊕
+                  overlapRow (overlapRow u U |* R ⊕ v) L |◂ L))
+                ⊕ v
+                v≈ overlapRow (overlapRow u U |* R ⊕ v) L
+        pf2 = begin 
+            (zeroVec ⊕ (overlapRow u U |* R ⊕ overlapRow (overlapRow u U |* R ⊕ v) L |◂ L)) ⊕ v
+              ≈⟨ ⊕-cong (identityˡV (overlapRow u U |* R ⊕ overlapRow (overlapRow u U |* R ⊕ v) L |◂ L)) reflV ⟩
+            ((overlapRow u U |* R ⊕
+                overlapRow (overlapRow u U |* R ⊕ v) L |◂ L))
+              ⊕ v
+              ≈⟨ ⊕-cong (commV (overlapRow u U |* R) (overlapRow (overlapRow u U |* R ⊕ v) L |◂ L)) reflV ⟩
+            (overlapRow (overlapRow u U |* R ⊕ v) L |◂ L ⊕ overlapRow u U |* R) ⊕ v
 
-valiant-sub-correctness {deeper s₁ s₂} {deeper s₁' s₂'} (Valiant.Concrete.Tri.two U R L) (Valiant.Concrete.Mat.quad A B C D) (Valiant.Concrete.Tri.two U' R' L') = Valiant.Concrete.Tri.Equalities.quad-eq pfA pfB (valiant-sub-correctness L C U') pfD
+              ≈⟨ assocV (overlapRow (overlapRow u U |* R ⊕ v) L |◂ L) (overlapRow u U |* R) v ⟩
+            overlapRow (overlapRow u U |* R ⊕ v) L |◂ L ⊕ (overlapRow u U |* R ⊕ v)
+              ≈⟨ overlapRow-corr (overlapRow u U |* R ⊕ v) L ⟩ 
+            overlapRow (overlapRow u U |* R ⊕ v) L ∎
+          where open EqR (record { Carrier = Vec s₂; _≈_ = _v≈_; isEquivalence = isEquivalenceV }) 
+valiant-sub-correctness {deeper s₁ s₂} {one} (Valiant.Concrete.Tri.two U R L) (CVec (two u v)) Valiant.Concrete.Tri.one = Valiant.Concrete.Tri.Equalities.CVec-eq (Valiant.Concrete.Tri.Equalities.two-eq pf1 pf2)
+  where pf1 : ((U ◂| overlapCol U (R *| overlapCol L v ⊕ u) ⊕
+                  R *| overlapCol L v)
+                 ⊕ zeroVec)
+                ⊕ u
+                v≈ overlapCol U (R *| overlapCol L v ⊕ u) 
+        pf1 = begin 
+            ((U ◂| overlapCol U (R *| overlapCol L v ⊕ u) ⊕
+                R *| overlapCol L v)
+               ⊕ zeroVec)
+              ⊕ u 
+              ≈⟨ ⊕-cong (proj₂ identity (U ◂| overlapCol U (R *| overlapCol L v ⊕ u) ⊕ R *| overlapCol L v)) reflV ⟩ 
+            ((U ◂| overlapCol U (R *| overlapCol L v ⊕ u) ⊕
+                R *| overlapCol L v))
+              ⊕ u 
+              ≈⟨ assocV (U ◂| overlapCol U (R *| overlapCol L v ⊕ u)) (R *| overlapCol L v) u ⟩ 
+            U ◂| overlapCol U (R *| overlapCol L v ⊕ u) ⊕
+              (R *| overlapCol L v ⊕ u)
+              ≈⟨ overlapCol-corr U (R *| overlapCol L v ⊕ u) ⟩ 
+            overlapCol U (R *| overlapCol L v ⊕ u) ∎
+          where open EqR (record { Carrier = Vec s₁; _≈_ = _v≈_; isEquivalence = isEquivalenceV })
+                open CommutativeMonoid (record {
+                                          Carrier = Vec s₁;
+                                          _≈_ = _v≈_;
+                                          _∙_ = _⊕_;
+                                          ε = zeroVec;
+                                          isCommutativeMonoid = isCommutativeMonoidV })
+        pf2 : (L ◂| overlapCol L v ⊕ zeroVec) ⊕ v v≈ overlapCol L v 
+        pf2 = begin 
+            (L ◂| overlapCol L v ⊕ zeroVec) ⊕ v 
+              ≈⟨ ⊕-cong (proj₂ identity (L ◂| overlapCol L v)) reflV ⟩
+            L ◂| overlapCol L v ⊕ v
+              ≈⟨ overlapCol-corr L v ⟩ 
+            overlapCol L v ∎
+          where open EqR (record { Carrier = Vec s₂; _≈_ = _v≈_; isEquivalence = isEquivalenceV })
+                open CommutativeMonoid (record {
+                                          Carrier = Vec s₂;
+                                          _≈_ = _v≈_;
+                                          _∙_ = _⊕_;
+                                          ε = zeroVec;
+                                          isCommutativeMonoid = isCommutativeMonoidV })
+valiant-sub-correctness {deeper s₁ s₂} {deeper s₁' s₂'} (Valiant.Concrete.Tri.two U R L) (quad A B C D) (Valiant.Concrete.Tri.two U' R' L') = Valiant.Concrete.Tri.Equalities.quad-eq pfA pfB (valiant-sub-correctness L C U') pfD
   where pfC : (L ◂* valiantOverlap L C U' + valiantOverlap L C U' *◂ U') + C 
                 m≈
               valiantOverlap L C U' 
@@ -253,20 +304,25 @@ valiant-sub-correctness {deeper s₁ s₂} {deeper s₁' s₂'} (Valiant.Concret
             valiantOverlap u (b + (r * valiantOverlap l (d + valiantOverlap l c u' * r') l' + valiantOverlap u (a + r * valiantOverlap l c u') u' * r'))
               l' ∎
             where open EqR (record { Carrier = Mat s₁ s₂' ; _≈_ = _m≈_; isEquivalence = isEquivalenceM})
+                  T₁ : Mat s₁ s₂'
                   T₁ = u ◂*
                          valiantOverlap u
                          (b +
                           (r * valiantOverlap l (d + valiantOverlap l c u' * r') l' +
                            valiantOverlap u (a + r * valiantOverlap l c u') u' * r'))
                          l'
+                  T₂ : Mat s₁ s₂'
                   T₂ = r * valiantOverlap l (d + valiantOverlap l c u' * r') l'
+                  T₃ : Mat s₁ s₂'
                   T₃ = valiantOverlap u (a + r * valiantOverlap l c u') u' * r'
+                  T₄ : Mat s₁ s₂'
                   T₄ = valiantOverlap u
                          (b +
                           (r * valiantOverlap l (d + valiantOverlap l c u' * r') l' +
                            valiantOverlap u (a + r * valiantOverlap l c u') u' * r'))
                          l'
                          *◂ l'
+                  T₅ : Mat s₁ s₂'
                   T₅ = b
 --((U ◂* valiantOverlap U (A + R * valiantOverlap L C U') U' +
 --        R * valiantOverlap L C U')
@@ -280,7 +336,6 @@ valiant-sub-correctness {deeper s₁ s₂} {deeper s₁' s₂'} (Valiant.Concret
 abstract
  congT : ∀ {s₁ s₂} → {U U' : Tri s₁}{R R' : Mat s₁ s₂}{L L' : Tri s₂} → U t≈ U' → R m≈ R' → L t≈ L' → two U R L t≈ two U' R' L'
  congT = two-eq
-
  sub-correct : {s₁ s₂ : Splitting} → (U : Tri s₁) → (R : Mat s₁ s₂) → (L : Tri s₂) → two U ((U ◂* (valiantOverlap U R L) + (valiantOverlap U R L) *◂ L) + R) L t≈ two U (valiantOverlap U R L) L 
  sub-correct U R L = congT reflT (valiant-sub-correctness U R L) reflT
   --where open EqR isEquivalenceM renaming (cong to congM) 
@@ -300,10 +355,10 @@ abstract
 
 -- correctness proof of valiant:
 -- the goal is to prove that: φ is a fold (in particular, that φ is valiantFold)
-abstract
- v-c : ∀ {s} (C : Tri s) → TC C (valiantFold C)
- v-c {one} one = one-eq
- v-c {deeper s₁ s₂} (two U R L) = lemma
+
+v-c : ∀ {s} (C : Tri s) → TC C (valiantFold C)
+v-c {one} one = one-eq
+v-c {deeper s₁ s₂} (two U R L) = lemma
   where 
     lemma : ∀ {s₁ s₂} {U : Tri s₁} {R : Mat s₁ s₂} {L : Tri s₂} → φ (two U R L) t≈ valiantOverlap' (valiantFold U) R (valiantFold L)
     lemma {s₁} {s₂} {U} {R} {L} = begin 
@@ -325,8 +380,11 @@ abstract
         ≡⟨ refl ⟩
       valiantOverlap' U⁺ R L⁺  ∎
         where open EqR (record { Carrier = Tri (deeper s₁ s₂); _≈_ = _t≈_; isEquivalence = isEquivalenceT })
+              U⁺ : Tri s₁
               U⁺ = valiantFold U
+              L⁺ : Tri s₂
               L⁺ = valiantFold L
+              R⁺ : Mat s₁ s₂
               R⁺ = valiantOverlap U⁺ R L⁺
 
 
