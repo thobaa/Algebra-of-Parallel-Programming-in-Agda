@@ -1,0 +1,33 @@
+\section{Algebra}
+We are going to indroduce a bunch of algebraic things that will be useful either later or as point of reference. They will also be useful as an example of using agda as a proof assistant!
+
+The first two sections are about algebraic structures taht are probably already known. Both for reference, and as examples. Then we go on to more general algebraic structures, more common in Computer Science, since they satisfy fewer axioms (more axioms mean more interesting structure -- probably -- but at the same time, it's harder to satisfy all the axioms.
+\subsection{Groups}
+The first algebraic structure we will discuss is that of a group.
+\begin{Def}
+A group is a 
+\end{Def}
+
+In Agda code, this is defined using a record:
+\begin{code}
+_≡_ : Set → Set → Set
+A ≡ B = A
+record Test : Set₁ where
+  infix  4 _≈_
+  field
+    Carrier : Set
+    _≈_     : Set → Set → Set
+\end{code}
+To prove that something is a group, one would thus
+\subsection{Rings}
+\subsubsection{Definition}
+\subsubsection{Matrixes}
+\subsection{Monoids}
+\subsubsection{Definition}
+\subsubsection{Cayley Table}
+\subsection{Monoid-like structures}
+\subsubsection{Definition}
+\subsubsection{Cayley Table}
+\subsection{Ring-like structures}
+\subsubsection{Definition}
+\subsubsection{Matrixes}
