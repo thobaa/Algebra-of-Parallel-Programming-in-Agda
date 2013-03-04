@@ -10,6 +10,7 @@ import Valiant.Helper.Definitions using (R; R0)
 open Valiant.Helper.Definitions NAR
 
 
+
 -- Concrete vector
 data Vec : Splitting → Set l₁ where
   one : (x : R) → Vec one
@@ -45,6 +46,43 @@ cVec {deeper y y'} v = CVec v
 rVec : ∀ {s} → Vec s → Mat one s
 rVec {one} (one x) = Sing x
 rVec {deeper y y'} v = RVec v
+
+_M++_ : ∀ {r c₁ c₂} → Mat r c₁ → Mat r c₂ → Mat r (deeper c₁ c₂)
+Sing x M++ Sing y = RVec (two (one x) (one y))
+Sing x M++ RVec v = RVec (two (one x) v)
+RVec v M++ Sing x = RVec (two v (one x))
+RVec u M++ RVec v = RVec (two u v)
+CVec (two u v) M++ CVec (two u' v') = quad (cVec u) (cVec u') (cVec v) (cVec v')
+CVec (two u v) M++ quad A B C D = quad (cVec u) (A M++ B) (cVec v) (C M++ D)
+quad A B C D M++ CVec (two u v) = quad (A M++ B) (cVec u) (C M++ D) (cVec v)
+quad A B C D M++ quad A' B' C' D' = quad (A M++ B) (A' M++ B') (C M++ D) (C' M++ D')
+
+_over_ : ∀ {r₁ r₂ c} → Mat r₁ c → Mat r₂ c → Mat (deeper r₁ r₂) c
+Sing x over Sing y = CVec (two (one x) (one y))
+Sing x over CVec v = CVec (two (one x) v)
+RVec (two u v) over RVec (two u' v') = quad (rVec u) (rVec v) (rVec u') (rVec v')
+RVec (two u v) over quad A B C D = quad (rVec u) (rVec v) (A over C) (B over D)
+CVec v over Sing x = CVec (two v (one x))
+CVec u over CVec v = CVec (two u v)
+quad A B C D over RVec (two u v) = quad (A over C) (B over D) (rVec u) (rVec v)
+quad A B C D over quad A' B' C' D' = quad (A over C) (B over D) (A' over C') (B' over D')
+
+left : ∀ {r c₁ c₂} → Mat r (deeper c₁ c₂) → Mat r c₁
+left (RVec (two u v)) = rVec u
+left (quad A B C D) = A over C
+
+right : ∀ {r c₁ c₂} → Mat r (deeper c₁ c₂) → Mat r c₂
+right (RVec (two u v)) = rVec v
+right (quad A B C D) = B over D
+
+upper : ∀ {r₁ r₂ c} → Mat (deeper r₁ r₂) c → Mat r₁ c
+upper (CVec (two u v)) = cVec u
+upper (quad A B C D) = A M++ B
+
+lower : ∀ {r₁ r₂ c} → Mat (deeper r₁ r₂) c → Mat r₂ c
+lower (CVec (two u v)) = cVec v
+lower (quad A B C D) = C M++ D
+
 
 unMat1 : ∀ {s} → Mat s one → Vec s
 unMat1 (Sing x) = one x

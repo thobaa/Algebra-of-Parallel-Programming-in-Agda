@@ -1,0 +1,27 @@
+\section{Agda}
+Agda was invented at Chalmers! By Ulf Norell.
+\subsection{As a programming language}
+As a programming language, Agda is fairly similar to Haskell. The syntax is very similar to that of Haskell, with the biggest difference being that Agda uses |:| for typing: |f : a → b|, while Haskell instead uses |::|, as in |f :: a -> b|
+The reason for this is that in Haskell, lists are very important, and use |:| for the cons operation. In Agda, on the other hand, there are no built in types, so |:| is not used up already, and Agda can use it for type information, like it is used in Type Theory. The second syntactical difference is that Agda allows all unicode [TODO: ?] characters in programs.
+
+That Agda doens't have built in types is another very big difference. One advantage is that it guarantees that all types are inductively defined, instead of as in Haskell, where the built in types behave differently from the user defined ones. But the fact that allows unicode in programs let's one define types similar to those of Haskell.
+%include /Code/Agda/List1.lagda
+
+
+
+Agda is a dependently typed language, which means that types can depend on the \emph{values} of other types. To some degree, this can be simulated in Haskell, using extensions like Generalized Algebraic Datatypes [TODO: What can't be done, is it relevant].
+
+\subsection{Agda as a proof assistant}
+The main use of Agda in this thesis is as a proof assistant. This use is based on the Curry Howard correspondence, which considers types as propositions, and their inhabitants as proofs of them.
+%include /Code/Agda/CH.lagda
+
+As a small example of using Agda, we will define a maximum function |max| for lists of natural numbers and prove that it satisfies a sensible specification. The specification we will use is that, |max xs| is greater than or equal to each element of |xs|, and equal to some element. 
+%include /Code/Agda/List2.lagda
+
+
+Another practical difference is that all programs have to terminate. This is guaranteed by requiering that some argument of the function gets smaller at each step. This means that recursive programs written in Agda should be structurally recursive in some way, or include some kind of proof term on which they recurse structurally.
+Thanks to the dependent types, it is possible to encode also properties of programs.
+
+The first thing to do this is 
+
+, for example, as in the above example, we could express that the length of the list after the 
