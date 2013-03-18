@@ -1,4 +1,5 @@
--- own:
+
+-- ope-- own:
 import Valiant.MatrixAlgebra.Matrix as Matrix
 open import Valiant.MatrixAlgebra.ZLemmas     using (>⇒≰; less_sum_has_less) renaming (≰⇒> to z≰⇒>)
 open import Valiant.MatrixAlgebra.Definitions using (toℤ; _<_)
@@ -41,7 +42,7 @@ open ℤ.≤-Reasoning            using (_≤⟨_⟩_)
                               renaming (begin_ to ≤begin_ ; _∎ to _≤∎; 
                                        _≡⟨_⟩_ to _≤≡⟨_⟩_)
 
-module UTriang (A : Ring zeroL zeroL) where
+module Valiant.MatrixAlgebra.UTriang (A : Ring zeroL zeroL) where
 
 open Matrix A            using (Matrix; _![_,_]; rows; lookupLemma1; cols; 
                                lookupLemma2; _m*_; <_,_>; simpleOrthOrth )

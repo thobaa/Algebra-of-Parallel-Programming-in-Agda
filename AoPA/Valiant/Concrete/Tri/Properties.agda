@@ -48,7 +48,8 @@ setoidM {s₁} {s₂} = record { Carrier = Mat s₁ s₂; _≈_ = _m≈_; isEqui
 
 
 
-open NonAssociativeNonRing NAR using (_≈_) renaming (refl to ≈refl; sym to ≈sym; trans to ≈trans; +-assoc to R+-assoc; +-comm to R+-comm; +-identity to R+-identity; +-cong to R+-cong; +-idempotent to R+-idempotent; *-cong to R*-cong; distrib to R-distrib; +-commutativeMonoid to R-commutativeMonoid)
+open NonAssociativeNonRing NAR using (_≈_) renaming (refl to ≈refl; sym to ≈sym; trans to ≈trans; +-assoc to R+-assoc; +-comm to R+-comm; +-identity to R+-identity; +-cong to R+-cong; --+-idempotent to R+-idempotent; 
+  *-cong to R*-cong; distrib to R-distrib; +-commutativeMonoid to R-commutativeMonoid)
 
 
 
@@ -59,7 +60,7 @@ open NonAssociativeNonRing NAR using (_≈_) renaming (refl to ≈refl; sym to �
 
 -- left to do: also, clean things up by giving proper names "Associative" etc 
 -- think about ∀ s, should probably not parametrize by it.
-private 
+{-private 
   
   -- idempotent stuff
   ⊕-idempotent : ∀ {s} (x : Vec s) → x ⊕ x v≈ x
@@ -73,12 +74,12 @@ private
   ◂+-idempotent : ∀ {s} (x : Tri s) → x ◂+ x t≈ x
   ◂+-idempotent Valiant.Concrete.Tri.one = Valiant.Concrete.Tri.Equalities.one-eq
   ◂+-idempotent (Valiant.Concrete.Tri.two U R L) = Valiant.Concrete.Tri.Equalities.two-eq (◂+-idempotent U) (+-idempotent R) (◂+-idempotent L)
-
+  -}
 
 isNonAssociativeNonRing : ∀ {s} → IsNonAssociativeNonRing _t≈_ (_◂+_ {s}) (_◂_ {s}) zeroTri
 isNonAssociativeNonRing = record 
   { +-isCommutativeMonoid = isCommutativeMonoid
-  ; +-idempotent = ◂+-idempotent
+  --; +-idempotent = ◂+-idempotent
   ; *-cong = ◂-cong
   ; distrib = ◂-distrib
   ; zero = ◂-zeroˡ , ◂-zeroʳ
@@ -87,7 +88,7 @@ isNonAssociativeNonRing = record
 isNonAssociativeNonRingM : ∀ {s} → IsNonAssociativeNonRing _m≈_ (_+_ {s} {s}) (_*_) zeroMat
 isNonAssociativeNonRingM = record 
   { +-isCommutativeMonoid = isCommutativeMonoidM
-  ; +-idempotent = +-idempotent
+  --; +-idempotent = +-idempotent
   ; *-cong = *-cong
   ; distrib = *-distribˡ , (λ x y z → *-distribʳ y z x)
   ; zero = *-zeroˡ , *-zeroʳ 

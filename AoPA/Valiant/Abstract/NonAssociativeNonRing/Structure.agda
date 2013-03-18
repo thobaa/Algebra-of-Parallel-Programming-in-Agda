@@ -18,7 +18,7 @@ record IsNonAssociativeNonRing
   open FunctionProperties ≈
   field
     +-isCommutativeMonoid : IsCommutativeMonoid ≈ _+_ 0#
-    +-idempotent          : Idempotent _+_
+    -- +-idempotent          : Idempotent _+_ -- should + be idempotent? Maybe not! proof 
     *-cong                : _*_ Preserves₂ ≈ ⟶ ≈ ⟶ ≈
     distrib               : _*_ DistributesOver _+_
     zero                  : Zero 0# _*_
