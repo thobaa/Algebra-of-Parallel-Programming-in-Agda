@@ -38,7 +38,7 @@ length : ∀ {a} → [ a ] → ℕ
 length [] = 0
 length (x ∷ xs) = suc (length xs)
 \end{code}
-Here, again, we introduce a new concept, preceeding a variable with |∀| means that Agda infers its type (in this case |Set|).
+Here, again, we introduce a new concept, preceding a variable with |∀| means that Agda infers its type (in this case |Set|).
 
 Now, we can define the |max| function:
 \begin{code}
@@ -58,14 +58,14 @@ index (x ∷ xs) zero _ = x
 index (x ∷ xs) (suc n) (s≤s m≤n) = index xs n m≤n
 \end{code}
 %endif
-However, this leads to a bit of trouble later on, when we want to specify things about it, in particular when we want to say that the maximum is in the list. We want to say that there is an index $n$ such that the $n$:th element of the list is equal to the maximum. But to say this, we'd need to prove that the $n$ was less than the length of the list, and the simple way to do this would be to attempt to use the proposition |P = (proof : n ≤ length xs) → index xs n proof ≡ max xs lengthproof|, but this is horribly wrong, because it states something completely different to what we want. It states that if there is a proof that |n ≤ length xs|, then we need to have that all |n > length xs| satisfy |P|, and this is clearly not what we want. The simplest way to fix this is to state that we want an integer that is |n| less than |length xs| and that the |n|th element of |xs| is equal to the max. However, there is a problem here too. To be able to index into the |n|th position, we need the proof that |n ≤ length xs|, so we would can't use a pair (becuase the second element would have to depend on the first [todo: is there a way around this?]. Instead, we choose to define datatype |Fin n| containing the numbers less than |n|, and change the |index| function to use it instead of |ℕ|:
+However, this leads to a bit of trouble later on, when we want to specify things about it, in particular when we want to say that the maximum is in the list. We want to say that there is an index $n$ such that the $n$:th element of the list is equal to the maximum. But to say this, we'd need to prove that the $n$ was less than the length of the list, and the simple way to do this would be to attempt to use the proposition |P = (proof : n ≤ length xs) → index xs n proof ≡ max xs lengthproof|, but this is horribly wrong, because it states something completely different to what we want. It states that if there is a proof that |n ≤ length xs|, then we need to have that all |n > length xs| satisfy |P|, and this is clearly not what we want. The simplest way to fix this is to state that we want an integer that is |n| less than |length xs| and that the |n|th element of |xs| is equal to the max. However, there is a problem here too. To be able to index into the |n|th position, we need the proof that |n ≤ length xs|, so we would can't use a pair (because the second element would have to depend on the first [todo: is there a way around this?]. Instead, we choose to define datatype |Fin n| containing the numbers less than |n|, and change the |index| function to use it instead of |ℕ|:
 \begin{code}
 data Fin : (n : ℕ) → Set where
   fzero : {n : ℕ} → Fin (suc n)
   fsuc  : {n : ℕ} → (i : Fin n) → Fin (suc n)
 \end{code}
 That is, |f0| (representing |0|, but given a different name for clarity -- it is not equal to the natural number |0|, they don't even have the same type) is less than any number greater than or equal to |1|, and for any number |i|, less than some number |n|, |fsuc i| is less than |n + 1|. 
-Note that we have put the index |n| on the right side of the colon n the definintion of |Fin|, this is so that [todo: is there a reason??? somethin with it being nidexed (doesn't work if we move it).
+Note that we have put the index |n| on the right side of the colon n the definition of |Fin|, this is so that [todo: is there a reason??? something with it being indexed (doesn't work if we move it).
 Alternatively, we could define |Fin n| as a dependent pair of a natural number |i| and a proof that it is less than |n|. For future use, we define a dependent pair type first (we could of course have used it to define the regular pair for the Curry Howard Correspondence): 
 \begin{code}
 data Σ (A : Set) (B : A → Set) : Set where
@@ -96,7 +96,7 @@ infix 3 _≡_
 data _≡_ {a : Set} : a → a → Set where
   refl : {x : a} → x ≡ x
 \end{code}
-Herre, we have an implicit argument to the \emph{type}, to allow it to work for an type. For our purposes, this very strong concept of equality is suitable. However, if one wants to allow different ``representations'' of an object, for example if one defines the rational numbers as pairs of integers, |ℚ = ℤ × ℤ\{0}|, one wants a concept of equality that considers |(p , q)| and |(m * p , m * q)| to be  equal. This could be taken care of by using equality defined as for eaxmple [TODO: what about division by $0$]
+Here, we have an implicit argument to the \emph{type}, to allow it to work for an type. For our purposes, this very strong concept of equality is suitable. However, if one wants to allow different ``representations'' of an object, for example if one defines the rational numbers as pairs of integers, |ℚ = ℤ × ℤ\{0}|, one wants a concept of equality that considers |(p , q)| and |(m * p , m * q)| to be  equal. This could be taken care of by using equality defined as for example [TODO: what about division by $0$]
 %if False
 \begin{code}
 infixl 2 _*_
@@ -125,7 +125,7 @@ max-spec : (xs : [ ℕ ]) → (pf : 0 < length xs) →
 \end{code}
 To prove the correctness of the |max| function, we must then find an implementation of |max-spec|, that is, we produce an element of its type, corresponding to a proof of the proposition it represents.
 
-We do this in two parts, [todo : note that one should compare with the inductive definiotns. ALSO BREAK THIS STUFF UP WITH USEFUL COMMENTS (SPLIT CODE BLOCK INTO MANY)]
+We do this in two parts, [todo : note that one should compare with the inductive definitions. ALSO BREAK THIS STUFF UP WITH USEFUL COMMENTS (SPLIT CODE BLOCK INTO MANY)]
 \begin{code}
 n≤n : {n : ℕ} → n ≤ n
 n≤n {zero} = z≤n

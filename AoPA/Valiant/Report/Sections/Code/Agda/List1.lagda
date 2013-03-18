@@ -10,9 +10,9 @@ data [_] (a : Set) : Set where
   []   : [ a ]
   _∷_ : (x : a) → (xs : [ a ]) → [ a ]
 \end{code}
-The notation here is very similar to the Haskell notation for lists, with the diffrerence that we need to use spaces between the brackets and |a| (the reason for this is that |[a]|, without spaces is a valid type identifier in Agda.
+The notation here is very similar to the Haskell notation for lists, with the difference that we need to use spaces between the brackets and |a| (the reason for this is that |[a]|, without spaces is a valid type identifier in Agda.
 
-We also define a type of natural numbers, so we have some type to make Lists of. Here we take advantage of Agdas ability to use any unicode symbols to give the type a short and familiar name:
+We also define a type of natural numbers, so we have some type to make Lists of. Here we take advantage of Agda's ability to use any unicode symbols to give the type a short and familiar name:
 \begin{code}
 data ℕ : Set where
   zero : ℕ

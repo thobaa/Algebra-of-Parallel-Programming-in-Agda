@@ -51,9 +51,9 @@ postulate
 all = secret2
 \end{code}
 %endif
-Indeed, Agda allows the use of the syntax |∀ x| to mean |(x : _)| in type definitions, so that |∀ x → P x| means exactly what we expect it to mean (usnig the |∀ x| in definitions is nice even when not considering the types as propositions, because it lets us use Agda's type inference to shortedn the defniitions).
+Indeed, Agda allows the use of the syntax |∀ x| to mean |(x : _)| in type definitions, so that |∀ x → P x| means exactly what we expect it to mean (using the |∀ x| in definitions is nice even when not considering the types as propositions, because it lets us use Agda's type inference to shorten the definitions).
 
-Finnally, existential quantification, $\exists x. P(x)$, which in constructive logic is interpreted to be true if there is a pair $x_0$ along with a proof of $P (x_0)$, so we can model it by a dependent product (similar to the cartesian product defined above but now we consider one of the sets a domain for the variables, and the other as a proposition). We use the same name for the constructor as above.
+Finally, existential quantification, $\exists x. P(x)$, which in constructive logic is interpreted to be true if there is a pair $x_0$ along with a proof of $P (x_0)$, so we can model it by a dependent product (similar to the cartesian product defined above but now we consider one of the sets a domain for the variables, and the other as a proposition). We use the same name for the constructor as above.
 \begin{code}
 data ∃ (X : Set) (P : X → Set) : Set where
   _,_ : (x : X) → P x → ∃ X P

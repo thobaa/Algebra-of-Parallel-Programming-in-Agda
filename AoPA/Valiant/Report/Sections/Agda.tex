@@ -4,7 +4,7 @@ Agda was invented at Chalmers! By Ulf Norell.
 Agda is a dependently typed functional language. Functional means that programs are essentially a sequence of definitions of different functions (mathematical functions -- meaning no side effects). Dependently typed means that data types can depend on \emph{values} of other typed. The syntax is very similar to that of Haskell, with the biggest difference being that Agda uses |:| for typing: |f : a → b|, while Haskell instead uses |::|, as in |f :: a -> b|
 The reason for this is that in Haskell, lists are very important, and use |:| for the cons operation. In Agda, on the other hand, there are no built in types, so |:| is not used up already, and Agda can use it for type information, like it is used in Type Theory. The second syntactical difference is that Agda allows all unicode [TODO: ?] characters in programs.
 
-That Agda doens't have built in types is another very big difference. One advantage is that it guarantees that all types are inductively defined, instead of as in Haskell, where the built in types behave differently from the user defined ones. But the fact that allows unicode in programs let's one define types similar to those of Haskell.
+That Agda doesn't have built in types is another very big difference. One advantage is that it guarantees that all types are inductively defined, instead of as in Haskell, where the built in types behave differently from the user defined ones. But the fact that allows unicode in programs let's one define types similar to those of Haskell.
 %include /Code/Agda/List1.lagda
 
 
@@ -19,7 +19,7 @@ As a small example of using Agda, we will define a maximum function |max| for li
 %include /Code/Agda/List2.lagda
 
 
-Another practical difference is that all programs have to terminate. This is guaranteed by requiering that some argument of the function gets smaller at each step. This means that recursive programs written in Agda should be structurally recursive in some way, or include some kind of proof term on which they recurse structurally.
+Another practical difference is that all programs have to terminate. This is guaranteed by requiring that some argument of the function gets smaller at each step. This means that recursive programs written in Agda should be structurally recursive in some way, or include some kind of proof term on which they recurse structurally.
 Thanks to the dependent types, it is possible to encode also properties of programs.
 
 The first thing to do this is 
