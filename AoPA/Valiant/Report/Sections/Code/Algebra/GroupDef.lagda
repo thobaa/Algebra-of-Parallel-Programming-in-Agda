@@ -1,7 +1,7 @@
 %if False
 \begin{code}
-module GroupDef where
-open import FunctionDefs
+module Algebra.GroupDef where
+open import Algebra.Equivalence
 \end{code}
 %endif
 In Agda code, we define the proposition |IsGroup|, that states that something is a group. We define this using a record \todo{include that Agda records somewhere in Agda section} so that we can give names to the different lemmas, because when reasoning about an arbitrary group (which we will define shortly), the only thing we have are these lemmas.\todo{make note that we have taken names from standard library but use less general/simpler definitions}

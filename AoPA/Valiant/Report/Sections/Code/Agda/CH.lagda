@@ -1,12 +1,13 @@
 %if False
 \begin{code}
-module CH where
+module Agda.CH where
 \end{code}
 %endif
 \subsection{The Curry--Howard Correspondence}
 To define a conjunction between two Propositions |P| and |Q|, one uses the pair |P ∧ Q| defined below
 %if False
 \begin{code}
+infixl 1 _∧_
 infixl 1 _,_
 \end{code}
 %endif

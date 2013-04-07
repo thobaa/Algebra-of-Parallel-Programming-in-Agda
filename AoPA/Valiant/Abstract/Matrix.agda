@@ -33,8 +33,8 @@ Matrix m n = (i : Fin m) → (j : Fin n) → R
 -- NOTE: No Identity matrix as no one in ring
 
 -- Zero Matrix
-Zero : ∀ n m -> Matrix n m
-Zero n m i j = R0
+zeroMatrix : ∀ {n} {m} -> Matrix n m
+zeroMatrix i j = R0
 
 -- Concatenation 
 Side : ∀ {m n o} -> Matrix m n -> Matrix m o -> Matrix m (n + o)

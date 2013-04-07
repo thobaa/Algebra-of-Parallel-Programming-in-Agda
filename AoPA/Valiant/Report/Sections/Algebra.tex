@@ -1,7 +1,66 @@
+\newcommand{\nanring}{non-associative non-ring}
+\newcommand{\Nanring}{Non-associative non-ring}
 \section{Algebra}
 We are going to introduce a bunch of algebraic things that will be useful either later or as point of reference. They will also be useful as an example of using agda as a proof assistant!
 
 The first two sections are about algebraic structures that are probably already known. Both for reference, and as examples. Then we go on to more general algebraic structures, more common in Computer Science, since they satisfy fewer axioms (more axioms mean more interesting structure---probably---but at the same time, it's harder to satisfy all the axioms.
+\subsection{Introductory defintions}
+Before covering some algebraic structures, we would like to define the things needed to talk about them in Agda. These are mainly propositions regarding functions and relations.
+\subsubsection{Relation properties}
+The first thing to discuss is the equivalence relation. It is a relation that acts like an equality.
+\begin{Definition}
+  A relation $R \subset X \times X$ is called an \emph{equivalence relation} if it is\todo{write sqiggly line instead of $R$}
+  \begin{itemize}
+  \item Reflexive: for $x \in X$, $x R x$.
+  \item Symmetric: for $x$, $y \in X$, if $x R y$, then $y R x$.
+  \item Transitive: for $x$, $y$, $z \in X$, if $x R y$ and $y R z$, then $x R z$.
+  \end{itemize}
+\end{Definition}
+We formalize the way it behaves like an equality in the following proposition:
+\begin{Proposition}
+An equivalence relation $R$ partitions the elements of a set $X$ into disjoint nonempty equivalence classes (subsets $[x] = \{y \in X \st y R x\}$) satisfying: 
+\begin{itemize}
+\item For every $x \in X$, $x \in [x]$.
+\item If $x \in [y]$, then $[x] = [y]$.
+\end{itemize}
+\end{Proposition}
+If we replace the equality of elements with an equivalence relation, i.e., that two elements are ``equal'' if they belong to the same equivalence class, we get a coarser sense of equality. To see that it acts as the regular equality, we note that the equivalence relation is equality on equivalence classes.\todo{Expand/clean up on induced equality from equivalence classes.}
+
+%include /Code/Algebra/Equivalence.lagda
+
+\subsubsection{Operation Properties}
+Next, we define some properties that binary operation (i.e., functions $X \to X \to X$) can have. These are functions that are similar to ordinary addition and multiplication of numbers (if they have all the properties we define below---but it can be useful to think of them that way even if they don't).
+\begin{Definition} %%% Associative
+A function is 
+\end{Definition}
+\begin{Example}
+% Non-example of parsing
+\end{Example}
+\begin{Definition} %%% Commutative
+A function is 
+\end{Definition}
+\begin{Example}
+% Non example of matrix mult
+\end{Example}
+
+\subsubsection{Properties of pairs of operations}
+When we have two different binary operations on the same set, we often want them to interact with each other sensibly, where sensibly means as much as multiplication and addition of numbers interact as possible. We recall the distributive law $a\cdot(b + c) = a\cdot b + a\cdot c$, where $x$, $y$, and $z$ are numbers and $\cdot$ and $+$ are multiplication and addition and generalize it to arbitrary operations: 
+\begin{Definition}
+  A binary operation $\cdot$ on $A$ \emph{distributes over} a binary operation $+$ if, for all $x$, $y$, $z$,
+  \begin{itemize}
+  \item $x \cdot (y + z) = x \cdot y + x \cdot z$,
+  \item $(y + z) \cdot x = y \cdot x + z \cdot x$,
+  \end{itemize}
+  where we assume that $\cdot$ binds its arguments harder than $+$.
+\end{Definition}
+
+%include /Code/Algebra/Distributive.lagda
+
+The second such interaction axiom we will consider comes from the fact that $0$ annihilates things when involved in a multiplication of numbers: $0 * x = 0$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% GROUPS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Groups}
 The first algebraic structure we will discuss is that of a group. We give first the mathematical definition, and then define it in Agda:
 \begin{Definition}
@@ -15,9 +74,9 @@ A group is a set $G$ (sometimes called the \emph{carrier}) together with a binar
 \begin{Remark}
 One usually refers to a group $(G, \cdot, e)$ simply by the name of the set $G$.
 \end{Remark}
-\begin{Remark}
-$G$ doesn't actually need to be a set. \todo{should this be noted}
-\end{Remark}
+%\begin{Remark}
+%$G$ doesn't actually need to be a set. \todo{should this be noted}
+%\end{Remark}
 An important reason to study groups that many common mathematical objects are groups. First there are groups where the set is a set of numbers:
 \begin{Example}
   The integers $\Z$, the rational numbers $\Q$, the real numbers $\R$ and the complex numbers $\C$, all form groups when $\cdot$ is addition and $e$ is $0$.
@@ -30,15 +89,87 @@ Second, the symmetries of a
 %include /Code/Algebra/GroupDef.lagda
 
 To prove that something is a group, one would thus
-\subsection{Rings}
-\subsubsection{Definition}
-\subsubsection{Matrixes}
-\subsection{Monoids}
-\subsubsection{Definition}
+
 \subsubsection{Cayley Table}
+One 
+%\subsection{Rings} We remove these sections, temporarily <- they don't add much
+%\subsubsection{Definition}
+%\subsubsection{Matrixes}
+%\subsection{Monoids} %monoids make sense, because addition is a monoid in parsing
+%\subsubsection{Definition}
+%\subsubsection{Cayley Table}
 \subsection{Monoid-like structures}
 \subsubsection{Definition}
 \subsubsection{Cayley Table}
 \subsection{Ring-like structures}
-\subsubsection{Definition}
+\subsubsection{Definitions}
+As we discussed above, in Section \ref{}, when one has two operations on a set, one often wants them to interact sensibly. The basic example from algebra is a Ring:
+\begin{Definition}
+A set $R$ together with two binary operations $+$ and $*$ forms a ring if
+\begin{itemize}
+\item It is an abelian group with respect to $+$.
+\item It is a monoid with respect to $*$.
+\item Multiplication distributes over addition.
+\end{itemize}
+\end{Definition}
+From these facts, it is in fact possible to prove that the additive identity $0$ is an absoribing element with respect to multiplication ($0 * x = x * 0 = 0$ for every $x \in X$).\todo{include proof? -- useful exercize -- proof exists in standard library}
+
+However, for the applications we have in mind, Parsing, the algebraic structure in question (see section \ref{}) does not even have associative multiplication (see section \ref{monoid-like}), and does not have inverses for addition. We still have an additive $0$ (the empty set---representing no parse), and want it to be an absorbing element with regard to multiplication (if the left or right substring has no parse, then the whole string has no parse). But the proof that $0$ is an absorbing element depends crucially on the existence of the ability to cancel (implied by the existence of additive inverses in a group).
+
+For this reason, we include as an axiom that zero annihilates. We this, we define a \nanring (which doesn't have :
+\begin{Definition}
+A set $X$ together with two operations $+$ and $*$ called addition and multiplication forms a \emph{\nanring} if:
+\begin{itemize}
+\item It is a commutative monoid with respect to addition.
+\item It is a magma with respect to multiplication.
+\item Multipliciation distributes over addition.
+\item The additive identity is a multiplicative zero.
+\end{itemize}
+\end{Definition}
+\todo{more text?}
 \subsubsection{Matrixes}
+We recall that a matrix is really just a square set of numbers, so there is nothing stopping us from defining one over an arbitrary ring, or even over a \nanring, as opposed to over $\R$ or $\C$. To be similar to the definition we will make in Agda of an abstract matrix (one without a specific implementation in mind), we consider a matrices of size $m \times n$ as a functions from a pair of natural numbers $(i,j)$, with $0 \le i < m$, $0 \le j < n$ (or more specifically, $i \in \Fin m$, $j \in Fin n$, and hence, after currying \todo{uncurrying?} define: 
+\begin{Definition}
+A matrix $A$ over a set $R$ is a function $A : Fin m \to Fin \to R$. 
+\end{Definition}
+When talking about matrices mathematically, we write $A_{i j}$ for $A i j$
+
+%include /Code/Algebra/Matrix.lagda
+
+If $R$ is a ring or a \nanring, we can define addition and multiplication of matrices with the usual formulas:
+\begin{align*}
+  (A + B)_{i j} &= A_{i j} + B_{i j} 
+  \intertext{and}
+  (A * B)_{i j} &= \sum_{k = 1}^n A_{i k} B_{k j} 
+\end{align*}
+Above, we used $*$ to denote matrix multiplication, even though it is normally written simply as $AB$, because in Agda we need to give it a name.
+
+%include /Code/Algebra/MatrixOperations.lagda
+
+The most interesting fact about matrices (to our application) is the following proposition:
+\begin{Proposition}
+If $R$ is a a ring (\nanring), then the matrices of size $n \times n$ over $R$ also form a ring (\nanring).
+\end{Proposition}
+The proof is fairly easy but boring. We prove the case where $R$ is a \nanring in Agda (because it is the case we will make use of later).
+
+%include /Code/Algebra/MatrixProof.lagda
+\todo{write the proof that matrices are a ring}
+
+\subsection{Triangular Matrices}
+For our applications, we will be interested in matrices that have no non-zero elements on or below the diagonal.
+\begin{Definition}
+  A matrix is \emph{upper triangular} if all elements on or below its diagonal are equal to zero.
+\end{Definition}
+Since we are only interested in upper triangular matrices, we will sometimes refer to them as just \emph{triangular} matrices. We generalize the defintion to matrices that have zeros on their super diagonals too.
+%\begin{Definition}         TRIANGULARITY???
+%  An upper triangular matrix has \emph{triangularity} $d$ if all elements on or below its $d$th super diagonal are zero. \todo{are they called super diagonals?}
+%\end{Definition}
+%That is, if $i \le j + d$ implies that $A_{i j} = 0$. An upper triangular matrix thus has triangularity $0$, an upper triangular matrix where the line above the diagonal also contains \todo{line is not a good word} zeros has triangularity $1$ and so on. See Figure \ref{Figure:TriangularityExample}
+%\begin{figure}
+%  \centering
+%  \missingfigure{matrix with positive triangularity \label{Figure:TriangularityExample}}
+%\end{figure}
+
+%include /Code/Algebra/Triangle.lagda
+
+%continues until it is proven in Triangle.lagda, since there isn't really anthing mathematical to say

@@ -1,8 +1,8 @@
 %if False
 \begin{code}
-open import List1
-open import CH
-module List2 where
+open import Agda.List1
+open import Agda.CH
+module Agda.List2 where
 \end{code}
 %endif
 As an example, we will define a maximum function |max| for lists of natural numbers and prove that it satisfies a sensible specification. The specification we will use is that, |max xs| is greater than or equal to each element of |xs|, and equal to some element. 
@@ -73,7 +73,7 @@ And then use it to define |Fin′|.
 Fin′ : (n : ℕ) → Set
 Fin′ n = Σ ℕ (λ i → i < n)
 \end{code}
-This second representation has the advantage that the natural number is close by (|i| is an actual natural number, that we can use right away, for the other |Fin| type, we would have to write and use a translation-function that replaces each |fsuc| by |suc| and |fzero| by |zero|) .
+This second representation has the advantage that the natural number is close by (|i| is an actual natural number, that we can use right away, for the other |Fin| type, we would have to write and use a translation-function that replaces each |fsuc| by |suc| and |fzero| by |zero|).
 
 However, this would require us to always extract the proof when we need to use it, instead of having it ``built into'' the type.
 These two different ways of defining things are something we will use later when we define upper triangular matrixes as their own data-type. For a concrete representation, we are going to use the first kind of representation, where we have built in the ``proof'' that the matrix is triangular---which lets us not worry about modifying the proof appropriately, or reprove that the product of two upper triangular matrixes is again upper triangular. While when representing matrixes abstractly (as functions from their indices), we will need to use the proofs and modify them, to strengthen some results from the concrete case.
@@ -247,8 +247,52 @@ _≤?′_ (suc m) zero = True
 _≤?′_ (suc m) (suc n) = m ≤?′ n
 \end{code}
 Because while |if (x ≤?′ y) then x else y| does return the maximum, it doesn't return a proof, and we cannot use it to convince Agda that |x ≤ y| or vice versa.
-Instead, we need a function like that along with a |Bool|-like answer returns a proof that it is correct. This is exactly the point of the data type |Dec| we defined above \ref{dec}.
+Instead, we need a function like that along with a |Bool|-like answer returns a proof that it is correct. This is exactly the point of the data type |Dec| we defined above \ref{decidable-def}.
+
+So we want define the function |_≤?_| to return |yes x≤y|, where |x≤y : x ≤ y| is a proof that |x| is less than or equal to |y|, or |no ¬x≤y|, where |¬x≤y : ¬ (x ≤ y)|. If |x == 0|, this is straightforward, since we simply return |yes z≤n|. If |x == suc x′|, we need to pattern match on |y|. The simples case is if |y == 0|, because then we need to derive |⊥| from |suc x′ ≤ 0|. 
+%Since, |s≤s z≤n| is a proof that |0 < suc x′|, we define a lemma |x<y⇒¬y≤x| that states that if |x < y|, then |¬ (y ≤ x)|. Since |x < y| expands to |suc x ≤ y|, and hence, |y == suc y′|, and the proof of |x < y| must be |s≤s x<y′|. 
+\todo{More here (think about what the proof does, really) Also write that we curry/uncurry--whatever, actually ,this might be unneccessary}
+%begin{code}
+%--x<y⇒¬y≤x : {x y : ℕ} → (x < y) → ¬ (y ≤ x)
+%--x<y⇒¬y≤x (s≤s x<y′) y′<x = x<y⇒¬y≤x y′<x x<y′
+%end{code}
+%Using this, we can hence finish the case |x == suc x′| and |y == 0|. 
+
+Next, in the case where |x == suc x′| and |y == suc y′|, we need to know (with proof) which of |x′| and |y′| is greater. We need to pattern match on the |Dec (x′ ≤ y′)|, which is not part of the function arguments, and do this by introducing a new piece of Agda syntax, the |with| statement (we could of course use a helper function to do the pattern matching, but the with statement is simpler). After the function arguments, one writes |with| followed by a list of expressions to pattern match on, separated by vertical bars:| || |. Then on the line below, one writes either |...| in place of the old arguments, followed by a bar, | || |, and the new arguments separated by bars, or (in case one wants to infer things about the old arguments based on the pattern matching), one repeats the function arguments in place of the |...|. We show both alternatives.
 \begin{code}
+_≤?_ : (x y : ℕ) → Dec (x ≤ y) 
+zero  ≤? n = yes z≤n
+suc m ≤? zero = no (λ ()) --(x<y⇒¬y≤x (s≤s z≤n))
+suc m ≤? suc n with m ≤? n 
+...            | yes m≤n = yes (s≤s m≤n)
+suc m ≤? suc n | no  n≤m = no (λ x → n≤m (p≤p x))
+  where p≤p : {m n : ℕ} → (suc m ≤ suc n) → m ≤ n
+        p≤p (s≤s m≤n) = m≤n
+\end{code}
+Above, we made a local definition of the proposition |p≤p| stating that if both |m| and |n| are the successors of something, and if |m ≤ n|, then the predecessor of |m| is less than or equal to the predecessor of |n|.
+
+We note that in the above example, we didn't actually need to use the |with| construction, since we didn't use the result of the pattern matching (if we had pattern matched on |m≤n| above, we could have inferred that whether the argument |m| to |suc m| was |zero| or |suc m'|, but that wasn't neccessary for this proof \todo{include ref to where it is actually neccessary (if ever in this report)}). We could instead have introduced a helper function (perhaps locally) that we call in place of the with statement:
+\begin{spec}
+helper : {m n : ℕ} → Dec (m ≤ n) → Dec ((suc m) ≤ (suc n))
+helper (yes p) = yes (s≤s p)
+helper (no ¬p) = no (λ x → ¬p (p≤p x))
+\end{spec}
+So we write
+\begin{spec}
+min-finder x (x′ ∷ xs) with x ≤? max (x′ ∷ xs) _
+\end{spec}
+
+Now, we begin with the the case where |x ≤? max| returns |yes x≤max|. We thus have a proof that |x ≤ max (x′ ∷ xs)|, and by recursively calling |min-finder x′ xs| \todo{make sure I mention |min-finder| name when introducing it above}, we get an index |i| and a proof that the |i|th element of |x′ ∷ xs| is the greatest element there. Hence, the index of our maximum should be |fsuc i|, and we need to prove that given the above, |max (x ∷ x′ ∷ xs) ≡ max (x′ ∷ xs)|, since then, the |fsuc i|th element in |x ∷ x′ ∷ xs| would be equal to |max (x′ ∷ xs)| by the definition of |‼|, and hence to |max (x ∷ x′ ∷ xs)|.. We introduce the function |move-right| to move the proof one step to the right.
+\begin{code}
+move-right : {x x′ : ℕ} {xs : [ ℕ ]} → x ≤ max (x′ ∷ xs) (s≤s z≤n) → ∃ (λ i → (x′ ∷ xs) ‼ i ≡ max (x′ ∷ xs) (s≤s z≤n)) → ∃ (λ i → (x ∷ x′ ∷ xs) ‼ i ≡ maxℕ x (max (x′ ∷ xs) (s≤s z≤n)))
+\end{code}
+We write out the arguments as 
+\begin{spec}
+
+\end{spec}
+pattern match on the existence proof, getting |(i , pf)|. We already know that the first part of the pair |move-right| should return (the witness) should be |fsuc i|, 
+\begin{code}
+-- No CASE
 ≡-cong : {a b : Set} {x y : a} → (f : a → b) → x ≡ y → f x ≡ f y
 ≡-cong f refl = refl
 
@@ -263,48 +307,33 @@ l″ : ∀ {x y} → y ≤ x → x ≡ maxℕ x y
 l″ {x} {zero} z≤n = x≡maxℕx0
 l″ (s≤s m≤n) = ≡-cong suc (l″ m≤n)
 
-lemma : ∀ x xs pf → max xs pf ≤ x → x ≡ max (x ∷ xs) (s≤s z≤n)
-lemma x [] pf pf′ = refl
-lemma x (x′ ∷ xs) (s≤s z≤n) pf′ = l″ pf′
-
-x<y⇒¬y≤x : {x y : ℕ} → (x < y) → ¬ (y ≤ x)
-x<y⇒¬y≤x (s≤s m≤n) = λ x → x<y⇒¬y≤x x m≤n
-
 ¬x≤y⇒y≤x : {x y : ℕ} → ¬ (x ≤ y) → (y ≤ x)
 ¬x≤y⇒y≤x {x} {zero} pf = z≤n
 ¬x≤y⇒y≤x {zero} {suc n} pf with pf z≤n 
 ...| ()
 ¬x≤y⇒y≤x {suc m} {suc n} pf = s≤s (¬x≤y⇒y≤x (λ x → pf (s≤s x)))
 
-p≤p : {m n : ℕ} → (suc m ≤ suc n) → m ≤ n
-p≤p (s≤s m≤n) = m≤n
+x-max : (x : ℕ) (xs : [ ℕ ]) (pf : 0 < length xs) → max xs pf ≤ x → x ≡ max (x ∷ xs) (s≤s z≤n)
+x-max x [] pf pf′ = refl
+x-max x (x′ ∷ xs) (s≤s z≤n) pf′ = l″ pf′
 
-_≤?_ : (x : ℕ) → (y : ℕ) → Dec (x ≤ y) 
-zero  ≤? n = yes z≤n
-suc m ≤? zero = no (x<y⇒¬y≤x (s≤s z≤n))
-suc m ≤? suc n with m ≤? n 
-...| yes m≤n = yes (s≤s m≤n)
-...| no n≤m = no (λ x → n≤m (p≤p x))
-
+-- yes case
 maxℕ-is-max : (x y : ℕ) → x ≤ y → y ≡ maxℕ x y
 maxℕ-is-max zero y pf = refl
 maxℕ-is-max (suc m) zero () 
 maxℕ-is-max (suc m) (suc n) (s≤s m≤n) = ≡-cong suc (maxℕ-is-max m n m≤n)
 
-lemma″ : ∀ x x′ xs → x ≤ max (x′ ∷ xs) (s≤s z≤n) → max (x′ ∷ xs) (s≤s z≤n) ≡ maxℕ x (max (x′ ∷ xs) (s≤s z≤n))
-lemma″ zero x′ xs pf = refl
-lemma″ (suc n) x′ xs pf = maxℕ-is-max (suc n) (max (x′ ∷ xs) (s≤s z≤n)) pf
+small-x⇒max-equal : (x x′ : ℕ) (xs : [ ℕ ]) → x ≤ max (x′ ∷ xs) (s≤s z≤n) → max (x′ ∷ xs) (s≤s z≤n) ≡ max (x ∷ x′ ∷ xs) (s≤s z≤n)
+small-x⇒max-equal zero x′ xs pf = refl
+small-x⇒max-equal (suc n) x′ xs pf = maxℕ-is-max (suc n) (max (x′ ∷ xs) (s≤s z≤n)) pf
 
-increase : ∀ x x′ xs → x ≤ max (x′ ∷ xs) (s≤s z≤n) → ∃ (λ i → (x′ ∷ xs) ‼ i ≡ max (x′ ∷ xs) (s≤s z≤n)) → ∃ (λ i → (x ∷ x′ ∷ xs) ‼ i ≡ maxℕ x (max (x′ ∷ xs) (s≤s z≤n)))
-increase x x′ xs pf′ (i , pf) = fsuc i , ≡-trans pf (lemma″ x x′ xs pf′)
-
--- en max funktion som tar värde och kanske tom lista
+move-right {x} {x′} {xs} x≤max (i , pf) = fsuc i , ≡-trans pf (small-x⇒max-equal x x′ xs x≤max)
 
 min-finder : (x : ℕ) → (xs : [ ℕ ]) → ∃ (λ i → (x ∷ xs) ‼ i ≡ max (x ∷ xs) (s≤s z≤n))
 min-finder x [] = fzero , refl
-min-finder x (x′ ∷ xs) with x ≤? max (x′ ∷ xs) (s≤s z≤n)
-min-finder x (x′ ∷ xs) | yes x≤y = increase x x′ xs x≤y (min-finder x′ xs)
-min-finder x (x′ ∷ xs) | no y≤x = fzero , lemma x (x′ ∷ xs) (s≤s z≤n) (¬x≤y⇒y≤x y≤x)
+min-finder x (x′ ∷ xs) with x ≤? max (x′ ∷ xs) _
+min-finder x (x′ ∷ xs) | yes x≤max = move-right x≤max (min-finder x′ xs)
+min-finder x (x′ ∷ xs) | no max≤x = fzero , x-max x (x′ ∷ xs) _ (¬x≤y⇒y≤x max≤x)
 
 max-in-list {[]} {()}
 max-in-list {(x ∷ xs)} {s≤s z≤n} = min-finder x xs
@@ -335,5 +364,5 @@ To end this example, we note that proving even simple (obvious) propositions in 
 We also feel that we have illustrated the fact that proving something in Agda often requires a lot of code, but not much thinking, as the above proof essentially proceeds as one would intuitively think to prove the specification correct. Most of the standard concepts used are available in one form or another from the standard library, and we have attempted to keep our names consistent with it (the actual code given in later sections uses the standard library when possible, but we try to include simplified definitions in this report).
 
 
-\todo{fix references below}
+\todo{fix references below (only visible in source)}
 \label{decidable-def}

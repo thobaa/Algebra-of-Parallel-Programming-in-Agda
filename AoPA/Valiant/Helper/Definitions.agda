@@ -38,6 +38,10 @@ infix 6 _R*_
 _R*_ : R → R → R
 _R*_ = NonAssociativeNonRing._*_ NAR
 
+infix 3 _R≈_
+_R≈_ : R → R → Set l₂
+_R≈_ = NonAssociativeNonRing._≈_ NAR
+
 
 rearrangeLemma : ∀ {a b}{cm : CommutativeMonoid a b} (x y z å : CommutativeMonoid.Carrier cm) → 
                let _+'_ = CommutativeMonoid._∙_ cm ; _≈'_ = (CommutativeMonoid._≈_ cm) in

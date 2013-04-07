@@ -23,6 +23,10 @@ IsTriangular : ∀ {m n} -> (d : ℕ) -> (A : Matrix m n) -> Set l₁
 IsTriangular {m} {n} d A = (i : Fin m) → (j : Fin n) → 
                            (toℤ j - toℤ i < + d) → A i j ≡ R0
 
+record Triangle (n : ℕ) : Set l₁ where
+  field 
+    matrix   : Matrix n n
+    triproof : IsTriangular 1 matrix
 
-Triangle : ℕ -> Set l₁
-Triangle n = Σ (Matrix n n) (λ A → IsTriangular 1 A)
+--Triangle : ℕ -> Set l₁
+--Triangle n = Σ (Matrix n n) (λ A → IsTriangular 1 A)

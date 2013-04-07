@@ -25,6 +25,11 @@ _∙_ : ∀ {n} → Vector n → Vector n → R
 _∙_ {zero} u v = R0
 _∙_ {suc n} u v = (u f0 R* v f0) R+ _∙_ {n} (λ i → u (fsuc i)) (λ i → v (fsuc i))
 
+-- Vector equality
+_v≈_ : ∀ {n} → Vector n → Vector n → Set l₂
+u v≈ v = (i : _) → u i R≈ v i
+
+
 -- Matrix addition
 _+_ : ∀ {m n} -> Matrix m n -> Matrix m n -> Matrix m n
 _+_ A B = λ i j → (A i j) R+ (B i j)
@@ -41,3 +46,5 @@ _^[1+_] {n} A i = (foldr (λ _ → Matrix n n) _+_ A ∘ (map (uncurry (_*_))) �
     allPrevious zero     = []
     allPrevious (suc n') = A ^[1+ n' ] ∷ allPrevious n'
 
+_M≈_ : ∀ {m n} → Matrix m n → Matrix m n → Set l₂
+A M≈ B = (i : _) (j : _) → A i j R≈ B i j

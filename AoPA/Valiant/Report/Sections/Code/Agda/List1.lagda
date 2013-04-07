@@ -1,7 +1,7 @@
 For example, we could define Lists as 
 %if False
 \begin{code}
-module List1 where
+module Agda.List1 where
 \end{code}
 %endif
 \begin{code}

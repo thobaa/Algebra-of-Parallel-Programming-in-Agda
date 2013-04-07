@@ -1,3 +1,68 @@
+\newcommand{\productions}{P}
+\newcommand{\nonterminals}{N}
+\newcommand{\terminals}{T}
+\newcommand{\startsymbol}{S}
+\newcommand{\grammar}{(\nonterminals, \terminals, \productions, \startsymbol)}
 \section{Parsing}
-\subsection{General stuff}
+Parsing is the process of annoting a string of tokens with structural properties. We will only give a fairly general overview of the process, to tie it in with the algebra we discussed in Section \ref{Section:Algebra}. We note that this section contains \todo{very little or no} very little Agda code, instead we move back to mathematical notation. In Section \ref{Section:Valiant}, we will then focus on a particular algorithm for parsing, Valiant's Algorithm, that we implement and prove the correctness of using Agda.
+
+
+\subsection{Definitions}
+The goal of parsing is to first decide if a given string of tokens belongs to a given language, and second to describe its structure in the language.
+
+To do these two things, one uses a \emph{grammar}, which contains rules for assigning structural properties to tokens and sequences of tokens.
+
+\begin{Definition}
+  A \emph{grammar} $G$ is a tuple $\grammar$, where 
+  \begin{itemize}
+  \item $\nonterminals$ is a finite set of nonterminals, 
+  \item $\terminals$,
+  \item $ $
+  \item $ $,
+  \end{itemize}
+\end{Definition}
+A grammar can generate a string of terminals by repeatedly applying production rules to the start symbol. 
+A grammar is used to describe a language (a set of strings of tokens). We say that  grammar $G$ generates a language $L$ if the strings in $L$ are exactly the strings that can be generated from $G$ by repeatedly applying \todo{this paragraph is a mess}
+
+\begin{Definition}
+  Context Free Grammar
+\end{Definition}
+\begin{Definition}
+  Chomsky Normal Form (or reduced CNF) --- probably only consider languages that don't contain the empty string, for simplicity.
+\end{Definition}
+Any Context Free Grammar can be converted into one in Chomsky Normal Form\todo{reference, and size increase}. Hence we only consider grammars in Chomsky Normal Form in the rest of the report.
+
+\subsection{Grammar as an algebraic structure}
+When looking at the set of production rules for a grammar in Chomsky Normal Form, we see some similarities with the definition of a multiplication in a magma in Section \ref{Section:Magma-multiplication}:
+If we only consider the production rules involving only nonterminals:
+\begin{equation*}
+  A \to BC,
+\end{equation*}
+and if we further reverse places of $A$ and $BC$, replace the arrow $\to$ by an equals sign $=$, we get
+\begin{equation*}
+  BC = A,
+\end{equation*}
+which we can consider as defining the product of $B$ and $C$ to be equal to $A$, giving us a multiplication table similar to \eqref{Equation:Magma-multiplication-table}.
+
+Note also that as in Section \ref{Section:Magma-multiplication}, the multiplication is little more than a binary operation. Grammars are usually not associative: \todo{what does associative represent here? also, commutative, have inverse, have unit --- write down the equations for each.}
+
+This looks very nice, but we note that we only considered a single production $A \to BC$. When we try to apply this to the whole of $\productions$, there are two problems:
+\begin{enumerate}
+\item What happens if $\productions$ contains $A \to BC$ and $D \to BC$, where $A$ and $D$ are different nonterminals?
+\item What happens if, for some pair $B$ and $C$ of nonterminals, $\productions$ contains no rule $A \to BC$?
+\end{enumerate}
+The first problem is related to the fact that some strings have different many parses, and the second problem is related to the fact that some strings have none (i.e., they don't belong to the language).
+
+The solution to these two problems is to consider \emph{sets} of nonterminals, with the following multiplication:
+\begin{equation*}
+  \{A_1, \ldots, A_n \} \cdot \{B_1 \ldots B_m\} = \{A_1B_1, \ldots, A_nB_m, A_2B_1 \ldots, A_2B_m, \ldots, A_nB_n\}
+\end{equation*}
 \subsubsection{Parsing as Trasitive Closure}
+\todo{was it valiant who came up with this idea? -- include reference to whoever}
+
+% here should be a ``proof'' that parsing can be seen as computing the transitive closure of a matrix
+When we consider the 
+
+
+\todo{fix references to other sections}
+\label{Section:Magma-multiplication}
