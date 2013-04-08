@@ -1,3 +1,6 @@
+
+\todo{Fix formatting of 0\#}
+
 In Agda, we will only define the type of a matrix over the \nanring. For simplicity, and to allow us to avoid adding the \nanring as an argument to every functino and proposition, we decide to parametrize the module the definition of the matrix by a nanring. We must first ensure that we have it imported, by starting the module file (named \verb?Matrix.lagda?) with
 %if False
 \begin{code}

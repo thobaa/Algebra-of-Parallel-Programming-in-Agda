@@ -94,7 +94,7 @@ To prove that something is a group, one would thus
 One 
 %\subsection{Rings} We remove these sections, temporarily <- they don't add much
 %\subsubsection{Definition}
-%\subsubsection{Matrixes}
+%\subsubsection{Matrices}
 %\subsection{Monoids} %monoids make sense, because addition is a monoid in parsing
 %\subsubsection{Definition}
 %\subsubsection{Cayley Table}
@@ -127,14 +127,14 @@ A set $X$ together with two operations $+$ and $*$ called addition and multiplic
 \end{itemize}
 \end{Definition}
 \todo{more text?}
-\subsubsection{Matrixes}
-We recall that a matrix is really just a square set of numbers, so there is nothing stopping us from defining one over an arbitrary ring, or even over a \nanring, as opposed to over $\R$ or $\C$. To be similar to the definition we will make in Agda of an abstract matrix (one without a specific implementation in mind), we consider a matrices of size $m \times n$ as a functions from a pair of natural numbers $(i,j)$, with $0 \le i < m$, $0 \le j < n$ (or more specifically, $i \in \Fin m$, $j \in Fin n$, and hence, after currying \todo{uncurrying?} define: 
+\subsubsection{Matrices}
+We recall that a matrix is really just a square set of numbers, so there is nothing stopping us from defining one over an arbitrary ring, or even over a \nanring, as opposed to over $\R$ or $\C$. To be similar to the definition we will make in Agda of an abstract matrix (one without a specific implementation in mind), we consider a matrices of size $m \times n$ as a functions from a pair of natural numbers $(i,j)$, with $0 \le i < m$, $0 \le j < n$ (or more specifically, $i \in \Fin{m}$, $j \in \Fin{n}$, and hence, after currying \todo{uncurrying?} define: 
 \begin{Definition}
-A matrix $A$ over a set $R$ is a function $A : Fin m \to Fin \to R$. 
+A matrix $A$ over a set $R$ is a function $A : \Fin{m} \to \Fin{n} \to R$. 
 \end{Definition}
 When talking about matrices mathematically, we write $A_{i j}$ for $A i j$
 
-%include /Code/Algebra/Matrix.lagda
+%include Code/Algebra/Matrix.lagda
 
 If $R$ is a ring or a \nanring, we can define addition and multiplication of matrices with the usual formulas:
 \begin{align*}
