@@ -25,6 +25,9 @@ _∙_ : ∀ {n} → Vector n → Vector n → R
 _∙_ {zero} u v = R0
 _∙_ {suc n} u v = (u f0 R* v f0) R+ _∙_ {n} (λ i → u (fsuc i)) (λ i → v (fsuc i))
 
+_v+_ : ∀ {n} → Vector n → Vector n → Vector n
+u v+ v = λ i → u i R+ v i
+
 -- Vector equality
 _v≈_ : ∀ {n} → Vector n → Vector n → Set l₂
 u v≈ v = (i : _) → u i R≈ v i

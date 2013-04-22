@@ -1,3 +1,172 @@
-
+\newcommand{\zeromat}{\mathbf{0}}
 \section{Valiant's Algorithm}
-\subsection{Specification of transitive closure}
+In his paper \cite{Valiant's-Algorithm}, Leslie G. Valiant gave a divide and conquer algorithm for chart parsing that has the same time complexity as matrix multiplication. The algorithm divides a string into two parts, and parses them recursively, and then puts them together through a fairly complicated procedure that requires a constant number of matrix multiplications.
+
+Since the algorithm is a divide and conquer algorithm (and the combining step is also fairly paralellizable), it could potentially be used for parsing in parallel, as suggested by Jean-Philippe Bernardy and Koen Claessen \todo{- or --}\cite{JP-PP}. 
+
+\subsection{Specification of transitive closure}\todo{should this be here? might not make sense}
+
+\subsection{The Algorithm} \todo{note that we want to compute the transitive closure here, not \emph{parse}.}
+We want to compute the transitive closure of the parse chart. The main idea of the algorithm is to split the chart along the diagonal, into two subcharts and a rectangular overlap region, see Figure \ref{Figure:ParseChart}. Next, compute the transitive closures of the subcharts, and combine them (somehow) to fill in the rectangular part. We note that charts of size $1 \times 1$ are the zero matrix, where the transitive closure is also the zero matrix. We also note that it is easy to compute the transitive closure of subcharts that have size $2 \times 2$, since all charts are nonzero on the diagonal, they have only one nonzero element:
+\begin{equation*}
+  \begin{pmatrix}
+    0 x \\
+    0 0
+  \end{pmatrix},
+\end{equation*}
+and hence the specification \eqref{Equation:SpecificationTC} is: 
+\begin{equation*}
+  \begin{pmatrix}
+    0 c
+    0 0
+  \end{pmatrix}
+  = 
+  \begin{pmatrix}
+    0 & c\\
+    0 & 0 
+  \end{pmatrix}
+  \begin{pmatrix}
+    0 & c \\
+    0 & 0
+  \end{pmatrix}
+  + 
+  \begin{pmatrix}
+    0 & x
+    0 & 0
+  \end{pmatrix}
+\end{equation*}
+which turns into $c = x$, since $CC = \zeromat$.
+
+When the chart $X$ is $n \times n$, with $n > 1$, we can write it down as a block matrix 
+\begin{equation*}
+  C = 
+  \begin{pmatrix}
+    U & R \\
+    0 & L
+  \end{pmatrix}
+\end{equation*}
+where $U$ is upper triangular and is the chart corresponding to the first part of the string (the \emph{upper} part of the chart), $L$ is upper triangular and is the chart corresponding to the second part of the string (the \emph{lower} part of the chart, and $R$ corresponds to the parses that start in the first string and end in the second string (the \emph{rectangular} part of the chart).
+
+If we put this into the specification, we get:
+\begin{equation*}
+  \begin{pmatrix}
+    U^+ & R^+ \\
+    0   & L^+
+  \end{pmatrix}
+  =  
+  \begin{pmatrix}
+    U^+ & R^+ \\
+    0   & L^+
+  \end{pmatrix}
+  \begin{pmatrix}
+    U^+ & R^+ \\
+    0   & L^+
+  \end{pmatrix}
+  +
+  \begin{pmatrix}
+    U & R \\
+    0 & L
+  \end{pmatrix}
+\end{equation*}
+where $U^+$, $R^+$, $L^+$ are the corresponding parts of (a priori, we don't know if $U^+$ and $L^+$ are the transitive closures of $U$, $L$). Multiplying together $C^+C^+$, and adding $C$, we get:
+\begin{equation*}
+    \begin{pmatrix}
+    U^+ & R^+ \\
+    0   & L^+
+  \end{pmatrix} 
+    =
+  \begin{pmatrix}
+    U^+U^+ + R^+\zeromat + U   &   U^+R^+     + R^+L^+ + R \\
+    0                          &   \zeromat R + L^+L^+ + L
+  \end{pmatrix}
+  = 
+  \begin{pmatrix}
+    U^+U^+ + U                 &   U^+R^+ + R^+L^+ + R \\
+    0                          &   L^+L^+ + L
+  \end{pmatrix},
+\end{equation*}
+since $\zeromat$ is an absorbing element. Since all elements of two matrices need to be equal for the matrices to be equal, we get the set of equations:
+\begin{align}
+  U^+ &= U^+U^+ + U \\
+  R^+ &= U^+R^+ + R^+L^+ + R \label{Equation:R-Specification}\\
+  L^+ &= L^+L^+ + L,
+\end{align}
+so we see that it the condition that $C^+$ is the transitive closure of $C$ is equivalent to the conditions that the upper and lower parts of $C^+$ are the transitive closures of the upper and lower parts of $C$, respectively (intuitively, this makes sense, since the transitive closure of the first part describes the ways to get between nodes in the first part, and these don't depend on the second part, and vice versa, since the matrix is upper triangular---i.e., while parsing a subset of the of the first part of a string, it doesn't matter what the second part of the string is, because the grammar is context free) and the rectangular part of $C^+$ satisfies the equation \eqref{Equation:R-Specification}.
+
+Hence, if we compute the transitive closures of the upper and lower part of the matrix recursively, we only need to put them together and compute the rectangular part of the matrix.
+To do this, we subdivide $R$ into four blocks:
+\begin{equation*}
+  R =
+  \begin{pmatrix}
+    A & B \\ 
+    C & D
+  \end{pmatrix}
+\end{equation*}
+
+So assuming 
+
+So Valiant's algorithm is: \todo{should it be written like this?}
+
+\subsection{Implementation}
+In this section, we are going to implement Valiant's Algorithm.
+\subsubsection{Data types}
+To implement this in Agda using the |Matrix| and |Triangle| datatype from Section \ref{Section:Triangle} would be very complicated since we would have to handle the splitting manually. Instead, we define concrete representations for the matrices and triangle that have the way we split them built in% (at least two levels down, for use with the rectangular part). 
+We will call the datatypes we use |Mat| and |Tri| for general matrices and upper triangular matrices, respectively.
+To build the split into the data types, we give them constructors for building a large |Mat| or |Tri| from four smaller |Mat|s or two |Tri| and one |Mat| respectively. Since we need |Mat| to define |Tri|, it should appear earlier on in the Agda code, and we begin by reasoning about it. By the above, we have one constructor ready, which we will call |quad|, and which takes four smaller matrices and puts them together into a big one. \todo{make note about us using matrix for |Mat| here.} Written mathematically, we want the meaning to be:
+\begin{equation}
+\operatorname{quad}(A,B,C,D) = 
+\begin{pmatrix} 
+  A & B \\
+  C & D
+\end{pmatrix},
+\end{equation}
+where $A$ has the same number of rows as $B$, $C$ has the same number of rows as $D$, $A$ has the same number of columns as $C$ and $B$ has the same number of columns as $D$.
+Thinking about what ``small'' structures should have constructors, we we realize that it is not enough to simply allow $1 \times 1$ matrices, since then, any matrix would be a $2^n \times 2^n$ matrix, where $n$ is the number of times we use |quad|. 
+
+One way to to solve this problem is to have a constructor for ``empty'' matrices of any dimension, that play two different roles. First, empty $0 \times n$ matrices are used to allow |quad| to put two matrices with the same number of rows next to each others:
+\begin{equation}
+\operatorname{quad}(A, B, e_{0\,m}, e_{0\,n}) =
+\begin{pmatrix}
+  A & B \\
+  e_{0\,m} & e_{0\,n}
+\end{pmatrix} = 
+\begin{pmatrix}
+  A & B
+\end{pmatrix},
+\end{equation}
+where $e_m$ and $e_n$ are empty $m \times 0$ and $n\times 0$ matrices respectively. Similarily, empty $n \times 0$ matrices are used to put two matrice with the same number of columns on top of each others. Second, an empty $m \times n$ matrix, $m \ne 0$, $n \ne 0$, represents a $m \times n$ matrix whose entries are all zero. This approach is taken in \cite{JP-PP}. One advantages of this method is that one can probably get some speedup when adding and multiplying with ``empty'' matrices:
+\begin{equation*}
+  e_{m\, n} + A = A + e_{m\,n} = A
+  e_{m\, n} * A = e_{m\,p}
+  A * e_{n\,p}  = e_{m\,p},
+\end{equation*}
+where $A$ is an arbitrary $m \times n$, $n \times p$ and $m \times n$ matrix, respectively.
+Another is that it keeps the number of constructors down (three constructors for the matrix type), and this is desirable when proving things with Agda, since one often has to deal separately with each constructor, to establish the base cases in an induction.
+
+One (potential) downside with this approach is that while it allows easy construction of zero-matrices of arbitrary size, non-zero matrices still require many constructor application. For example, to make a $2^k \times 1$ vector, we'd have to build a tree of ``n'' \todo{count} applications of |quad|.
+
+Another approach, which we take in this report, is to allow row and column vectors, that is $1 \times n$ and $n \times 1$ matrices for arbitrary $n > 1$, along with the single element matrices. That is, we define |rVec| and |cVec| to take a vector of length $n > 1$ and turn it into a $1 \times n$ or $n \times 1$ matrix respectively.
+This approach has the advantage that we can define all matrices in a simple way, and that we could potentially specialize algorithms when the input is a vector, but introduces one extra constructor (one for rows, one for columns and one for single elements and |quad|, as opposed to one for empty matrices, one for single element matrices and |quad|).
+
+Similarily to the matrices, we then want a concrete representation |Vec| of vectors. Since we (probably) want to be able to split vectors too along the middle, we give them a constructor |two| that takes a vector of length $m$ and one of length $n$ and appends them. For our base cases, we need to be able to build single element vectors, and this turns out to be enough, since we can then build any vector. 
+To implement this approach, we need to define the datatypes |Vec| of vectors and |Mat| of matrices (that shoud be concrete representations of |Vector| and |Matrix|).
+
+%include Code/Valiant/NaiveCode.lagda
+
+Instead we want to use a different approach for indexing our matrices, by building the splitting further into the data structures. Looking at the first attempt to define |quad|, we can perhaps guess that the indexing should have a constructor that puts two sub-indices together to form a new index (as in |a + b|), because then, |quad| would result in a |Mat| whose indices are clearly distinguishable from the single index (that is |1| above). Hence, we want something like |ℕ|, but, instead of having |suc| as a constructor, it should have |+|. \todo{ask JP where the idea is from}
+%include Code/Valiant/Splitting.lagda
+
+Using this data type we can finally define our data types \todo{data type or datatype?} |Mat| and |Tri|.
+%include Code/Valiant/MatAndTri.lagda
+
+
+\todo{when getting to |Tri|, comment on the fact that |Tri| probably needs another constructor if we're doing things JP's way (does it have that in his papers / code?)}
+
+That is, we want 
+The way to do this in a way that works well with Agda is by using 
+\todo{smart Constructors}
+
+
+
+\subsection{Correctness Proof}
+Here we prove the correctness of Valiant's Algorithm.
