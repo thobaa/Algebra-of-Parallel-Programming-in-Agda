@@ -76,10 +76,10 @@ infix 6 _*_
 _*_ : ∀ {t1 t2 t3} → Mat t1 t2 → Mat t2 t3 → Mat t1 t3
 _*_ {one} {one} {one} (Sing x) (Sing x') = Sing (x R* x')
 _*_ {one} {one} {deeper t₁ t₂} (Sing x) (RVec v) = RVec (x ⊛| v)
-_*_ {deeper s₁ s₂} {one} (CVec y) (Sing x) = CVec (y |⊛ x)
-_*_ {deeper s₁ s₂} {one} {deeper t₁ t₂} (CVec (two u₁ u₂)) (RVec (two v₁ v₂)) = quad (u₁ ⊛ v₁) (u₁ ⊛ v₂) (u₂ ⊛ v₁) (u₂ ⊛ v₂) -- or just u ⊛ v  --((cVec u₁) * (rVec v₁)) ((cVec u₁) * (rVec v₂)) ((cVec u₂) * (rVec v₁)) ((cVec u₂) * (rVec v₂))
+_*_ {deeper s₁ s₂} {one} {one} (CVec y) (Sing x) = CVec (y |⊛ x)
+_*_ {deeper s₁ s₂} {one} {deeper t₁ t₂} (CVec u) (RVec v) = u ⊛ v  --((cVec u₁) * (rVec v₁)) ((cVec u₁) * (rVec v₂)) ((cVec u₂) * (rVec v₁)) ((cVec u₂) * (rVec v₂))
 _*_ {one} {deeper s₁ s₂} (RVec u) (CVec v) = Sing (u ∙ v)
-_*_ {one} {deeper s₁ s₂} (RVec (two u v)) (quad A B C D) = RVec (two (u |* A ⊕ v |* C) (u |* B ⊕ v |* D)) --(two (unMat2 (rVec u * A  +  rVec v * C)) (unMat2 (rVec u * B  +  rVec v * D)))
-_*_ {deeper r1 r2} {deeper y y'} (quad A B C D) (CVec (two e f)) = CVec (two (A *| e ⊕ B *| f) (C *| e ⊕ D *| f)) --(two (unMat1 (A * cVec e  +  B * cVec f)) (unMat1 (C * cVec e  +  D * cVec f)))
+_*_ {one} {deeper s₁ s₂} (RVec (two u v)) (quad A B C D) = RVec (two (u |* A ⊕ v |* C) (u |* B ⊕ v |* D))
+_*_ {deeper r1 r2} {deeper y y'} (quad A B C D) (CVec (two e f)) = CVec (two (A *| e ⊕ B *| f) (C *| e ⊕ D *| f))
 _*_ {deeper r1 r2} {deeper y y'} (quad A₁ B₁ C₁ D₁) (quad A₂ B₂ C₂ D₂) = quad (A₁ * A₂  +  B₁ * C₂) (A₁ * B₂  +  B₁ * D₂) (C₁ * A₂  +  D₁ * C₂) (C₁ * B₂  +  D₁ * D₂)
 

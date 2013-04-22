@@ -6,7 +6,7 @@ open import Relation.Nullary.Core using (yes; no)
 
 -- OWN:
 open import Valiant.Abstract.NonAssociativeNonRing using (NonAssociativeNonRing)
-import Valiant.Helper.Definitions using (R; R0; reduce≤; ≰to>; reduce′; reduce″; injectF+F)
+import Valiant.Helper.Definitions using (reduce≤; ≰to>; reduce′; reduce″; injectF+F)
 -- "Deprecated":
 open import Valiant.MatrixAlgebra.NatLemmas using (p≤p)
 
@@ -18,7 +18,10 @@ open Valiant.Helper.Definitions NAR
 
 -- Abstract vector
 Vector : ℕ → Set l₁
-Vector n = (i : Fin n) → R
+Vector n = (i : Fin n) → NonAssociativeNonRing.Carrier NAR
+
+zeroVector : {n : _} → Vector n
+zeroVector i = NonAssociativeNonRing.0# NAR
 
 -- Vector concatenation
 V++ : ∀ {n m} -> Vector n -> Vector m -> Vector (n + m)
@@ -26,15 +29,27 @@ V++ {n} {m} v1 v2 i with suc (toℕ i) ≤? n
 V++ v1 v2 i | yes p = v1 (reduce≤ i p)
 V++ v1 v2 i | no ¬p = v2 (reduce≥ i (p≤p (≰to> ¬p)))
 
+-- head and tail
+head : {n : _} → Vector (suc n) → NonAssociativeNonRing.Carrier NAR
+head v = v f0
+tail : {n : _} → Vector (suc n) → Vector n
+tail v = λ i → v (fsuc i)
+
+
+
+
+
+
+
 -- Abstract matrix
 Matrix : ℕ → ℕ → Set l₁
-Matrix m n = (i : Fin m) → (j : Fin n) → R
+Matrix m n = (i : Fin m) → (j : Fin n) → NonAssociativeNonRing.Carrier NAR
 
 -- NOTE: No Identity matrix as no one in ring
 
 -- Zero Matrix
-Zero : ∀ n m -> Matrix n m
-Zero n m i j = R0
+zeroMatrix : ∀ {n} {m} -> Matrix n m
+zeroMatrix i j = NonAssociativeNonRing.0# NAR
 
 -- Concatenation 
 Side : ∀ {m n o} -> Matrix m n -> Matrix m o -> Matrix m (n + o)

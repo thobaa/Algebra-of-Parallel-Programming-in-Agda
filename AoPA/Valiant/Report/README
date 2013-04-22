@@ -1,0 +1,1 @@
+I have modified lhs2Tex.fmt to avoid doing changes that are sensible for Haskell, where it is nice to have == show as \equiv, but not for Agda, where \equiv is a symbol (and \lambda vs \).

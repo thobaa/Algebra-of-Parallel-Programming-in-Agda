@@ -1,0 +1,2072 @@
+\documentclass{article}
+
+\usepackage{thesis}
+\usepackage{bbm}
+\usepackage{todonotes}
+
+
+\def\textmu{}
+
+\usepackage{ucs}
+\include{unicodedefs}
+% format _          = "\anonymous "
+% format ->         = "\to "
+% format <-         = "\leftarrow "
+% format =>         = "\Rightarrow "
+% format \          = "\lambda "
+% format !!         = "\mathbin{!!}"
+% format ==         = "\equiv "
+%% ODER: format ==         = "\mathrel{==}"
+% format /=         = "\not\equiv "
+%% ODER: format /=         = "\neq "
+% format <=         = "\leq "
+% format >=         = "\geq "
+% format `elem`     = "\in "
+% format `notElem`  = "\notin "
+% format &&         = "\mathrel{\wedge}"
+% format ||         = "\mathrel{\vee}"
+%
+%
+\makeatletter
+\@ifundefined{lhs2tex.lhs2tex.sty.read}%
+  {\@namedef{lhs2tex.lhs2tex.sty.read}{}%
+   \newcommand\SkipToFmtEnd{}%
+   \newcommand\EndFmtInput{}%
+   \long\def\SkipToFmtEnd#1\EndFmtInput{}%
+  }\SkipToFmtEnd
+
+\newcommand\ReadOnlyOnce[1]{\@ifundefined{#1}{\@namedef{#1}{}}\SkipToFmtEnd}
+\usepackage{amstext}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\DeclareFontFamily{OT1}{cmtex}{}
+\DeclareFontShape{OT1}{cmtex}{m}{n}
+  {<5><6><7><8>cmtex8
+   <9>cmtex9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmtex10}{}
+\DeclareFontShape{OT1}{cmtex}{m}{it}
+  {<-> ssub * cmtt/m/it}{}
+\newcommand{\texfamily}{\fontfamily{cmtex}\selectfont}
+\DeclareFontShape{OT1}{cmtt}{bx}{n}
+  {<5><6><7><8>cmtt8
+   <9>cmbtt9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmbtt10}{}
+\DeclareFontShape{OT1}{cmtex}{bx}{n}
+  {<-> ssub * cmtt/bx/n}{}
+\newcommand{\tex}[1]{\text{\texfamily#1}}	% NEU
+
+\newcommand{\Sp}{\hskip.33334em\relax}
+
+
+\newcommand{\Conid}[1]{\mathit{#1}}
+\newcommand{\Varid}[1]{\mathit{#1}}
+\newcommand{\anonymous}{\kern0.06em \vbox{\hrule\@width.5em}}
+\newcommand{\plus}{\mathbin{+\!\!\!+}}
+\newcommand{\bind}{\mathbin{>\!\!\!>\mkern-6.7mu=}}
+\newcommand{\rbind}{\mathbin{=\mkern-6.7mu<\!\!\!<}}% suggested by Neil Mitchell
+\newcommand{\sequ}{\mathbin{>\!\!\!>}}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+\usepackage{polytable}
+
+%mathindent has to be defined
+\@ifundefined{mathindent}%
+  {\newdimen\mathindent\mathindent\leftmargini}%
+  {}%
+
+\def\resethooks{%
+  \global\let\SaveRestoreHook\empty
+  \global\let\ColumnHook\empty}
+\newcommand*{\savecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\savecolumns[#1]}}
+\newcommand*{\restorecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\restorecolumns[#1]}}
+\newcommand*{\aligncolumn}[2]%
+  {\g@addto@macro\ColumnHook{\column{#1}{#2}}}
+
+\resethooks
+
+\newcommand{\onelinecommentchars}{\quad-{}- }
+\newcommand{\commentbeginchars}{\enskip\{-}
+\newcommand{\commentendchars}{-\}\enskip}
+
+\newcommand{\visiblecomments}{%
+  \let\onelinecomment=\onelinecommentchars
+  \let\commentbegin=\commentbeginchars
+  \let\commentend=\commentendchars}
+
+\newcommand{\invisiblecomments}{%
+  \let\onelinecomment=\empty
+  \let\commentbegin=\empty
+  \let\commentend=\empty}
+
+\visiblecomments
+
+\newlength{\blanklineskip}
+\setlength{\blanklineskip}{0.66084ex}
+
+\newcommand{\hsindent}[1]{\quad}% default is fixed indentation
+\let\hspre\empty
+\let\hspost\empty
+\newcommand{\NB}{\textbf{NB}}
+\newcommand{\Todo}[1]{$\langle$\textbf{To do:}~#1$\rangle$}
+
+\EndFmtInput
+\makeatother
+%
+%
+%
+%
+%
+%
+% This package provides two environments suitable to take the place
+% of hscode, called "plainhscode" and "arrayhscode". 
+%
+% The plain environment surrounds each code block by vertical space,
+% and it uses \abovedisplayskip and \belowdisplayskip to get spacing
+% similar to formulas. Note that if these dimensions are changed,
+% the spacing around displayed math formulas changes as well.
+% All code is indented using \leftskip.
+%
+% Changed 19.08.2004 to reflect changes in colorcode. Should work with
+% CodeGroup.sty.
+%
+\ReadOnlyOnce{polycode.fmt}%
+\makeatletter
+
+\newcommand{\hsnewpar}[1]%
+  {{\parskip=0pt\parindent=0pt\par\vskip #1\noindent}}
+
+% can be used, for instance, to redefine the code size, by setting the
+% command to \small or something alike
+\newcommand{\hscodestyle}{}
+
+% The command \sethscode can be used to switch the code formatting
+% behaviour by mapping the hscode environment in the subst directive
+% to a new LaTeX environment.
+
+\newcommand{\sethscode}[1]%
+  {\expandafter\let\expandafter\hscode\csname #1\endcsname
+   \expandafter\let\expandafter\endhscode\csname end#1\endcsname}
+
+% "compatibility" mode restores the non-polycode.fmt layout.
+
+\newenvironment{compathscode}%
+  {\par\noindent
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \let\hspre\(\let\hspost\)%
+   \pboxed}%
+  {\endpboxed\)%
+   \par\noindent
+   \ignorespacesafterend}
+
+\newcommand{\compaths}{\sethscode{compathscode}}
+
+% "plain" mode is the proposed default.
+% It should now work with \centering.
+% This required some changes. The old version
+% is still available for reference as oldplainhscode.
+
+\newenvironment{plainhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\hspre\(\let\hspost\)%
+   \pboxed}%
+  {\endpboxed%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+\newenvironment{oldplainhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \(\pboxed}%
+  {\endpboxed\)%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+% Here, we make plainhscode the default environment.
+
+\newcommand{\plainhs}{\sethscode{plainhscode}}
+\newcommand{\oldplainhs}{\sethscode{oldplainhscode}}
+\plainhs
+
+% The arrayhscode is like plain, but makes use of polytable's
+% parray environment which disallows page breaks in code blocks.
+
+\newenvironment{arrayhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \(\parray}%
+  {\endparray\)%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+\newcommand{\arrayhs}{\sethscode{arrayhscode}}
+
+% The mathhscode environment also makes use of polytable's parray 
+% environment. It is supposed to be used only inside math mode 
+% (I used it to typeset the type rules in my thesis).
+
+\newenvironment{mathhscode}%
+  {\parray}{\endparray}
+
+\newcommand{\mathhs}{\sethscode{mathhscode}}
+
+% texths is similar to mathhs, but works in text mode.
+
+\newenvironment{texthscode}%
+  {\(\parray}{\endparray\)}
+
+\newcommand{\texths}{\sethscode{texthscode}}
+
+% The framed environment places code in a framed box.
+
+\def\codeframewidth{\arrayrulewidth}
+\RequirePackage{calc}
+
+\newenvironment{framedhscode}%
+  {\parskip=\abovedisplayskip\par\noindent
+   \hscodestyle
+   \arrayrulewidth=\codeframewidth
+   \tabular{@{}|p{\linewidth-2\arraycolsep-2\arrayrulewidth-2pt}|@{}}%
+   \hline\framedhslinecorrect\\{-1.5ex}%
+   \let\endoflinesave=\\
+   \let\\=\@normalcr
+   \(\pboxed}%
+  {\endpboxed\)%
+   \framedhslinecorrect\endoflinesave{.5ex}\hline
+   \endtabular
+   \parskip=\belowdisplayskip\par\noindent
+   \ignorespacesafterend}
+
+\newcommand{\framedhslinecorrect}[2]%
+  {#1[#2]}
+
+\newcommand{\framedhs}{\sethscode{framedhscode}}
+
+% The inlinehscode environment is an experimental environment
+% that can be used to typeset displayed code inline.
+
+\newenvironment{inlinehscode}%
+  {\(\def\column##1##2{}%
+   \let\>\undefined\let\<\undefined\let\\\undefined
+   \newcommand\>[1][]{}\newcommand\<[1][]{}\newcommand\\[1][]{}%
+   \def\fromto##1##2##3{##3}%
+   \def\nextline{}}{\) }%
+
+\newcommand{\inlinehs}{\sethscode{inlinehscode}}
+
+% The joincode environment is a separate environment that
+% can be used to surround and thereby connect multiple code
+% blocks.
+
+\newenvironment{joincode}%
+  {\let\orighscode=\hscode
+   \let\origendhscode=\endhscode
+   \def\endhscode{\def\hscode{\endgroup\def\@currenvir{hscode}\\}\begingroup}
+   %\let\SaveRestoreHook=\empty
+   %\let\ColumnHook=\empty
+   %\let\resethooks=\empty
+   \orighscode\def\hscode{\endgroup\def\@currenvir{hscode}}}%
+  {\origendhscode
+   \global\let\hscode=\orighscode
+   \global\let\endhscode=\origendhscode}%
+
+\makeatother
+\EndFmtInput
+%
+%
+\ReadOnlyOnce{agda.fmt}%
+
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8x]{inputenc}
+\RequirePackage{ucs}
+\RequirePackage{amsfonts}
+
+\providecommand\mathbbm{\mathbb}
+
+% TODO: Define more of these ...
+\DeclareUnicodeCharacter{737}{\textsuperscript{l}}
+\DeclareUnicodeCharacter{8718}{\ensuremath{\blacksquare}}
+\DeclareUnicodeCharacter{8759}{::}
+\DeclareUnicodeCharacter{9669}{\ensuremath{\triangleleft}}
+\DeclareUnicodeCharacter{8799}{\ensuremath{\stackrel{\scriptscriptstyle ?}{=}}}
+\DeclareUnicodeCharacter{10214}{\ensuremath{\llbracket}}
+\DeclareUnicodeCharacter{10215}{\ensuremath{\rrbracket}}
+
+% TODO: This is in general not a good idea.
+\providecommand\textepsilon{$\epsilon$}
+\providecommand\textmu{$\mu$}
+
+
+%Actually, varsyms should not occur in Agda output.
+
+% TODO: Make this configurable. IMHO, italics doesn't work well
+% for Agda code.
+
+\renewcommand\Varid[1]{\mathord{\textsf{#1}}}
+\let\Conid\Varid
+\newcommand\Keyword[1]{\textsf{\textbf{#1}}}
+\EndFmtInput
+
+
+\usepackage[utf8x]{inputenc}
+
+
+
+\begin{document}
+\title{Report}
+\author{Thomas Bååth Sjöblom}
+\date{\today}
+\maketitle
+\section{Introduction}
+
+
+\subsection{What?}
+$\mathbb{N}$ $\mathbbm{N}$
+\subsection{Why?}
+\section{Agda}
+Agda was invented at Chalmers! By Ulf Norell.
+\subsection{As a programming language}
+\todo{Notes by JP:
+  1. Every binding can be given a name.
+  2. Explain \ensuremath{\Varid{\char95 }}.
+  3. Use of spacing.
+  4. Totality.
+}
+
+Agda is a dependently typed functional language. Functional means that programs are essentially a sequence of definitions of different functions (mathematical functions -- meaning no side effects). Dependently typed means that data types can depend on \emph{values} of other typed. The syntax is very similar to that of Haskell, with the biggest difference being that Agda uses \ensuremath{\mathbin{:}} for typing: \ensuremath{\Varid{f}\;\mathbin{:}\;\Varid{a}\;\Varid{→}\;\Varid{b}}, while Haskell instead uses \ensuremath{\Conid{::}}, as in \ensuremath{\Varid{f}\;\Conid{::}\;\Varid{a}\;\Varid{->}\;\Varid{b}}
+The reason for this is that in Haskell, lists are very important, and use \ensuremath{\mathbin{:}} for the cons operation. In Agda, on the other hand, there are no built in types, so \ensuremath{\mathbin{:}} is not used up already, and Agda can use it for type information, like it is used in Type Theory. The second syntactical difference is that Agda allows all unicode \todo{?} characters in programs.
+
+\todo{make clear list/section about agda-haskell differences. see afp lectures}
+\todo{also make a section about what we're going to do: write an extended example of a proof, showing all code}
+\todo{mention that we only use \ensuremath{\Conid{Set}} here, in library, use arbitrary sets}
+
+That Agda doesn't have built in types is another very big difference. One advantage is that it guarantees that all types are inductively defined, instead of as in Haskell, where the built in types behave differently from the user defined ones. But the fact that allows unicode in programs let's one define types similar to those of Haskell.
+For example, we could define Lists as 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{infixr}\;\Varid{8}\;\Varid{\char95 ∷\char95 }{}\<[E]%
+\\
+\>[B]{}\Keyword{data}\;[\mskip1.5mu \Varid{\char95 }\mskip1.5mu]\;(\Varid{a}\;\mathbin{:}\;\Conid{Set})\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}[\mskip1.5mu \mskip1.5mu]\;{}\<[8]%
+\>[8]{}\mathbin{:}\;[\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{\char95 ∷\char95 }\;\mathbin{:}\;(\Varid{x}\;\mathbin{:}\;\Varid{a})\;\Varid{→}\;(\Varid{xs}\;\mathbin{:}\;[\mskip1.5mu \Varid{a}\mskip1.5mu])\;\Varid{→}\;[\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+The notation here is very similar to the Haskell notation for lists, with the difference that we need to use spaces between the brackets and \ensuremath{\Varid{a}} (the reason for this is that \ensuremath{[\mskip1.5mu \Varid{a}\mskip1.5mu]}, without spaces is a valid type identifier in Agda.
+
+We also define a type of natural numbers, so we have some type to make Lists of. Here we take advantage of Agda's ability to use any unicode symbols to give the type a short and familiar name:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{ℕ}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{zero}\;\mathbin{:}\;\Conid{ℕ}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{suc}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;(\Varid{n}\;\mathbin{:}\;\Conid{ℕ})\;\Varid{→}\;\Conid{ℕ}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+If we use the commands following commands
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mbox{\enskip\{-\# BUILTIN NATURAL ℕ     \#-\}\enskip}{}\<[E]%
+\\
+\>[B]{}\mbox{\enskip\{-\# BUILTIN ZERO    zero  \#-\}\enskip}{}\<[E]%
+\\
+\>[B]{}\mbox{\enskip\{-\# BUILTIN SUC     suc   \#-\}\enskip}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+we can write the natural numbers with digits, and define a list 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{exampleList}\;\mathbin{:}\;[\mskip1.5mu \Conid{ℕ}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{exampleList}\;\mathrel{=}\;\Varid{5}\;\Varid{∷}\;\Varid{2}\;\Varid{∷}\;\Varid{12}\;\Varid{∷}\;\Varid{0}\;\Varid{∷}\;\Varid{23}\;\Varid{∷}\;[\mskip1.5mu \mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+
+
+Agda is a dependently typed language, which means that types can depend on the \emph{values} of other types. To some degree, this can be simulated in Haskell, using extensions like Generalized Algebraic Datatypes \todo{What can't be done, is it relevant -- especially: can one point to some example later in the report that can't be done}.
+
+\subsection{Agda as a proof assistant}
+The main use of Agda in this thesis is as a proof assistant. This use is based on the Curry Howard correspondence, which considers types as propositions, and their inhabitants as proofs of them.
+\subsection{The Curry--Howard Correspondence}
+To define a conjunction between two Propositions \ensuremath{\Conid{P}} and \ensuremath{\Conid{Q}}, one uses the pair \ensuremath{\Conid{P}\;\Varid{∧}\;\Conid{Q}} defined below
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Varid{\char95 ∧\char95 }\;(\Conid{P}\;\Conid{Q}\;\mathbin{:}\;\Conid{Set})\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{\char95 },\Varid{\char95 }\;\mathbin{:}\;(\Varid{p}\;\mathbin{:}\;\Conid{P})\;\Varid{→}\;(\Varid{q}\;\mathbin{:}\;\Conid{Q})\;\Varid{→}\;\Conid{P}\;\Varid{∧}\;\Conid{Q}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Because, to construct an element of \ensuremath{\Conid{P}\;\Varid{∧}\;\Conid{Q}}, one needs an element of both \ensuremath{\Conid{P}} and \ensuremath{\Conid{Q}}.
+
+For disjunction, one uses a disjoint sum:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Varid{\char95 ∨\char95 }\;(\Conid{P}\;\Conid{Q}\;\mathbin{:}\;\Conid{Set})\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{inl}\;\mathbin{:}\;(\Varid{p}\;\mathbin{:}\;\Conid{P})\;\Varid{→}\;\Conid{P}\;\Varid{∨}\;\Conid{Q}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{inr}\;\mathbin{:}\;(\Varid{q}\;\mathbin{:}\;\Conid{Q})\;\Varid{→}\;\Conid{P}\;\Varid{∨}\;\Conid{Q}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+For implication, one simply uses functions, \ensuremath{\Conid{P}\;\Varid{→}\;\Conid{Q}},
+because implication in constructive logic is a method for converting a proof of \ensuremath{\Conid{P}} to a proof of \ensuremath{\Conid{Q}}¸ and this is exactly what a function is. On the other hand, one might want a data type for implication, along with constructors for ``canonical proofs'' \cite{dybj-or-ML}.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Varid{\char95 ⇒\char95 }\;(\Conid{P}\;\Conid{Q}\;\mathbin{:}\;\Conid{Set})\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{impl}\;\mathbin{:}\;(\Conid{P}\;\Varid{→}\;\Conid{Q})\;\Varid{→}\;\Conid{P}\;\Varid{⇒}\;\Conid{Q}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+However, this has the disadvantage that every time we want to access the function, we have to unwrap it, which clutters the code. In general, it's a good idea to use unwrapped functions when possible \todo{is there another reason}. For example, we use this approach when defining the matrixes in \ref{Matrix-def}.
+
+The last of the predicate logic concepts is negation. Constructively, the negation of a proposition means that the proposition implies falsity. To define this, we first define the empty type as a type with no constructors to represent falsity:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Varid{⊥}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+We then define negation with
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{¬}\;\mathbin{:}\;(\Conid{P}\;\mathbin{:}\;\Conid{Set})\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Varid{¬}\;\Conid{P}\;\mathrel{=}\;\Conid{P}\;\Varid{→}\;\Varid{⊥}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Constructively, the law of excluded middle---saying that for every proposition \ensuremath{\Conid{P}}, either \ensuremath{\Conid{P}} or \ensuremath{\Varid{¬}\;\Conid{P}} is true---is not valid. However, there are propositions for which it is valid (trivially, for all true propositions). These are said to be \emph{decidable}, and are propositions such that there exists an algorithm producing either a proof of the proposition, or a proof of the negation. In Agda, if \ensuremath{\Conid{X}} is a collection of statements, we define this with a helper type \ensuremath{\Conid{Dec}\;\Conid{X}} that has two constructors, one taking a proof of an instance \ensuremath{\Varid{x}\;\mathbin{:}\;\Conid{X}} and one a proof \ensuremath{\Varid{¬x}\;\mathbin{:}\;\Varid{¬}\;\Conid{X}}\todo{what is it really that is decidable, proposition or relation (think a bit)}:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{Dec}\;(\Conid{P}\;\mathbin{:}\;\Conid{Set})\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{yes}\;\mathbin{:}\;(\Varid{p}\;\mathbin{:}\;{}\<[17]%
+\>[17]{}\Conid{P})\;\Varid{→}\;\Conid{Dec}\;\Conid{P}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{no}\;{}\<[7]%
+\>[7]{}\mathbin{:}\;(\Varid{¬p}\;\mathbin{:}\;\Varid{¬}\;\Conid{P})\;\Varid{→}\;\Conid{Dec}\;\Conid{P}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Then, a set of propositions \ensuremath{\Conid{P}} is proven to be decidable if we have a function \ensuremath{\Conid{P}\;\Varid{→}\;\Conid{Dec}\;\Conid{P}}, that is, and algorithm that takes an arbitrary instance of \ensuremath{\Conid{P}} and decides whether it is true.
+\begin{Example}
+  One example of a decidable proposition is inequality between natural numbers, which we consider in Section \ref{extended-example-nat-ineq}, since, given two natural numbers, we can determine which is smaller by repeatedly subtracting $1$ from both until one is zero.
+\end{Example}
+\todo{expand above section (the Dec section) a bit}
+
+Next (the \todo{CUrry or Howard? (or is this something I imagined I heard someone say?)} part of the Curry--Howard correspondence), we look at universal and existential quantification from predicate logic.
+ 
+For universal quantification, we again use functions, but this time the variable is bound to a name \ensuremath{\Varid{x}\;\mathbin{:}\;\Conid{X}}, and appears again, and the proposition can depend on the value \ensuremath{\Varid{x}}: \ensuremath{\Conid{P}\;\mathbin{:}\;\Conid{X}\;\Varid{→}\;\Conid{Set}}, that is universal quantification is a function \ensuremath{(\Varid{x}\;\mathbin{:}\;\Conid{X})\;\Varid{→}\;\Conid{P}\;\Varid{x}}:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{all}\;\mathbin{:}\;\{\mskip1.5mu \Conid{X}\;\mathbin{:}\;\Conid{Set}\mskip1.5mu\}\;\{\mskip1.5mu \Conid{P}\;\mathbin{:}\;\Conid{X}\;\Varid{→}\;\Conid{Set}\mskip1.5mu\}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Varid{all}\;\{\mskip1.5mu \Conid{X}\mskip1.5mu\}\;\{\mskip1.5mu \Conid{P}\mskip1.5mu\}\;\mathrel{=}\;(\Varid{x}\;\mathbin{:}\;\Conid{X})\;\Varid{→}\;\Conid{P}\;\Varid{x}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+That is, for any element \ensuremath{\Varid{x}\;\mathbin{:}\;\Conid{X}}, we have \ensuremath{\Conid{P}\;\Varid{x}}. Agda allows the use of the syntax \ensuremath{\Varid{∀}\;\Varid{x}} to mean \ensuremath{(\Varid{x}\;\mathbin{:}\;\Varid{\char95 })} in type definitions, so that \ensuremath{\Varid{∀}\;\Varid{x}\;\Varid{→}\;\Conid{P}\;\Varid{x}} means exactly what we expect it to mean (using the \ensuremath{\Varid{∀}\;\Varid{x}} in definitions is nice even when not considering the types as propositions, because it lets us use Agda's type inference to shorten the definitions).
+
+Finally, existential quantification, $\exists x. P(x)$, which in constructive logic is interpreted to be true if there is a pair $(x_0, P x_0)$ of an element  $x_0$ along with a proof of $P (x_0)$, so we can model it by a dependent pair (similar to the cartesian product defined above but now we consider one of the sets a domain for the variables, and the other as a proposition). We use the same name for the constructor as above.
+\todo{lookup ∃ in standard library}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Varid{∃}\;\{\mskip1.5mu \Conid{X}\;\mathbin{:}\;\Conid{Set}\mskip1.5mu\}\;(\Conid{P}\;\mathbin{:}\;\Conid{X}\;\Varid{→}\;\Conid{Set})\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{\char95 },\Varid{\char95 }\;\mathbin{:}\;(\Varid{x}\;\mathbin{:}\;\Conid{X})\;\Varid{→}\;\Conid{P}\;\Varid{x}\;\Varid{→}\;\Varid{∃}\;\Conid{P}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+
+
+% labels to fill in.
+\todo{Fix the below labels (move)}
+\label{Matrix-def}
+\label{extended-example-nat-ineq}
+
+As a small example of using Agda, we will define a maximum function \ensuremath{\Varid{max}} for lists of natural numbers and prove that it satisfies a sensible specification. The specification we will use is that, \ensuremath{\Varid{max}\;\Varid{xs}} is greater than or equal to each element of \ensuremath{\Varid{xs}}, and equal to some element. 
+As an example, we will define a maximum function \ensuremath{\Varid{max}} for lists of natural numbers and prove that it satisfies a sensible specification. The specification we will use is that, \ensuremath{\Varid{max}\;\Varid{xs}} is greater than or equal to each element of \ensuremath{\Varid{xs}}, and equal to some element. 
+First, we define the \ensuremath{\Varid{maxℕ}} function on \ensuremath{\Conid{ℕ}}.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{maxℕ}\;\mathbin{:}\;\Conid{ℕ}\;\Varid{→}\;\Conid{ℕ}\;\Varid{→}\;\Conid{ℕ}{}\<[E]%
+\\
+\>[B]{}\Varid{maxℕ}\;\Varid{zero}\;\Varid{n}\;\mathrel{=}\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\Varid{maxℕ}\;\Varid{n}\;\Varid{zero}\;\mathrel{=}\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\Varid{maxℕ}\;(\Varid{suc}\;\Varid{m})\;(\Varid{suc}\;\Varid{n})\;\mathrel{=}\;\Varid{suc}\;(\Varid{maxℕ}\;\Varid{m}\;\Varid{n}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+We decide to only define the \ensuremath{\Varid{max}} function on nonempty lists (in the case of natural numbers, it might be sensible to define \ensuremath{\Varid{max}\;[\mskip1.5mu \mskip1.5mu]\;\mathrel{=}\;\Varid{0}}, but when it comes to other types, and orders, there is no least element).
+ Second, we need to define less than, \ensuremath{\Varid{\char95 ≤\char95 }}. This is done with the following data type: 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{infix}\;\Varid{3}\;\Varid{\char95 ≤\char95 }{}\<[E]%
+\\
+\>[B]{}\Keyword{data}\;\Varid{\char95 ≤\char95 }\;\mathbin{:}\;\Conid{ℕ}\;\Varid{→}\;\Conid{ℕ}\;\Varid{→}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{z≤n}\;\mathbin{:}\;\{\mskip1.5mu \Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Varid{zero}\;\Varid{≤}\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{s≤s}\;\mathbin{:}\;\{\mskip1.5mu \Varid{m}\;\Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;(\Varid{m≤n}\;\mathbin{:}\;\Varid{m}\;\Varid{≤}\;\Varid{n})\;\Varid{→}\;\Varid{suc}\;\Varid{m}\;\Varid{≤}\;\Varid{suc}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Here we introduce another feature of Agda, that functions can take implicit arguments, the constructor \ensuremath{\Varid{z≤n}} takes an argument \ensuremath{\Varid{n}}, but Agda can figure out what it is from the resulting type (which includes \ensuremath{\Varid{n}}), and hence, we don't need to include it.
+
+Viewed through the Curry Howard Correspondence, the data type \ensuremath{\Varid{m}\;\Varid{≤}\;\Varid{n}} represents the proposition that \ensuremath{\Varid{m}} is less than or equal to \ensuremath{\Varid{n}}, and the two possible proofs of this are, either \ensuremath{\Varid{m}} is \ensuremath{\Varid{zero}}, which is less than any natural number, or \ensuremath{\Varid{m}\;\mathrel{=}\;\Varid{suc}\;\Varid{m′}} and \ensuremath{\Varid{n}\;\mathrel{=}\;\Varid{suc}\;\Varid{n′}} and we have a proof of \ensuremath{\Varid{m′}\;\Varid{≤}\;\Varid{n′}}.
+Using the above definition, we can also define a less than function, 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 <\char95 }\;\mathbin{:}\;\Conid{ℕ}\;\Varid{→}\;\Conid{ℕ}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Varid{m}\;\Varid{<}\;\Varid{n}\;\mathrel{=}\;\Varid{suc}\;\Varid{m}\;\Varid{≤}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+We note that we didn't need to create a new type using the \ensuremath{\Keyword{data}} command to create this, 
+
+Now we define the \ensuremath{\Varid{length}} function for lists, 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{length}\;\mathbin{:}\;\{\mskip1.5mu \Varid{a}\;\mathbin{:}\;\Conid{Set}\mskip1.5mu\}\;\Varid{→}\;[\mskip1.5mu \Varid{a}\mskip1.5mu]\;\Varid{→}\;\Conid{ℕ}{}\<[E]%
+\\
+\>[B]{}\Varid{length}\;[\mskip1.5mu \mskip1.5mu]\;\mathrel{=}\;\Varid{0}{}\<[E]%
+\\
+\>[B]{}\Varid{length}\;(\Varid{x}\;\Varid{∷}\;\Varid{xs})\;\mathrel{=}\;\Varid{suc}\;(\Varid{length}\;\Varid{xs}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Now, we can define the \ensuremath{\Varid{max}} function:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{max}\;\mathbin{:}\;(\Varid{xs}\;\mathbin{:}\;[\mskip1.5mu \Conid{ℕ}\mskip1.5mu])\;\Varid{→}\;(\Varid{0}\;\Varid{<}\;\Varid{length}\;\Varid{xs})\;\Varid{→}\;\Conid{ℕ}{}\<[E]%
+\\
+\>[B]{}\Varid{max}\;[\mskip1.5mu \mskip1.5mu]\;(){}\<[E]%
+\\
+\>[B]{}\Varid{max}\;(\Varid{x}\;\Varid{∷}\;[\mskip1.5mu \mskip1.5mu])\;\Varid{\char95 }\;\mathrel{=}\;\Varid{x}{}\<[E]%
+\\
+\>[B]{}\Varid{max}\;(\Varid{x}\;\Varid{∷}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs}))\;\Varid{\char95 }\;\mathrel{=}\;\Varid{maxℕ}\;\Varid{x}\;(\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;(\Varid{s≤s}\;\Varid{z≤n})){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+On the first line, we use the absurd pattern \ensuremath{()} \todo{Explain why () can be used} to show that there is no proof that \ensuremath{\Varid{1}\;\Varid{≤}\;\Varid{0}}. On the second two lines, we don't care about what the input proof is (it is \ensuremath{\Varid{s≤s}\;\Varid{z≤n}} in both cases, so we use \ensuremath{\Varid{\char95 }} to signify that it's not important). \todo{NAmes of \ensuremath{\Varid{\char95 }}-pattern -- if there is one}
+
+We also need an indexing function, and again, we can only define it for sensible inputs. The simplest definition would probably be:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{index}\;\mathbin{:}\;\Varid{∀}\;\{\mskip1.5mu \Varid{a}\mskip1.5mu\}\;\Varid{→}\;(\Varid{xs}\;\mathbin{:}\;[\mskip1.5mu \Varid{a}\mskip1.5mu])\;\Varid{→}\;(\Varid{n}\;\mathbin{:}\;\Conid{ℕ})\;\Varid{→}\;\Varid{suc}\;\Varid{n}\;\Varid{≤}\;\Varid{length}\;\Varid{xs}\;\Varid{→}\;\Varid{a}{}\<[E]%
+\\
+\>[B]{}\Varid{index}\;[\mskip1.5mu \mskip1.5mu]\;\Varid{n}\;(){}\<[E]%
+\\
+\>[B]{}\Varid{index}\;(\Varid{x}\;\Varid{∷}\;\Varid{xs})\;\Varid{zero}\;\Varid{\char95 }\;\mathrel{=}\;\Varid{x}{}\<[E]%
+\\
+\>[B]{}\Varid{index}\;(\Varid{x}\;\Varid{∷}\;\Varid{xs})\;(\Varid{suc}\;\Varid{n})\;(\Varid{s≤s}\;\Varid{m≤n})\;\mathrel{=}\;\Varid{index}\;\Varid{xs}\;\Varid{n}\;\Varid{m≤n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+However, this leads to a bit of trouble later on, when we want to specify things about it, in particular when we want to say that the maximum is in the list. We want to say that there is an index $n$ such that the $n$th element of the list is equal to the maximum. But to say this, we'd need to prove that the $n$ was less than the length of the list, and the simple way to do this would be to attempt to use the proposition \ensuremath{\Conid{P}\;\mathrel{=}\;(\Varid{proof}\;\mathbin{:}\;\Varid{n}\;\Varid{≤}\;\Varid{length}\;\Varid{xs})\;\Varid{→}\;\Varid{index}\;\Varid{xs}\;\Varid{n}\;\Varid{proof}\;\Varid{≡}\;\Varid{max}\;\Varid{xs}\;\Varid{lengthproof}}, but this is horribly wrong, because it states something completely different to what we want. It states that if there is a proof that \ensuremath{\Varid{n}\;\Varid{≤}\;\Varid{length}\;\Varid{xs}}, then we need to have that all \ensuremath{\Varid{n}\;\Varid{>}\;\Varid{length}\;\Varid{xs}} satisfy \ensuremath{\Conid{P}}, and this is clearly not what we want. The simplest way to fix this is to state that we want an integer that is \ensuremath{\Varid{n}} less than \ensuremath{\Varid{length}\;\Varid{xs}} and that the \ensuremath{\Varid{n}}th element of \ensuremath{\Varid{xs}} is equal to the max. However, there is a problem here too. To be able to index into the \ensuremath{\Varid{n}}th position, we need the proof that \ensuremath{\Varid{n}\;\Varid{≤}\;\Varid{length}\;\Varid{xs}}, so we can't use a pair (because the second element would have to depend on the first \todo{expand on this, and clean up: curry howard says some things, can move away from it, or state that there is a pair, but the existence must be on the left of the implication}. Instead, we choose to define datatype \ensuremath{\Conid{Fin}\;\Varid{n}} containing the numbers less than \ensuremath{\Varid{n}}, and change the \ensuremath{\Varid{index}} function to use it instead of \ensuremath{\Conid{ℕ}}:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{Fin}\;\mathbin{:}\;(\Varid{n}\;\mathbin{:}\;\Conid{ℕ})\;\Varid{→}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{fzero}\;\mathbin{:}\;\{\mskip1.5mu \Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Fin}\;(\Varid{suc}\;\Varid{n}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{fsuc}\;{}\<[9]%
+\>[9]{}\mathbin{:}\;\{\mskip1.5mu \Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;(\Varid{i}\;\mathbin{:}\;\Conid{Fin}\;\Varid{n})\;\Varid{→}\;\Conid{Fin}\;(\Varid{suc}\;\Varid{n}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+That is, \ensuremath{\Varid{f0}} (representing \ensuremath{\Varid{0}}, but given a different name for clarity---it is not equal to the natural number \ensuremath{\Varid{0}}, they don't even have the same type) is less than any number greater than or equal to \ensuremath{\Varid{1}}, and for any number \ensuremath{\Varid{i}}, less than some number \ensuremath{\Varid{n}}, \ensuremath{\Varid{fsuc}\;\Varid{i}} is less than \ensuremath{\Varid{n}\;\Varid{+}\;\Varid{1}}. 
+Note that we have put the index \ensuremath{\Varid{n}} on the right side of the colon n the definition of \ensuremath{\Conid{Fin}}, this is so that [todo: is there a reason??? something with it being indexed (doesn't work if we move it).
+Alternatively, we could define \ensuremath{\Conid{Fin}\;\Varid{n}} as a dependent pair of a natural number \ensuremath{\Varid{i}} and a proof that it is less than \ensuremath{\Varid{n}}. For future use, we define a dependent pair type first (we could of course have used it to define the regular pair for the Curry Howard Correspondence): 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{Σ}\;(\Conid{A}\;\mathbin{:}\;\Conid{Set})\;(\Conid{B}\;\mathbin{:}\;\Conid{A}\;\Varid{→}\;\Conid{Set})\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{\char95 },\Varid{\char95 }\;\mathbin{:}\;(\Varid{x}\;\mathbin{:}\;\Conid{A})\;\Varid{→}\;\Conid{B}\;\Varid{x}\;\Varid{→}\;\Conid{Σ}\;\Conid{A}\;\Conid{B}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Here, on the other hand, we need to put the arguments to \ensuremath{\Conid{Σ}} on the left hand side of the colon, because otherwise the type would be too big [todo : Huh?]
+And then use it to define \ensuremath{\Conid{Fin′}}.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{Fin′}\;\mathbin{:}\;(\Varid{n}\;\mathbin{:}\;\Conid{ℕ})\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Conid{Fin′}\;\Varid{n}\;\mathrel{=}\;\Conid{Σ}\;\Conid{ℕ}\;(\Varid{λ}\;\Varid{i}\;\Varid{→}\;\Varid{i}\;\Varid{<}\;\Varid{n}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+This second representation has the advantage that the natural number is close by (\ensuremath{\Varid{i}} is an actual natural number, that we can use right away, for the other \ensuremath{\Conid{Fin}} type, we would have to write and use a translation-function that replaces each \ensuremath{\Varid{fsuc}} by \ensuremath{\Varid{suc}} and \ensuremath{\Varid{fzero}} by \ensuremath{\Varid{zero}}).
+
+However, this would require us to always extract the proof when we need to use it, instead of having it ``built into'' the type.
+These two different ways of defining things are something we will use later when we define upper triangular matrixes as their own data-type. For a concrete representation, we are going to use the first kind of representation, where we have built in the ``proof'' that the matrix is triangular---which lets us not worry about modifying the proof appropriately, or reprove that the product of two upper triangular matrixes is again upper triangular. While when representing matrixes abstractly (as functions from their indices), we will need to use the proofs and modify them, to strengthen some results from the concrete case.
+
+We now redefine the indexing function, with different syntax, more familiar to Haskell users (and see already that not needing a separate proof argument makes things a lot clearer)
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{infix}\;\Varid{10}\;\Varid{\char95 ‼\char95 }{}\<[E]%
+\\
+\>[B]{}\Varid{\char95 ‼\char95 }\;\mathbin{:}\;\Varid{∀}\;\{\mskip1.5mu \Varid{a}\mskip1.5mu\}\;\Varid{→}\;(\Varid{xs}\;\mathbin{:}\;[\mskip1.5mu \Varid{a}\mskip1.5mu])\;\Varid{→}\;(\Varid{n}\;\mathbin{:}\;\Conid{Fin}\;(\Varid{length}\;\Varid{xs}))\;\Varid{→}\;\Varid{a}{}\<[E]%
+\\
+\>[B]{}[\mskip1.5mu \mskip1.5mu]\;\Varid{‼}\;(){}\<[E]%
+\\
+\>[B]{}(\Varid{x}\;\Varid{∷}\;\Varid{xs})\;\Varid{‼}\;\Varid{fzero}\;\mathrel{=}\;\Varid{x}{}\<[E]%
+\\
+\>[B]{}(\Varid{x}\;\Varid{∷}\;\Varid{xs})\;\Varid{‼}\;\Varid{fsuc}\;\Varid{i}\;\mathrel{=}\;\Varid{xs}\;\Varid{‼}\;\Varid{i}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+The final step is defining equality, i.e., the proposition that two values \ensuremath{\Varid{x}} and \ensuremath{\Varid{y}} are equal. The basic equality is a data type whose only constructor \ensuremath{\Varid{refl}} is a proof that \ensuremath{\Varid{x}} is equal to itself.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{infix}\;\Varid{3}\;\Varid{\char95 ≡\char95 }{}\<[E]%
+\\
+\>[B]{}\Keyword{data}\;\Varid{\char95 ≡\char95 }\;\{\mskip1.5mu \Varid{a}\;\mathbin{:}\;\Conid{Set}\mskip1.5mu\}\;\mathbin{:}\;\Varid{a}\;\Varid{→}\;\Varid{a}\;\Varid{→}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{refl}\;\mathbin{:}\;\{\mskip1.5mu \Varid{x}\;\mathbin{:}\;\Varid{a}\mskip1.5mu\}\;\Varid{→}\;\Varid{x}\;\Varid{≡}\;\Varid{x}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Here, we have an implicit argument to the \emph{type}, to allow it to work for an type. For our purposes, this very strong concept of equality is suitable. However, if one wants to allow different ``representations'' of an object, for example if one defines the rational numbers as pairs of integers, \ensuremath{\Conid{ℚ}\;\mathrel{=}\;\Conid{ℤ}\;\Varid{×}\;\Conid{ℤ\char92 }\;\{\mskip1.5mu \Varid{0}\mskip1.5mu\}}, one wants a concept of equality that considers \ensuremath{(\Varid{p},\Varid{q})} and \ensuremath{(\Varid{m}\;\Varid{*}\;\Varid{p},\Varid{m}\;\Varid{*}\;\Varid{q})} to be  equal. This could be taken care of by using equality defined as for example [TODO: what about division by $0$]
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Varid{\char95 ≡′\char95 }\;\mathbin{:}\;\Conid{ℚ}\;\Varid{→}\;\Conid{ℚ}\;\Varid{→}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{p/q≡mp/mq}\;\mathbin{:}\;\{\mskip1.5mu \Varid{p}\;\mathbin{:}\;\Conid{ℤ}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{q}\;\mathbin{:}\;\Conid{ℤ\char92 0}\mskip1.5mu\}\;(\Varid{m}\;\mathbin{:}\;\Conid{ℤ\char92 0})\;\Varid{→}\;(\Varid{p},\Varid{q})\;\Varid{≡′}\;(\Varid{m}\;\Varid{*}\;\Varid{p},\Varid{m}\;\Varid{*′}\;\Varid{q}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Another example is if we define a datatype of sets, we want two sets to be equal as long as they have the same elements, regardless if they were added in different orders, or if one set had the same element added multiple times.
+
+
+Now we can finally express our specification in Agda.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{12}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{max-spec}\;\mathbin{:}\;(\Varid{xs}\;\mathbin{:}\;[\mskip1.5mu \Conid{ℕ}\mskip1.5mu])\;\Varid{→}\;(\Varid{pf}\;\mathbin{:}\;\Varid{0}\;\Varid{<}\;\Varid{length}\;\Varid{xs})\;\Varid{→}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{10}{}\<[10]%
+\>[10]{}((\Varid{n}\;\mathbin{:}\;\Conid{Fin}\;(\Varid{length}\;\Varid{xs}))\;\Varid{→}\;\Varid{xs}\;\Varid{‼}\;\Varid{n}\;\Varid{≤}\;\Varid{max}\;\Varid{xs}\;\Varid{pf})\;{}\<[E]%
+\\
+\>[10]{}\hsindent{2}{}\<[12]%
+\>[12]{}\Varid{∧}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{10}{}\<[10]%
+\>[10]{}\Varid{∃}\;(\Varid{λ}\;\Varid{n}\;\Varid{→}\;\Varid{xs}\;\Varid{‼}\;\Varid{n}\;\Varid{≡}\;\Varid{max}\;\Varid{xs}\;\Varid{pf}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+To prove the correctness of the \ensuremath{\Varid{max}} function, we must then find an implementation of \ensuremath{\Varid{max-spec}}, that is, we produce an element of its type, corresponding to a proof of the proposition it represents.This is actually quite a substantial task, that we accomplish in the following two sections. In Section \ref{extended-example-first-part-of-proof} we prove the first part of the disjunct, and in Section \ref{extended-example-second-part-of-proof}, we prove the second.
+
+\subsection{First part of proof}
+\label{extended-example-first-part-of-proof}
+This is actually quite a substantial task. We begin by proving the first disjunct \ensuremath{(\Varid{n}\;\mathbin{:}\;\Conid{Fin}\;(\Varid{length}\;\Varid{xs}))\;\Varid{→}\;\Varid{xs}\;\Varid{‼}\;\Varid{n}\;\Varid{≤}\;\Varid{max}\;\Varid{xs}\;\Varid{pf}} 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{max-greatest}\;\mathbin{:}\;\{\mskip1.5mu \Varid{xs}\;\mathbin{:}\;[\mskip1.5mu \Conid{ℕ}\mskip1.5mu]\mskip1.5mu\}\;\Varid{→}\;\{\mskip1.5mu \Varid{pf}\;\mathbin{:}\;\Varid{0}\;\Varid{<}\;\Varid{length}\;\Varid{xs}\mskip1.5mu\}\;\Varid{→}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{10}{}\<[10]%
+\>[10]{}(\Varid{n}\;\mathbin{:}\;\Conid{Fin}\;(\Varid{length}\;\Varid{xs}))\;\Varid{→}\;\Varid{xs}\;\Varid{‼}\;\Varid{n}\;\Varid{≤}\;\Varid{max}\;\Varid{xs}\;\Varid{pf}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+We have made the list and the proof that the length is greater than $0$ implicit arguments because they can be infered from the resulting type \ensuremath{\Varid{xs}\;\Varid{‼}\;\Varid{n}\;\Varid{≤}\;\Varid{max}\;\Varid{xs}\;\Varid{pf}}. However, when we prove the lemma, we are going to need to pattern match on those arguments many times.
+
+We make the simple, but important observation that we cannot use \ensuremath{\Varid{max-greatest}} in the place of \ensuremath{(\Varid{n}\;\mathbin{:}\;\Conid{Fin}\;(\Varid{length}\;\Varid{xs}))\;\Varid{→}\;\Varid{xs}\;\Varid{‼}\;\Varid{n}\;\Varid{≤}\;\Varid{max}\;\Varid{xs}\;\Varid{pf}} when giving the type of \ensuremath{\Varid{max-spec}}, because while the type of \ensuremath{\Varid{max-greatest}} is the proposition that \ensuremath{\Varid{max}\;\Varid{xs}\;\Varid{pf}} is the greatest element of the list, \ensuremath{\Varid{max-greatest}} itself is just one specific proof of that proposition.
+\todo{is \ensuremath{\Varid{max-greatest}} a good name for it?}
+
+%The overall strategy for proving things in Agda is to begin by writing the implementation with holes, in this case:
+%\begin{spec}
+%max-greatest = {! !}
+%\end{spec}
+%Then we look at the structure of what is to be proved. 
+%Then we begin by writing the arguments  
+To prove a proposition in Agda, it is important to look at the structure of the proposition, and the structures of the involved parts. Then one needs to determine which structure should be pattern matched on, depending on what the inductive step in the proposition is.
+
+To prove \ensuremath{\Varid{max-greatest}}, we begin by formulating the proof informally. The main idea we use is pattern matching the index into the list, if it is $0$, we want to prove the simpler proposition that \ensuremath{\Varid{x}\;\Varid{≤}\;\Varid{max}\;(\Varid{x}\;\Varid{∷}\;\Varid{xs})\;\Varid{pf}}, which we call \ensuremath{\Varid{max-greatest-initial}}, because it is essentially the initial step in an induction on the index:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{max-greatest-initial}\;\mathbin{:}\;\{\mskip1.5mu \Varid{x}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{xs}\;\mathbin{:}\;[\mskip1.5mu \Conid{ℕ}\mskip1.5mu]\mskip1.5mu\}\;\Varid{→}\;\Varid{x}\;\Varid{≤}\;\Varid{max}\;(\Varid{x}\;\Varid{∷}\;\Varid{xs})\;(\Varid{s≤s}\;\Varid{z≤n}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+On the other hand, if the index is $i + 1$, we must have that the list must has length at least $2$, we proceed by doing noting:
+\begin{enumerate}
+\item \label{Ex.List.Induction1} By induction, the $i$th element of the tail is less than the greatest element of the tail.
+\item \label{Ex.List.Induction2} The $i$th element of the tail equals the $i + 1$th element of the list.
+\item \label{Ex.List.Induction3} By the definition of \ensuremath{\Varid{max}}, \ensuremath{\Varid{max}\;(\Varid{x}\;\Varid{∷}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs}))\;\Varid{pf}} expands to \ensuremath{\Varid{maxℕ}\;\Varid{x}\;(\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Varid{pf′})}, and for any \ensuremath{\Varid{x}} and \ensuremath{\Varid{y}}, we have \ensuremath{\Varid{y}\;\Varid{≤}\;\Varid{maxℕ}\;\Varid{x}\;\Varid{y}}.
+\end{enumerate}
+To translate the induction case into Agda code, we need to introduce two new lemmas. By induction, we already know that Point \ref{Ex.List.Induction1} is true. Additionally, Agda infers Point \ref{Ex.List.Induction2}. However, we still need to prove the second part of Point \ref{Ex.List.Induction3}:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{maxℕ-increasing₂}\;\mathbin{:}\;\{\mskip1.5mu \Varid{m}\;\Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Varid{n}\;\Varid{≤}\;\Varid{maxℕ}\;\Varid{m}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Where the subscript $2$ refers to the fact that it is the second argument of \ensuremath{\Varid{maxℕ}} that is on the left hand side of the inequality. Finally, we need a way to piece together inequalities, if \ensuremath{\Varid{i}\;\Varid{≤}\;\Varid{j}} and \ensuremath{\Varid{j}\;\Varid{≤}\;\Varid{k}}, then \ensuremath{\Varid{i}\;\Varid{≤}\;\Varid{k}} (that is, \ensuremath{\Varid{≤}} is transitive):
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{≤-trans}\;\mathbin{:}\;\{\mskip1.5mu \Varid{i}\;\Varid{j}\;\Varid{k}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Varid{i}\;\Varid{≤}\;\Varid{j}\;\Varid{→}\;\Varid{j}\;\Varid{≤}\;\Varid{k}\;\Varid{→}\;\Varid{i}\;\Varid{≤}\;\Varid{k}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Now we begin proving these lemmas, beginning with \ensuremath{\Varid{≤-trans}}, since it does not depend on the others (all the other lemmas will require further sublemmas to prove). We pattern match on the first proof, \ensuremath{\Varid{i}\;\Varid{≤}\;\Varid{j}}. If it is \ensuremath{\Varid{z≤n}}, Agda infers that \ensuremath{\Varid{i}} is \ensuremath{\Varid{0}}, so the resulting proof if \ensuremath{\Varid{z≤n}}:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{≤-trans}\;\Varid{z≤n}\;\Varid{j≤k}\;\mathrel{=}\;\Varid{z≤n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+If it is \ensuremath{\Varid{s≤s}\;\Varid{i′≤j′}}, Agda infers that \ensuremath{\Varid{i}\;\Varid{==}\;\Varid{suc}\;\Varid{i′}}, and \ensuremath{\Varid{j}\;\Varid{==}\;\Varid{suc}\;\Varid{j′}}, and \ensuremath{\Varid{i′≤j′}} is a proof that \ensuremath{\Varid{i′}\;\Varid{≤}\;\Varid{j′}}. We pattern match on the proof of \ensuremath{\Varid{j}\;\Varid{≤}\;\Varid{k}}, which must be \ensuremath{\Varid{s≤s}\;\Varid{j′≤k′}}, because \ensuremath{\Varid{j}} is \ensuremath{\Varid{suc}\;\Varid{j′}}. Hence, we can use induction to get a proof that \ensuremath{\Varid{i′}\;\Varid{≤}\;\Varid{k′}}, and apply \ensuremath{\Varid{s≤s}} to that proof:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{≤-trans}\;(\Varid{s≤s}\;\Varid{i′≤j′})\;(\Varid{s≤s}\;\Varid{j′≤k′})\;\mathrel{=}\;\Varid{s≤s}\;(\Varid{≤-trans}\;\Varid{i′≤j′}\;\Varid{j′≤k′}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+We continue by proving \ensuremath{\Varid{maxℕ-increasing₂}}, for this, we introduce a lemma: \ensuremath{\Varid{≤-refl}}, stating that for any \ensuremath{\Varid{n}}, \ensuremath{\Varid{n}\;\Varid{≤}\;\Varid{n}} (that is, \ensuremath{\Varid{≤}} is reflexive), which is very easy to prove (if \ensuremath{\Varid{n}\;\Varid{==}\;\Varid{0}}, a proof is given by the constructor \ensuremath{\Varid{z≤n}}, and if \ensuremath{\Varid{n}\;\Varid{==}\;\Varid{suc}\;\Varid{n′}}, by induction, \ensuremath{\Varid{n′}\;\Varid{≤}\;\Varid{n′}} and \ensuremath{\Varid{s≤s}} takes the proof of this to a proof that \ensuremath{\Varid{n}\;\Varid{≤}\;\Varid{n}}:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{≤-refl}\;\mathbin{:}\;\{\mskip1.5mu \Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Varid{n}\;\Varid{≤}\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\Varid{≤-refl}\;\{\mskip1.5mu \Varid{zero}\mskip1.5mu\}\;\mathrel{=}\;\Varid{z≤n}{}\<[E]%
+\\
+\>[B]{}\Varid{≤-refl}\;\{\mskip1.5mu \Varid{suc}\;\Varid{n}\mskip1.5mu\}\;\mathrel{=}\;\Varid{s≤s}\;\Varid{≤-refl}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Now we prove \ensuremath{\Varid{maxℕ-increasing₂}}.
+We do this by pattern matching on the second argument (because it is the one involved in the inequality, and depending on its value, we need different constructors for the inequality proof). If it is \ensuremath{\Varid{zero}}, we use the constructor \ensuremath{\Varid{z≤n}}, regardless of what the first argument is. If it is \ensuremath{\Varid{suc}\;\Varid{n′}}, we need to know what the first argument was, so we pattern match on it. If the first argument is \ensuremath{\Varid{zero}}, then, from the definition of \ensuremath{\Varid{maxℕ}}, we know that \ensuremath{\Varid{maxℕ}\;\Varid{zero}\;(\Varid{suc}\;\Varid{n′})\;\Varid{==}\;\Varid{suc}\;\Varid{n′}}, so we want to prove that \ensuremath{\Varid{suc}\;\Varid{n′}\;\Varid{≤}\;\Varid{suc}\;\Varid{n′}}, which we do by using the lemma \ensuremath{\Varid{≤-refl}} (we note here that we didn't actually need the fact that the second argument was non-zero). On the other hand, if the first argument is \ensuremath{\Varid{suc}\;\Varid{m′}}, we know by induction (we call \ensuremath{\Varid{maxℕ-increasing₂}} where we need to supply at least the first argument, since it doesn't appear anywhere, and hence Agda is unable to infer it) that \ensuremath{\Varid{n′}\;\Varid{≤}\;\Varid{maxℕ}\;\Varid{m′}\;\Varid{n′}}, so we use \ensuremath{\Varid{s≤s}} to get \ensuremath{\Varid{suc}\;\Varid{n′}\;\Varid{≤}\;\Varid{suc}\;(\Varid{maxℕ}\;\Varid{m′}\;\Varid{n′})}, and from the definition of \ensuremath{\Varid{maxℕ}}, we (and more importantly Agda) get that \ensuremath{\Varid{suc}\;(\Varid{maxℕ}\;\Varid{m′}\;\Varid{n′})\;\Varid{==}\;\Varid{maxℕ}\;(\Varid{suc}\;\Varid{m′})\;(\Varid{suc}\;\Varid{n′})}, so we are in fact done.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{maxℕ-increasing₂}\;\{\mskip1.5mu \Varid{m}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{zero}\mskip1.5mu\}\;\mathrel{=}\;\Varid{z≤n}{}\<[E]%
+\\
+\>[B]{}\Varid{maxℕ-increasing₂}\;\{\mskip1.5mu \Varid{zero}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{suc}\;\Varid{n′}\mskip1.5mu\}\;\mathrel{=}\;\Varid{≤-refl}{}\<[E]%
+\\
+\>[B]{}\Varid{maxℕ-increasing₂}\;\{\mskip1.5mu \Varid{suc}\;\Varid{m′}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{suc}\;\Varid{n′}\mskip1.5mu\}\;\mathrel{=}\;\Varid{s≤s}\;(\Varid{maxℕ-increasing₂}\;\{\mskip1.5mu \Varid{m′}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{n′}\mskip1.5mu\}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+We also prove the similar proposition, \ensuremath{\Varid{maxℕ-increasing₁}\;\mathbin{:}\;\{\mskip1.5mu \Varid{m}\;\Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Varid{m}\;\Varid{≤}\;\Varid{maxℕ}\;\Varid{m}\;\Varid{n}}, that \ensuremath{\Varid{maxℕ}} is greater than its first argument, in essentially the same way (we pattern match first on the first argument instead).\todo{check that variable names are reasonably consistent}
+
+Using \ensuremath{\Varid{maxℕ-increasing₁}} and \ensuremath{\Varid{≤-refl}}, we are able to prove the initial step in the induction proof, \ensuremath{\Varid{max-greatest-initial}}. We pattern match on the remainter of the list, if it is \ensuremath{[\mskip1.5mu \mskip1.5mu]}, we need to show that \ensuremath{\Varid{x}\;\Varid{≤}\;\Varid{x}}, which is done with \ensuremath{\Varid{≤-refl}}, and if it is \ensuremath{\Varid{x′}\;\Varid{∷}\;\Varid{xs}}, we need to prove that \ensuremath{\Varid{x}\;\Varid{≤}\;\Varid{max}\;(\Varid{x}\;\Varid{∷}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs}))\;\Varid{pf}}, and expanding this using the definition of \ensuremath{\Varid{max}}, we find that we need to prove that \ensuremath{\Varid{x}\;\Varid{≤}\;\Varid{maxℕ}\;\Varid{x}\;(\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Varid{pf′})}, which is exactly what \ensuremath{\Varid{maxℕ-increasing₁}} does.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{max-greatest-initial}\;\{\mskip1.5mu \Varid{x}\mskip1.5mu\}\;\{\mskip1.5mu [\mskip1.5mu \mskip1.5mu]\mskip1.5mu\}\;\mathrel{=}\;\Varid{≤-refl}{}\<[E]%
+\\
+\>[B]{}\Varid{max-greatest-initial}\;\{\mskip1.5mu \Varid{x}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{x′}\;\Varid{∷}\;\Varid{xs}\mskip1.5mu\}\;\mathrel{=}\;\Varid{maxℕ-increasing₁}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Finally, we are able to finish our proof of \ensuremath{\Varid{max-greatest}}. As we said above, we want to pattern match on the index, however, this is not possible to do right away, since the available constructors (if any) for \ensuremath{\Conid{Fin}\;(\Varid{length}\;\Varid{xs})} depends on the length of \ensuremath{\Varid{xs}}. Therefore, we begin by pattern matching on the list. If the list is empty, we fill in the absurd pattern \ensuremath{()} for the proof that it is nonempty. Otherwise, we pattern match on the index. 
+If the index is \ensuremath{\Varid{fzero}}, we use the initial step \ensuremath{\Varid{max-greatest-initial}}, to prove that \ensuremath{\Varid{x}\;\Varid{≤}\;\Varid{max}\;(\Varid{x}\;\Varid{∷}\;\Varid{xs})\;\Varid{pf}}. 
+If the index is \ensuremath{\Varid{fsuc}\;\Varid{i}}, we pattern match on the tail of the list. If it is empty, we know that the index shouldn't have been \ensuremath{\Varid{fsuc}\;\Varid{i}}, because we'd have \ensuremath{\Varid{i}\;\mathbin{:}\;\Conid{Fin}\;\Varid{zero}}, so we fill in \ensuremath{\Varid{i}} with the absurd pattern \ensuremath{()}.
+The case we have left is when the list is \ensuremath{\Varid{x}\;\Varid{∷}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})}, and the index is \ensuremath{\Varid{fsuc}\;\Varid{i}}. As we said above, we use induction to prove that \ensuremath{(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Varid{‼}\;\Varid{i}\;\Varid{≤}\;\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Varid{pf}}. By the definition of \ensuremath{\Varid{‼}}, we have that
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}(\Varid{x}\;\Varid{∷}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs}))\;\Varid{‼}\;(\Varid{fsuc}\;\Varid{i})\;\Varid{==}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Varid{‼}\;\Varid{i}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+So by induction, \ensuremath{\Varid{max-greatest}\;\Varid{i}} proves that \ensuremath{(\Varid{x}\;\Varid{∷}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs}))\;\Varid{‼}\;(\Varid{fsuc}\;\Varid{i})\;\Varid{≤}\;\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Varid{pf}}, and additionally, from the definition of \ensuremath{\Varid{max}}, 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{max}\;(\Varid{x}\;\Varid{∷}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs}))\;\Varid{pf}\;\Varid{==}\;\Varid{maxℕ}\;\Varid{x}\;(\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Varid{pf′}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+So using \ensuremath{\Varid{maxℕ-increasing₂}}, and \ensuremath{\Varid{≤-trans}} to put things together, we get \todo{clean up the proofs ``pf'' that are input to max} the desired result:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{max-greatest}\;\{\mskip1.5mu [\mskip1.5mu \mskip1.5mu]\mskip1.5mu\}\;\{\mskip1.5mu ()\mskip1.5mu\}\;\Varid{\char95 }{}\<[E]%
+\\
+\>[B]{}\Varid{max-greatest}\;\{\mskip1.5mu \Varid{x}\;\Varid{∷}\;\Varid{xs}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{s≤s}\;\Varid{z≤n}\mskip1.5mu\}\;\Varid{fzero}\;\mathrel{=}\;\Varid{max-greatest-initial}\;\{\mskip1.5mu \Varid{x}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{xs}\mskip1.5mu\}{}\<[E]%
+\\
+\>[B]{}\Varid{max-greatest}\;\{\mskip1.5mu \Varid{x}\;\Varid{∷}\;[\mskip1.5mu \mskip1.5mu]\mskip1.5mu\}\;\{\mskip1.5mu \Varid{s≤s}\;\Varid{z≤n}\mskip1.5mu\}\;(\Varid{fsuc}\;()){}\<[E]%
+\\
+\>[B]{}\Varid{max-greatest}\;\{\mskip1.5mu \Varid{x}\;\Varid{∷}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\mskip1.5mu\}\;\{\mskip1.5mu \Varid{s≤s}\;\Varid{z≤n}\mskip1.5mu\}\;(\Varid{fsuc}\;\Varid{i})\;\mathrel{=}\;\Varid{≤-trans}\;(\Varid{max-greatest}\;\Varid{i})\;(\Varid{maxℕ-increasing₂}\;\{\mskip1.5mu \Varid{x}\mskip1.5mu\}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\subsection{Second part of proof}
+\label{extended-example-second-part-of-proof}
+\todo{Make first part of proof, making of specification, etc subsections (or something)}
+In this section, we will prove the disjunction in the specification, that is: \todo{Is \ensuremath{\Varid{pf}} a good name for a proof, or should they be more descriptive?}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{max-in-list}\;\mathbin{:}\;\{\mskip1.5mu \Varid{xs}\;\mathbin{:}\;[\mskip1.5mu \Conid{ℕ}\mskip1.5mu]\mskip1.5mu\}\;\Varid{→}\;\{\mskip1.5mu \Varid{pf}\;\mathbin{:}\;\Varid{0}\;\Varid{<}\;\Varid{length}\;\Varid{xs}\mskip1.5mu\}\;\Varid{→}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{10}{}\<[10]%
+\>[10]{}\Varid{∃}\;(\Varid{λ}\;\Varid{n}\;\Varid{→}\;\Varid{xs}\;\Varid{‼}\;\Varid{n}\;\Varid{≡}\;\Varid{max}\;\Varid{xs}\;\Varid{pf}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+This is a bit different from the previous proof, because the definition of the existential quantifier \ensuremath{\Varid{∃}} in constructive mathematics states that we actually need a function that finds the maximum in the list and remembers that it is the maximum. So proving that something exists is in mainly a programming problem---in particular 
+
+To find a function that does this, we begin by getting rid of the case when the list is empty, since then, there is no proof that it is non-empty. Then we look at the definition of \ensuremath{\Varid{max}}. If the list contains only one element, we can return \ensuremath{(\Varid{fzero},\Varid{refl})}, since the first element is returned by \ensuremath{\Varid{max}} and also by indexing at \ensuremath{\Varid{fzero}}, and \ensuremath{\Varid{refl}} proves that an element is equal to itself. That was the base case. If the list has at least two elements, we can find the maximum in the remaining list by induction. Depending on whether the first element is greater than this maximum or not, we then either return \ensuremath{(\Varid{fzero},\Varid{refl})} again, or increase the returned value and modify the proof returned by the maximum function.
+
+The fact that we need the proof means that we can't simply define a type \ensuremath{\Conid{Bool}} and an if statement:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{Bool}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Conid{True}\;{}\<[9]%
+\>[9]{}\mathbin{:}\;\Conid{Bool}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Conid{False}\;\mathbin{:}\;\Conid{Bool}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{if\char95 then\char95 else}\;\mathbin{:}\;\{\mskip1.5mu \Varid{a}\;\mathbin{:}\;\Conid{Set}\mskip1.5mu\}\;\Varid{→}\;\Conid{Bool}\;\Varid{→}\;\Varid{a}\;\Varid{→}\;\Varid{a}\;\Varid{→}\;\Varid{a}{}\<[E]%
+\\
+\>[B]{}\Varid{if}\;\Conid{True}\;{}\<[10]%
+\>[10]{}\Varid{then}\;\Varid{x}\;\Varid{else}\;\Varid{y}\;\mathrel{=}\;\Varid{x}{}\<[E]%
+\\
+\>[B]{}\Varid{if}\;\Conid{False}\;\Varid{then}\;\Varid{x}\;\Varid{else}\;\Varid{y}\;\mathrel{=}\;\Varid{y}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Along with a check like (we use the prime because we want the similar function we will actually use to be named \ensuremath{\Varid{\char95 ≤?\char95 }}):
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 ≤?′\char95 }\;\mathbin{:}\;\Conid{ℕ}\;\Varid{→}\;\Conid{ℕ}\;\Varid{→}\;\Conid{Bool}{}\<[E]%
+\\
+\>[B]{}\Varid{\char95 ≤?′\char95 }\;\Varid{zero}\;\Varid{n}\;\mathrel{=}\;\Conid{False}{}\<[E]%
+\\
+\>[B]{}\Varid{\char95 ≤?′\char95 }\;(\Varid{suc}\;\Varid{m})\;\Varid{zero}\;\mathrel{=}\;\Conid{True}{}\<[E]%
+\\
+\>[B]{}\Varid{\char95 ≤?′\char95 }\;(\Varid{suc}\;\Varid{m})\;(\Varid{suc}\;\Varid{n})\;\mathrel{=}\;\Varid{m}\;\Varid{≤?′}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Because while \ensuremath{\Varid{if}\;(\Varid{x}\;\Varid{≤?′}\;\Varid{y})\;\Varid{then}\;\Varid{x}\;\Varid{else}\;\Varid{y}} does return the maximum, it doesn't return a proof, and we cannot use it to convince Agda that \ensuremath{\Varid{x}\;\Varid{≤}\;\Varid{y}} or vice versa.
+Instead, we need a function like that along with a \ensuremath{\Conid{Bool}}-like answer returns a proof that it is correct. This is exactly the point of the data type \ensuremath{\Conid{Dec}} we defined above \ref{decidable-def}.
+
+So we want define the function \ensuremath{\Varid{\char95 ≤?\char95 }} to return \ensuremath{\Varid{yes}\;\Varid{x≤y}}, where \ensuremath{\Varid{x≤y}\;\mathbin{:}\;\Varid{x}\;\Varid{≤}\;\Varid{y}} is a proof that \ensuremath{\Varid{x}} is less than or equal to \ensuremath{\Varid{y}}, or \ensuremath{\Varid{no}\;\Varid{¬x≤y}}, where \ensuremath{\Varid{¬x≤y}\;\mathbin{:}\;\Varid{¬}\;(\Varid{x}\;\Varid{≤}\;\Varid{y})}. If \ensuremath{\Varid{x}\;\Varid{==}\;\Varid{0}}, this is straightforward, since we simply return \ensuremath{\Varid{yes}\;\Varid{z≤n}}. If \ensuremath{\Varid{x}\;\Varid{==}\;\Varid{suc}\;\Varid{x′}}, we need to pattern match on \ensuremath{\Varid{y}}. The simples case is if \ensuremath{\Varid{y}\;\Varid{==}\;\Varid{0}}, because then we need to derive \ensuremath{\Varid{⊥}} from \ensuremath{\Varid{suc}\;\Varid{x′}\;\Varid{≤}\;\Varid{0}}. 
+%Since, |s≤s z≤n| is a proof that |0 < suc x′|, we define a lemma |x<y⇒¬y≤x| that states that if |x < y|, then |¬ (y ≤ x)|. Since |x < y| expands to |suc x ≤ y|, and hence, |y == suc y′|, and the proof of |x < y| must be |s≤s x<y′|. 
+\todo{More here (think about what the proof does, really) Also write that we curry/uncurry--whatever, actually ,this might be unneccessary}
+%begin{code}
+%--x<y⇒¬y≤x : {x y : ℕ} → (x < y) → ¬ (y ≤ x)
+%--x<y⇒¬y≤x (s≤s x<y′) y′<x = x<y⇒¬y≤x y′<x x<y′
+%end{code}
+%Using this, we can hence finish the case |x == suc x′| and |y == 0|. 
+
+Next, in the case where \ensuremath{\Varid{x}\;\Varid{==}\;\Varid{suc}\;\Varid{x′}} and \ensuremath{\Varid{y}\;\Varid{==}\;\Varid{suc}\;\Varid{y′}}, we need to know (with proof) which of \ensuremath{\Varid{x′}} and \ensuremath{\Varid{y′}} is greater. We need to pattern match on the \ensuremath{\Conid{Dec}\;(\Varid{x′}\;\Varid{≤}\;\Varid{y′})}, which is not part of the function arguments, and do this by introducing a new piece of Agda syntax, the \ensuremath{\Keyword{with}} statement (we could of course use a helper function to do the pattern matching, but the with statement is simpler). After the function arguments, one writes \ensuremath{\Keyword{with}} followed by a list of expressions to pattern match on, separated by vertical bars:\ensuremath{\mid }. Then on the line below, one writes either \ensuremath{\Varid{...}} in place of the old arguments, followed by a bar, \ensuremath{\mid }, and the new arguments separated by bars, or (in case one wants to infer things about the old arguments based on the pattern matching), one repeats the function arguments in place of the \ensuremath{\Varid{...}}. We show both alternatives.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{16}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{22}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 ≤?\char95 }\;\mathbin{:}\;(\Varid{x}\;\Varid{y}\;\mathbin{:}\;\Conid{ℕ})\;\Varid{→}\;\Conid{Dec}\;(\Varid{x}\;\Varid{≤}\;\Varid{y}){}\<[E]%
+\\
+\>[B]{}\Varid{zero}\;{}\<[7]%
+\>[7]{}\Varid{≤?}\;\Varid{n}\;\mathrel{=}\;\Varid{yes}\;\Varid{z≤n}{}\<[E]%
+\\
+\>[B]{}\Varid{suc}\;\Varid{m}\;\Varid{≤?}\;\Varid{zero}\;\mathrel{=}\;\Varid{no}\;(\Varid{λ}\;())\mbox{\onelinecomment (x<y⇒¬y≤x (s≤s z≤n))}{}\<[E]%
+\\
+\>[B]{}\Varid{suc}\;\Varid{m}\;\Varid{≤?}\;\Varid{suc}\;\Varid{n}\;\Keyword{with}\;\Varid{m}\;\Varid{≤?}\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\Varid{...}\;{}\<[16]%
+\>[16]{}\mid \;\Varid{yes}\;\Varid{m≤n}\;\mathrel{=}\;\Varid{yes}\;(\Varid{s≤s}\;\Varid{m≤n}){}\<[E]%
+\\
+\>[B]{}\Varid{suc}\;\Varid{m}\;\Varid{≤?}\;\Varid{suc}\;\Varid{n}\;\mid \;\Varid{no}\;{}\<[22]%
+\>[22]{}\Varid{n≤m}\;\mathrel{=}\;\Varid{no}\;(\Varid{λ}\;\Varid{x}\;\Varid{→}\;\Varid{n≤m}\;(\Varid{p≤p}\;\Varid{x})){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{where}\;\Varid{p≤p}\;\mathbin{:}\;\{\mskip1.5mu \Varid{m}\;\Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;(\Varid{suc}\;\Varid{m}\;\Varid{≤}\;\Varid{suc}\;\Varid{n})\;\Varid{→}\;\Varid{m}\;\Varid{≤}\;\Varid{n}{}\<[E]%
+\\
+\>[3]{}\hsindent{6}{}\<[9]%
+\>[9]{}\Varid{p≤p}\;(\Varid{s≤s}\;\Varid{m≤n})\;\mathrel{=}\;\Varid{m≤n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Above, we made a local definition of the proposition \ensuremath{\Varid{p≤p}} stating that if both \ensuremath{\Varid{m}} and \ensuremath{\Varid{n}} are the successors of something, and if \ensuremath{\Varid{m}\;\Varid{≤}\;\Varid{n}}, then the predecessor of \ensuremath{\Varid{m}} is less than or equal to the predecessor of \ensuremath{\Varid{n}}.
+
+We note that in the above example, we didn't actually need to use the \ensuremath{\Keyword{with}} construction, since we didn't use the result of the pattern matching (if we had pattern matched on \ensuremath{\Varid{m≤n}} above, we could have inferred that whether the argument \ensuremath{\Varid{m}} to \ensuremath{\Varid{suc}\;\Varid{m}} was \ensuremath{\Varid{zero}} or \ensuremath{\Varid{suc}\;\Varid{m'}}, but that wasn't neccessary for this proof \todo{include ref to where it is actually neccessary (if ever in this report)}). We could instead have introduced a helper function (perhaps locally) that we call in place of the with statement:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{helper}\;\mathbin{:}\;\{\mskip1.5mu \Varid{m}\;\Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Dec}\;(\Varid{m}\;\Varid{≤}\;\Varid{n})\;\Varid{→}\;\Conid{Dec}\;((\Varid{suc}\;\Varid{m})\;\Varid{≤}\;(\Varid{suc}\;\Varid{n})){}\<[E]%
+\\
+\>[B]{}\Varid{helper}\;(\Varid{yes}\;\Varid{p})\;\mathrel{=}\;\Varid{yes}\;(\Varid{s≤s}\;\Varid{p}){}\<[E]%
+\\
+\>[B]{}\Varid{helper}\;(\Varid{no}\;\Varid{¬p})\;\mathrel{=}\;\Varid{no}\;(\Varid{λ}\;\Varid{x}\;\Varid{→}\;\Varid{¬p}\;(\Varid{p≤p}\;\Varid{x})){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+So we write
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{min-finder}\;\Varid{x}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Keyword{with}\;\Varid{x}\;\Varid{≤?}\;\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Varid{\char95 }{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Now, we begin with the the case where \ensuremath{\Varid{x}\;\Varid{≤?}\;\Varid{max}} returns \ensuremath{\Varid{yes}\;\Varid{x≤max}}. We thus have a proof that \ensuremath{\Varid{x}\;\Varid{≤}\;\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})}, and by recursively calling \ensuremath{\Varid{min-finder}\;\Varid{x′}\;\Varid{xs}} \todo{make sure I mention \ensuremath{\Varid{min-finder}} name when introducing it above}, we get an index \ensuremath{\Varid{i}} and a proof that the \ensuremath{\Varid{i}}th element of \ensuremath{\Varid{x′}\;\Varid{∷}\;\Varid{xs}} is the greatest element there. Hence, the index of our maximum should be \ensuremath{\Varid{fsuc}\;\Varid{i}}, and we need to prove that given the above, \ensuremath{\Varid{max}\;(\Varid{x}\;\Varid{∷}\;\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Varid{≡}\;\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})}, since then, the \ensuremath{\Varid{fsuc}\;\Varid{i}}th element in \ensuremath{\Varid{x}\;\Varid{∷}\;\Varid{x′}\;\Varid{∷}\;\Varid{xs}} would be equal to \ensuremath{\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})} by the definition of \ensuremath{\Varid{‼}}, and hence to \ensuremath{\Varid{max}\;(\Varid{x}\;\Varid{∷}\;\Varid{x′}\;\Varid{∷}\;\Varid{xs})}.. We introduce the function \ensuremath{\Varid{move-right}} to move the proof one step to the right.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{move-right}\;\mathbin{:}\;\{\mskip1.5mu \Varid{x}\;\Varid{x′}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{xs}\;\mathbin{:}\;[\mskip1.5mu \Conid{ℕ}\mskip1.5mu]\mskip1.5mu\}\;\Varid{→}\;\Varid{x}\;\Varid{≤}\;\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;(\Varid{s≤s}\;\Varid{z≤n})\;\Varid{→}\;\Varid{∃}\;(\Varid{λ}\;\Varid{i}\;\Varid{→}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Varid{‼}\;\Varid{i}\;\Varid{≡}\;\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;(\Varid{s≤s}\;\Varid{z≤n}))\;\Varid{→}\;\Varid{∃}\;(\Varid{λ}\;\Varid{i}\;\Varid{→}\;(\Varid{x}\;\Varid{∷}\;\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Varid{‼}\;\Varid{i}\;\Varid{≡}\;\Varid{maxℕ}\;\Varid{x}\;(\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;(\Varid{s≤s}\;\Varid{z≤n}))){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+We write out the arguments as 
+\begin{hscode}\SaveRestoreHook
+\ColumnHook
+\end{hscode}\resethooks
+pattern match on the existence proof, getting \ensuremath{(\Varid{i},\Varid{pf})}. We already know that the first part of the pair \ensuremath{\Varid{move-right}} should return (the witness) should be \ensuremath{\Varid{fsuc}\;\Varid{i}}, 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mbox{\onelinecomment  No CASE}{}\<[E]%
+\\
+\>[B]{}\Varid{≡-cong}\;\mathbin{:}\;\{\mskip1.5mu \Varid{a}\;\Varid{b}\;\mathbin{:}\;\Conid{Set}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{x}\;\Varid{y}\;\mathbin{:}\;\Varid{a}\mskip1.5mu\}\;\Varid{→}\;(\Varid{f}\;\mathbin{:}\;\Varid{a}\;\Varid{→}\;\Varid{b})\;\Varid{→}\;\Varid{x}\;\Varid{≡}\;\Varid{y}\;\Varid{→}\;\Varid{f}\;\Varid{x}\;\Varid{≡}\;\Varid{f}\;\Varid{y}{}\<[E]%
+\\
+\>[B]{}\Varid{≡-cong}\;\Varid{f}\;\Varid{refl}\;\mathrel{=}\;\Varid{refl}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{≡-trans}\;\mathbin{:}\;\Varid{∀}\;\{\mskip1.5mu \Varid{a}\;\Varid{b}\;\Varid{c}\mskip1.5mu\}\;\Varid{→}\;\Varid{a}\;\Varid{≡}\;\Varid{b}\;\Varid{→}\;\Varid{b}\;\Varid{≡}\;\Varid{c}\;\Varid{→}\;\Varid{a}\;\Varid{≡}\;\Varid{c}{}\<[E]%
+\\
+\>[B]{}\Varid{≡-trans}\;\Varid{refl}\;\Varid{refl}\;\mathrel{=}\;\Varid{refl}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{x≡maxℕx0}\;\mathbin{:}\;\{\mskip1.5mu \Varid{x}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Varid{x}\;\Varid{≡}\;\Varid{maxℕ}\;\Varid{x}\;\Varid{0}{}\<[E]%
+\\
+\>[B]{}\Varid{x≡maxℕx0}\;\{\mskip1.5mu \Varid{zero}\mskip1.5mu\}\;\mathrel{=}\;\Varid{refl}{}\<[E]%
+\\
+\>[B]{}\Varid{x≡maxℕx0}\;\{\mskip1.5mu \Varid{suc}\;\Varid{n}\mskip1.5mu\}\;\mathrel{=}\;\Varid{refl}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{l″}\;\mathbin{:}\;\Varid{∀}\;\{\mskip1.5mu \Varid{x}\;\Varid{y}\mskip1.5mu\}\;\Varid{→}\;\Varid{y}\;\Varid{≤}\;\Varid{x}\;\Varid{→}\;\Varid{x}\;\Varid{≡}\;\Varid{maxℕ}\;\Varid{x}\;\Varid{y}{}\<[E]%
+\\
+\>[B]{}\Varid{l″}\;\{\mskip1.5mu \Varid{x}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{zero}\mskip1.5mu\}\;\Varid{z≤n}\;\mathrel{=}\;\Varid{x≡maxℕx0}{}\<[E]%
+\\
+\>[B]{}\Varid{l″}\;(\Varid{s≤s}\;\Varid{m≤n})\;\mathrel{=}\;\Varid{≡-cong}\;\Varid{suc}\;(\Varid{l″}\;\Varid{m≤n}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{¬x≤y⇒y≤x}\;\mathbin{:}\;\{\mskip1.5mu \Varid{x}\;\Varid{y}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Varid{¬}\;(\Varid{x}\;\Varid{≤}\;\Varid{y})\;\Varid{→}\;(\Varid{y}\;\Varid{≤}\;\Varid{x}){}\<[E]%
+\\
+\>[B]{}\Varid{¬x≤y⇒y≤x}\;\{\mskip1.5mu \Varid{x}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{zero}\mskip1.5mu\}\;\Varid{pf}\;\mathrel{=}\;\Varid{z≤n}{}\<[E]%
+\\
+\>[B]{}\Varid{¬x≤y⇒y≤x}\;\{\mskip1.5mu \Varid{zero}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{suc}\;\Varid{n}\mskip1.5mu\}\;\Varid{pf}\;\Keyword{with}\;\Varid{pf}\;\Varid{z≤n}{}\<[E]%
+\\
+\>[B]{}\Varid{...|}\;(){}\<[E]%
+\\
+\>[B]{}\Varid{¬x≤y⇒y≤x}\;\{\mskip1.5mu \Varid{suc}\;\Varid{m}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{suc}\;\Varid{n}\mskip1.5mu\}\;\Varid{pf}\;\mathrel{=}\;\Varid{s≤s}\;(\Varid{¬x≤y⇒y≤x}\;(\Varid{λ}\;\Varid{x}\;\Varid{→}\;\Varid{pf}\;(\Varid{s≤s}\;\Varid{x}))){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{x-max}\;\mathbin{:}\;(\Varid{x}\;\mathbin{:}\;\Conid{ℕ})\;(\Varid{xs}\;\mathbin{:}\;[\mskip1.5mu \Conid{ℕ}\mskip1.5mu])\;(\Varid{pf}\;\mathbin{:}\;\Varid{0}\;\Varid{<}\;\Varid{length}\;\Varid{xs})\;\Varid{→}\;\Varid{max}\;\Varid{xs}\;\Varid{pf}\;\Varid{≤}\;\Varid{x}\;\Varid{→}\;\Varid{x}\;\Varid{≡}\;\Varid{max}\;(\Varid{x}\;\Varid{∷}\;\Varid{xs})\;(\Varid{s≤s}\;\Varid{z≤n}){}\<[E]%
+\\
+\>[B]{}\Varid{x-max}\;\Varid{x}\;[\mskip1.5mu \mskip1.5mu]\;\Varid{pf}\;\Varid{pf′}\;\mathrel{=}\;\Varid{refl}{}\<[E]%
+\\
+\>[B]{}\Varid{x-max}\;\Varid{x}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;(\Varid{s≤s}\;\Varid{z≤n})\;\Varid{pf′}\;\mathrel{=}\;\Varid{l″}\;\Varid{pf′}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mbox{\onelinecomment  yes case}{}\<[E]%
+\\
+\>[B]{}\Varid{maxℕ-is-max}\;\mathbin{:}\;(\Varid{x}\;\Varid{y}\;\mathbin{:}\;\Conid{ℕ})\;\Varid{→}\;\Varid{x}\;\Varid{≤}\;\Varid{y}\;\Varid{→}\;\Varid{y}\;\Varid{≡}\;\Varid{maxℕ}\;\Varid{x}\;\Varid{y}{}\<[E]%
+\\
+\>[B]{}\Varid{maxℕ-is-max}\;\Varid{zero}\;\Varid{y}\;\Varid{pf}\;\mathrel{=}\;\Varid{refl}{}\<[E]%
+\\
+\>[B]{}\Varid{maxℕ-is-max}\;(\Varid{suc}\;\Varid{m})\;\Varid{zero}\;(){}\<[E]%
+\\
+\>[B]{}\Varid{maxℕ-is-max}\;(\Varid{suc}\;\Varid{m})\;(\Varid{suc}\;\Varid{n})\;(\Varid{s≤s}\;\Varid{m≤n})\;\mathrel{=}\;\Varid{≡-cong}\;\Varid{suc}\;(\Varid{maxℕ-is-max}\;\Varid{m}\;\Varid{n}\;\Varid{m≤n}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{small-x⇒max-equal}\;\mathbin{:}\;(\Varid{x}\;\Varid{x′}\;\mathbin{:}\;\Conid{ℕ})\;(\Varid{xs}\;\mathbin{:}\;[\mskip1.5mu \Conid{ℕ}\mskip1.5mu])\;\Varid{→}\;\Varid{x}\;\Varid{≤}\;\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;(\Varid{s≤s}\;\Varid{z≤n})\;\Varid{→}\;\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;(\Varid{s≤s}\;\Varid{z≤n})\;\Varid{≡}\;\Varid{max}\;(\Varid{x}\;\Varid{∷}\;\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;(\Varid{s≤s}\;\Varid{z≤n}){}\<[E]%
+\\
+\>[B]{}\Varid{small-x⇒max-equal}\;\Varid{zero}\;\Varid{x′}\;\Varid{xs}\;\Varid{pf}\;\mathrel{=}\;\Varid{refl}{}\<[E]%
+\\
+\>[B]{}\Varid{small-x⇒max-equal}\;(\Varid{suc}\;\Varid{n})\;\Varid{x′}\;\Varid{xs}\;\Varid{pf}\;\mathrel{=}\;\Varid{maxℕ-is-max}\;(\Varid{suc}\;\Varid{n})\;(\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;(\Varid{s≤s}\;\Varid{z≤n}))\;\Varid{pf}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{move-right}\;\{\mskip1.5mu \Varid{x}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{x′}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{xs}\mskip1.5mu\}\;\Varid{x≤max}\;(\Varid{i},\Varid{pf})\;\mathrel{=}\;\Varid{fsuc}\;\Varid{i},\Varid{≡-trans}\;\Varid{pf}\;(\Varid{small-x⇒max-equal}\;\Varid{x}\;\Varid{x′}\;\Varid{xs}\;\Varid{x≤max}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{min-finder}\;\mathbin{:}\;(\Varid{x}\;\mathbin{:}\;\Conid{ℕ})\;\Varid{→}\;(\Varid{xs}\;\mathbin{:}\;[\mskip1.5mu \Conid{ℕ}\mskip1.5mu])\;\Varid{→}\;\Varid{∃}\;(\Varid{λ}\;\Varid{i}\;\Varid{→}\;(\Varid{x}\;\Varid{∷}\;\Varid{xs})\;\Varid{‼}\;\Varid{i}\;\Varid{≡}\;\Varid{max}\;(\Varid{x}\;\Varid{∷}\;\Varid{xs})\;(\Varid{s≤s}\;\Varid{z≤n})){}\<[E]%
+\\
+\>[B]{}\Varid{min-finder}\;\Varid{x}\;[\mskip1.5mu \mskip1.5mu]\;\mathrel{=}\;\Varid{fzero},\Varid{refl}{}\<[E]%
+\\
+\>[B]{}\Varid{min-finder}\;\Varid{x}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Keyword{with}\;\Varid{x}\;\Varid{≤?}\;\Varid{max}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Varid{\char95 }{}\<[E]%
+\\
+\>[B]{}\Varid{min-finder}\;\Varid{x}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\mid \;\Varid{yes}\;\Varid{x≤max}\;\mathrel{=}\;\Varid{move-right}\;\Varid{x≤max}\;(\Varid{min-finder}\;\Varid{x′}\;\Varid{xs}){}\<[E]%
+\\
+\>[B]{}\Varid{min-finder}\;\Varid{x}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\mid \;\Varid{no}\;\Varid{max≤x}\;\mathrel{=}\;\Varid{fzero},\Varid{x-max}\;\Varid{x}\;(\Varid{x′}\;\Varid{∷}\;\Varid{xs})\;\Varid{\char95 }\;(\Varid{¬x≤y⇒y≤x}\;\Varid{max≤x}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{max-in-list}\;\{\mskip1.5mu [\mskip1.5mu \mskip1.5mu]\mskip1.5mu\}\;\{\mskip1.5mu ()\mskip1.5mu\}{}\<[E]%
+\\
+\>[B]{}\Varid{max-in-list}\;\{\mskip1.5mu (\Varid{x}\;\Varid{∷}\;\Varid{xs})\mskip1.5mu\}\;\{\mskip1.5mu \Varid{s≤s}\;\Varid{z≤n}\mskip1.5mu\}\;\mathrel{=}\;\Varid{min-finder}\;\Varid{x}\;\Varid{xs}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\todo{note that \ensuremath{\Varid{min″}} wouldn't work, because Agda can't see that the structure gets smaller (could reformulate this wrt \ensuremath{\Varid{max-in-list}}, give different implementation}
+\todo{\ensuremath{\Varid{≤-trans}} repeatedly leads to introduction of equational syntax, trap is trying to expand variables too many times}
+
+
+
+
+
+
+
+
+
+
+\subsection{Finish}
+Now, we are able to finish our proof of the specification by putting together the parts of the two previous sections. 
+
+If the list is empty, the proof would be an element of \ensuremath{\Varid{1}\;\Varid{≤}\;\Varid{0}}, and that type is empty, so we can put in the absurd patern \ensuremath{()}. On the other hand, if the list is \ensuremath{\Varid{x}\;\Varid{∷}\;\Varid{xs}}, we make a pair of the above proofs, and are done:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{max-spec}\;[\mskip1.5mu \mskip1.5mu]\;(){}\<[E]%
+\\
+\>[B]{}\Varid{max-spec}\;(\Varid{x}\;\Varid{∷}\;\Varid{xs})\;(\Varid{s≤s}\;\Varid{z≤n})\;\mathrel{=}\;\Varid{max-greatest},\Varid{max-in-list}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+To end this example, we note that proving even simple (obvious) propositions in Agda takes quite a bit of work, and a lot of code, but generally not much thinking. After this extended example, we feel that we have illustrated most of the techniques that will be used later on in the report. As we wrote in the introduction to the section, we will often only give the types of the propositions, followed with the types of important lemmas and note what part of the arguments we pattern match on and in what order.
+
+We also feel that we have illustrated the fact that proving something in Agda often requires a lot of code, but not much thinking, as the above proof essentially proceeds as one would intuitively think to prove the specification correct. Most of the standard concepts used are available in one form or another from the standard library, and we have attempted to keep our names consistent with it (the actual code given in later sections uses the standard library when possible, but we try to include simplified definitions in this report).
+
+
+\todo{fix references below (only visible in source)}
+\label{decidable-def}
+
+
+Another practical difference is that all programs have to terminate. This is guaranteed by requiring that some argument of the function gets smaller at each step. This means that recursive programs written in Agda should be structurally recursive in some way, or include some kind of proof term on which they recurse structurally.
+Thanks to the dependent types, it is possible to encode also properties of programs.
+
+The first thing to do this is 
+
+, for example, as in the above example, we could express that the length of the list after the 
+\newcommand{\nanring}{non-associative non-ring}
+\newcommand{\Nanring}{Non-associative non-ring}
+\section{Algebra}
+We are going to introduce a bunch of algebraic things that will be useful either later or as point of reference. They will also be useful as an example of using agda as a proof assistant!
+
+The first two sections are about algebraic structures that are probably already known. Both for reference, and as examples. Then we go on to more general algebraic structures, more common in Computer Science, since they satisfy fewer axioms (more axioms mean more interesting structure---probably---but at the same time, it's harder to satisfy all the axioms.
+\subsection{Introductory defintions}
+Before covering some algebraic structures, we would like to define the things needed to talk about them in Agda. These are mainly propositions regarding functions and relations.
+\subsubsection{Relation properties}
+The first thing to discuss is the equivalence relation. It is a relation that acts like an equality.
+\begin{Definition}
+  A relation $R \subset X \times X$ is called an \emph{equivalence relation} if it is\todo{write sqiggly line instead of $R$}
+  \begin{itemize}
+  \item Reflexive: for $x \in X$, $x R x$.
+  \item Symmetric: for $x$, $y \in X$, if $x R y$, then $y R x$.
+  \item Transitive: for $x$, $y$, $z \in X$, if $x R y$ and $y R z$, then $x R z$.
+  \end{itemize}
+\end{Definition}
+We formalize the way it behaves like an equality in the following proposition:
+\begin{Proposition}
+An equivalence relation $R$ partitions the elements of a set $X$ into disjoint nonempty equivalence classes (subsets $[x] = \{y \in X \st y R x\}$) satisfying: 
+\begin{itemize}
+\item For every $x \in X$, $x \in [x]$.
+\item If $x \in [y]$, then $[x] = [y]$.
+\end{itemize}
+\end{Proposition}
+If we replace the equality of elements with an equivalence relation, i.e., that two elements are ``equal'' if they belong to the same equivalence class, we get a coarser sense of equality. To see that it acts as the regular equality, we note that the equivalence relation is equality on equivalence classes.\todo{Expand/clean up on induced equality from equivalence classes.}
+
+To define an equivalence relation in Agda, we first need to define what a relation (on a set) is. \todo{write about definition -- and think about whether it need s to be there as opposed to \ensuremath{\Conid{A}\;\Varid{→}\;\Conid{A}\;\Varid{→}\;\Conid{Set}}}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{Rel}\;\mathbin{:}\;\Conid{Set}\;\Varid{→}\;\Conid{Set₁}{}\<[E]%
+\\
+\>[B]{}\Conid{Rel}\;\Conid{X}\;\mathrel{=}\;\Conid{X}\;\Varid{→}\;\Conid{X}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Next, we need to define the axioms it should satisfy: reflexivity, symmetry and transitivity. The first thing to note is that they are all propositions (parametrized by a relation), so they should be functinos from \ensuremath{\Conid{Rel}} to \ensuremath{\Conid{Set}} (which is where propositions live).
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{Reflexive}\;\mathbin{:}\;\{\mskip1.5mu \Conid{X}\;\mathbin{:}\;\Varid{\char95 }\mskip1.5mu\}\;\Varid{→}\;(\Varid{\char95 ∼\char95 }\;\mathbin{:}\;\Conid{Rel}\;\Conid{X})\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Conid{Reflexive}\;\Varid{\char95 ∼\char95 }\;\mathrel{=}\;\Varid{∀}\;\{\mskip1.5mu \Varid{x}\mskip1.5mu\}\;\Varid{→}\;\Varid{x}\;\Varid{∼}\;\Varid{x}{}\<[E]%
+\\
+\>[B]{}\Conid{Symmetric}\;\mathbin{:}\;\{\mskip1.5mu \Conid{X}\;\mathbin{:}\;\Varid{\char95 }\mskip1.5mu\}\;\Varid{→}\;(\Varid{\char95 ∼\char95 }\;\mathbin{:}\;\Conid{Rel}\;\Conid{X})\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Conid{Symmetric}\;\Varid{\char95 ∼\char95 }\;\mathrel{=}\;\Varid{∀}\;\{\mskip1.5mu \Varid{x}\;\Varid{y}\mskip1.5mu\}\;\Varid{→}\;\Varid{x}\;\Varid{∼}\;\Varid{y}\;\Varid{→}\;\Varid{y}\;\Varid{∼}\;\Varid{x}{}\<[E]%
+\\
+\>[B]{}\Conid{Transitive}\;\mathbin{:}\;\{\mskip1.5mu \Conid{X}\;\mathbin{:}\;\Varid{\char95 }\mskip1.5mu\}\;\Varid{→}\;(\Varid{\char95 ∼\char95 }\;\mathbin{:}\;\Conid{Rel}\;\Conid{X})\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Conid{Transitive}\;\Varid{\char95 ∼\char95 }\;\mathrel{=}\;\Varid{∀}\;\{\mskip1.5mu \Varid{x}\;\Varid{y}\;\Varid{z}\mskip1.5mu\}\;\Varid{→}\;\Varid{x}\;\Varid{∼}\;\Varid{y}\;\Varid{→}\;\Varid{y}\;\Varid{∼}\;\Varid{z}\;\Varid{→}\;\Varid{x}\;\Varid{∼}\;\Varid{z}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Then, we define the record \ensuremath{\Conid{IsEquivalence}}, for expressing that a relation is an equivalence relation (we use a record to be able to extract the three axioms with using names)
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{24}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{record}\;\Conid{IsEquivalence}\;\{\mskip1.5mu \Conid{X}\;\mathbin{:}\;\Conid{Set}\mskip1.5mu\}\;(\Varid{\char95 ∼\char95 }\;\mathbin{:}\;\Conid{Rel}\;\Conid{X})\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{field}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{refl}\;{}\<[11]%
+\>[11]{}\mathbin{:}\;\Conid{Reflexive}\;{}\<[24]%
+\>[24]{}\Varid{\char95 ∼\char95 }{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{sym}\;{}\<[11]%
+\>[11]{}\mathbin{:}\;\Conid{Symmetric}\;{}\<[24]%
+\>[24]{}\Varid{\char95 ∼\char95 }{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{trans}\;\mathbin{:}\;\Conid{Transitive}\;\Varid{\char95 ∼\char95 }{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\subsubsection{Operation Properties}
+Next, we define some properties that binary operation (i.e., functions $X \to X \to X$) can have. These are functions that are similar to ordinary addition and multiplication of numbers (if they have all the properties we define below---but it can be useful to think of them that way even if they don't).
+\begin{Definition} %%% Associative
+A function is 
+\end{Definition}
+\begin{Example}
+% Non-example of parsing
+\end{Example}
+\begin{Definition} %%% Commutative
+A function is 
+\end{Definition}
+\begin{Example}
+% Non example of matrix mult
+\end{Example}
+
+\subsubsection{Properties of pairs of operations}
+When we have two different binary operations on the same set, we often want them to interact with each other sensibly, where sensibly means as much as multiplication and addition of numbers interact as possible. We recall the distributive law $a\cdot(b + c) = a\cdot b + a\cdot c$, where $x$, $y$, and $z$ are numbers and $\cdot$ and $+$ are multiplication and addition and generalize it to arbitrary operations: 
+\begin{Definition}
+  A binary operation $\cdot$ on $A$ \emph{distributes over} a binary operation $+$ if, for all $x$, $y$, $z$,
+  \begin{itemize}
+  \item $x \cdot (y + z) = x \cdot y + x \cdot z$,
+  \item $(y + z) \cdot x = y \cdot x + z \cdot x$,
+  \end{itemize}
+  where we assume that $\cdot$ binds its arguments harder than $+$.
+\end{Definition}
+
+In Agda, we begin by defining what a binary operation is:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{Op₂}\;\mathbin{:}\;\Conid{Set}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Conid{Op₂}\;\Conid{A}\;\mathrel{=}\;\Conid{A}\;\Varid{→}\;\Conid{A}\;\Varid{→}\;\Conid{A}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+In Agda, we define the two requirements separately, as \ensuremath{\Varid{\char95 DistributesOverˡ\char95 }} and \ensuremath{\Varid{\char95 DistributesOverʳ\char95 }}, for left and right distributive repectively, so the statement that \ensuremath{\Varid{*}} distributes over \ensuremath{\Varid{+}} on the right becomes the very readable \ensuremath{\Varid{*}\;\Conid{DistributesOverˡ}\;\Varid{+}} (sadly, the definition cannot be written in this readable syntax due to the fact that we need to include an implicit argument to express equality):
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 DistributesOverˡ\char95 }\;\mathbin{:}\;\{\mskip1.5mu \Conid{A}\;\mathbin{:}\;\Conid{Set}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{\char95 ≈\char95 }\;\mathbin{:}\;\Conid{Rel}\;\Conid{A}\mskip1.5mu\}\;\Varid{→}\;\Conid{Op₂}\;\Conid{A}\;\Varid{→}\;\Conid{Op₂}\;\Conid{A}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Varid{\char95 DistributesOverˡ\char95 }\;\{\mskip1.5mu \Conid{A}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{\char95 ≈\char95 }\mskip1.5mu\}\;\Varid{\char95 *\char95 }\;\Varid{\char95 +\char95 }\;\mathrel{=}\;\Varid{∀}\;\Varid{x}\;\Varid{y}\;\Varid{z}\;\Varid{→}\;(\Varid{x}\;\Varid{*}\;(\Varid{y}\;\Varid{+}\;\Varid{z}))\;\Varid{≈}\;((\Varid{x}\;\Varid{*}\;\Varid{y})\;\Varid{+}\;(\Varid{x}\;\Varid{*}\;\Varid{z})){}\<[E]%
+\\
+\>[B]{}\Varid{\char95 DistributesOverʳ\char95 }\;\mathbin{:}\;\{\mskip1.5mu \Conid{A}\;\mathbin{:}\;\Conid{Set}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{\char95 ≈\char95 }\;\mathbin{:}\;\Conid{Rel}\;\Conid{A}\mskip1.5mu\}\;\Varid{→}\;\Conid{Op₂}\;\Conid{A}\;\Varid{→}\;\Conid{Op₂}\;\Conid{A}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Varid{\char95 DistributesOverʳ\char95 }\;\{\mskip1.5mu \Conid{A}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{\char95 ≈\char95 }\mskip1.5mu\}\;\Varid{\char95 *\char95 }\;\Varid{\char95 +\char95 }\;\mathrel{=}\;\Varid{∀}\;\Varid{x}\;\Varid{y}\;\Varid{z}\;\Varid{→}\;((\Varid{y}\;\Varid{+}\;\Varid{z})\;\Varid{*}\;\Varid{x})\;\Varid{≈}\;((\Varid{y}\;\Varid{*}\;\Varid{x})\;\Varid{+}\;(\Varid{z}\;\Varid{*}\;\Varid{x})){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+And then we combine them to make the proposition \ensuremath{\Varid{\char95 DistributesOver\char95 }}:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 DistributesOver\char95 }\;\mathbin{:}\;\{\mskip1.5mu \Conid{A}\;\mathbin{:}\;\Conid{Set}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{\char95 ≈\char95 }\;\mathbin{:}\;\Conid{Rel}\;\Conid{A}\mskip1.5mu\}\;\Varid{→}\;\Conid{Op₂}\;\Conid{A}\;\Varid{→}\;\Conid{Op₂}\;\Conid{A}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Varid{\char95 DistributesOver\char95 }\;\{\mskip1.5mu \Conid{A}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{\char95 ≈\char95 }\mskip1.5mu\}\;\Varid{\char95 *\char95 }\;\Varid{\char95 +\char95 }\;\mathrel{=}\;(\Varid{\char95 DistributesOverˡ\char95 }\;\{\mskip1.5mu \Conid{A}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{\char95 ≈\char95 }\mskip1.5mu\}\;\Varid{\char95 *\char95 }\;\Varid{\char95 +\char95 })\;\Varid{∧}\;(\Varid{\char95 DistributesOverʳ\char95 }\;\{\mskip1.5mu \Conid{A}\mskip1.5mu\}\;\{\mskip1.5mu \Varid{\char95 ≈\char95 }\mskip1.5mu\}\;\Varid{\char95 *\char95 }\;\Varid{\char95 +\char95 }){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+
+The second such interaction axiom we will consider comes from the fact that $0$ annihilates things when involved in a multiplication of numbers: $0 * x = 0$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% GROUPS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Groups}
+The first algebraic structure we will discuss is that of a group. We give first the mathematical definition, and then define it in Agda:
+\begin{Definition}
+A group is a set $G$ (sometimes called the \emph{carrier}) together with a binary operation $\cdot$ on $G$, satisfying the following:
+\begin{itemize}
+\item $\cdot$ is associative, that is, 
+\item There is an element $e \in G$ such that $e \cdot g = g \cdot e = g$ for every $g \in G$. This element is the \emph{neutral element} of $G$.
+\item For every $g \in G$, there is an element $g^{-1}$ such that $g \cdot g^{-1} = g^{-1} \cdot g = e$. This element $g^{-1}$ is the \emph{inverse} of $g$.
+\end{itemize}
+\end{Definition}
+\begin{Remark}
+One usually refers to a group $(G, \cdot, e)$ simply by the name of the set $G$.
+\end{Remark}
+%\begin{Remark}
+%$G$ doesn't actually need to be a set. \todo{should this be noted}
+%\end{Remark}
+An important reason to study groups that many common mathematical objects are groups. First there are groups where the set is a set of numbers:
+\begin{Example}
+  The integers $\Z$, the rational numbers $\Q$, the real numbers $\R$ and the complex numbers $\C$, all form groups when $\cdot$ is addition and $e$ is $0$.
+\end{Example}
+\begin{Example}
+  The non-zero rational numbers $\Q\setminus{0}$, non-zero real numbers $\R\setminus{0}$, and non-zero complex numbers $\C\setminus{0}$, all form groups when $\cdot$ is multiplication and $e$ is $1$.
+\end{Example}
+Second, the symmetries of a 
+% In Agda code, this is defined using a record:
+In Agda code, we define the proposition \ensuremath{\Conid{IsGroup}}, that states that something is a group. We define this using a record \todo{include that Agda records somewhere in Agda section} so that we can give names to the different lemmas, because when reasoning about an arbitrary group (which we will define shortly), the only thing we have are these lemmas.\todo{make note that we have taken names from standard library but use less general/simpler definitions}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{record}\;\Conid{IsGroup}\;\{\mskip1.5mu \Conid{G}\;\mathbin{:}\;\Conid{Set}\mskip1.5mu\}\;(\Varid{\char95 ≈\char95 }\;\mathbin{:}\;\Conid{G}\;\Varid{→}\;\Conid{G}\;\Varid{→}\;\Conid{Set})\;(\Varid{\char95 ∙\char95 }\;\mathbin{:}\;\Conid{G}\;\Varid{→}\;\Conid{G}\;\Varid{→}\;\Conid{G})\;(\Varid{e}\;\mathbin{:}\;\Conid{G})\;(\Varid{\char95 ⁻¹}\;\mathbin{:}\;\Conid{G}\;\Varid{→}\;\Conid{G})\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{field}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{isEquivalence}\;\mathbin{:}\;\Conid{IsEquivalence}\;\Varid{\char95 ≈\char95 }{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+We note that we need to include the equality in the definition of the group along with the fact that it should be an equivalence relation, this is usually not mentioned in a mathematical definitions of a group, but is necessary here, because the structural equality \todo{is this the word, is it used before---should be mentioned when introducing refl} of the type \ensuremath{\Conid{G}} is not necessarily the equality we want for the group (as not all sets are inductively defined).
+
+We can then define the type \ensuremath{\Conid{Group}}, containing all groups with a record, so that we can have names for the different fields. Note that the type of \ensuremath{\Conid{Group}} is \ensuremath{\Conid{Set₁}}, because like \ensuremath{\Conid{Set}}, \ensuremath{\Conid{Group}} is ``too big'' to be in \ensuremath{\Conid{Set}} (if we want to avoid things like Russel's Paradox).
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{record}\;\Conid{Group}\;\mathbin{:}\;\Conid{Set₁}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{infix}\;\Varid{7}\;\Varid{\char95 ∙\char95 }{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{infix}\;\Varid{4}\;\Varid{\char95 ≈\char95 }{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{field}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Conid{Carrier}\;\mathbin{:}\;\Conid{Set}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{\char95 ≈\char95 }\;{}\<[13]%
+\>[13]{}\mathbin{:}\;\Conid{Carrier}\;\Varid{→}\;\Conid{Carrier}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{\char95 ∙\char95 }\;{}\<[13]%
+\>[13]{}\mathbin{:}\;\Conid{Carrier}\;\Varid{→}\;\Conid{Carrier}\;\Varid{→}\;\Conid{Carrier}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{e}\;{}\<[13]%
+\>[13]{}\mathbin{:}\;\Conid{Carrier}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{\char95 ⁻¹}\;{}\<[13]%
+\>[13]{}\mathbin{:}\;\Conid{Carrier}\;\Varid{→}\;\Conid{Carrier}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{isGroup}\;\mathbin{:}\;\Conid{IsGroup}\;\Varid{\char95 ≈\char95 }\;\Varid{\char95 ∙\char95 }\;\Varid{e}\;\Varid{\char95 ⁻¹}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+The things to note here are that 
+Where we have both defined the various elements required in a group, along with the axioms they need to satisfy.
+
+To prove that something is a group, one would thus
+
+\subsubsection{Cayley Table}
+One 
+%\subsection{Rings} We remove these sections, temporarily <- they don't add much
+%\subsubsection{Definition}
+%\subsubsection{Matrices}
+%\subsection{Monoids} %monoids make sense, because addition is a monoid in parsing
+%\subsubsection{Definition}
+%\subsubsection{Cayley Table}
+\subsection{Monoid-like structures}
+\subsubsection{Definition}
+\subsubsection{Cayley Table}
+\subsection{Ring-like structures}
+\subsubsection{Definitions}
+As we discussed above, in Section \ref{}, when one has two operations on a set, one often wants them to interact sensibly. The basic example from algebra is a Ring:
+\begin{Definition}
+A set $R$ together with two binary operations $+$ and $*$ forms a ring if
+\begin{itemize}
+\item It is an abelian group with respect to $+$.
+\item It is a monoid with respect to $*$.
+\item Multiplication distributes over addition.
+\end{itemize}
+\end{Definition}
+From these facts, it is in fact possible to prove that the additive identity $0$ is an absoribing element with respect to multiplication ($0 * x = x * 0 = 0$ for every $x \in X$).\todo{include proof? -- useful exercize -- proof exists in standard library}
+
+However, for the applications we have in mind, Parsing, the algebraic structure in question (see section \ref{}) does not even have associative multiplication (see section \ref{monoid-like}), and does not have inverses for addition. We still have an additive $0$ (the empty set---representing no parse), and want it to be an absorbing element with regard to multiplication (if the left or right substring has no parse, then the whole string has no parse). But the proof that $0$ is an absorbing element depends crucially on the existence of the ability to cancel (implied by the existence of additive inverses in a group).
+
+For this reason, we include as an axiom that zero annihilates. We this, we define a \nanring (which doesn't have :
+\begin{Definition}
+A set $X$ together with two operations $+$ and $*$ called addition and multiplication forms a \emph{\nanring} if:
+\begin{itemize}
+\item It is a commutative monoid with respect to addition.
+\item It is a magma with respect to multiplication.
+\item Multipliciation distributes over addition.
+\item The additive identity is a multiplicative zero.
+\end{itemize}
+\end{Definition}
+\todo{more text?}
+\subsubsection{Matrices}
+We recall that a matrix is really just a square set of numbers, so there is nothing stopping us from defining one over an arbitrary ring, or even over a \nanring, as opposed to over $\R$ or $\C$. To be similar to the definition we will make in Agda of an abstract matrix (one without a specific implementation in mind), we consider a matrices of size $m \times n$ as a functions from a pair of natural numbers $(i,j)$, with $0 \le i < m$, $0 \le j < n$ (or more specifically, $i \in \Fin{m}$, $j \in \Fin{n}$, and hence, after currying \todo{uncurrying?} define: 
+\begin{Definition}
+A matrix $A$ over a set $R$ is a function $A : \Fin{m} \to \Fin{n} \to R$. 
+\end{Definition}
+When talking about matrices mathematically, we write $A_{i j}$ for $A i j$
+
+
+\todo{Fix formatting of 0\#}
+
+In Agda, we will only define the type of a matrix over the \nanring. For simplicity, and to allow us to avoid adding the \nanring as an argument to every functino and proposition, we decide to parametrize the module the definition of the matrix by a nanring. We must first ensure that we have it imported, by starting the module file (named \text{\tt Matrix\char46{}lagda}) with
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{open}\;\Keyword{import}\;\Conid{NANRing.agda}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Then we continue by writing
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{module}\;\Conid{Matrix}\;(\Conid{NAR}\;\mathbin{:}\;\Conid{NonAssociativeNonRing})\;\Keyword{where}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+We open the record \ensuremath{\Conid{NonAssociativeNonRing}} with \ensuremath{\Conid{NAR}} so that we will be able to use the definitions in the ring easily, and rename things so that they do not clash with concepts we will define for the matrices (and also to help us figure out what operation we are using):
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{open}\;\Conid{NonAssociativeNonRing}\;\Conid{NAR}\;\Keyword{renaming}\;(\Varid{\char95 +\char95 }\;\Varid{to}\;\Varid{\char95 R+\char95 };\Varid{\char95 *\char95 }\;\Varid{to}\;\Varid{\char95 R*\char95 };\Varid{\char95 ≈\char95 }\;\Varid{to}\;\Varid{\char95 R≈\char95 }){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+If we didn't open the record, instead of, for example \ensuremath{\Varid{a}\;\Varid{+}\;\Varid{b}}, we would have to write
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}(\Conid{NonAssociativeNonRing.\char95 +\char95 }\;\Conid{NAR})\;\Varid{a}\;\Varid{b}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Now we are ready to define our matrix type in Agda:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{Matrix}\;\mathbin{:}\;(\Varid{m}\;\Varid{n}\;\mathbin{:}\;\Conid{ℕ})\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Conid{Matrix}\;\Varid{m}\;\Varid{n}\;\mathrel{=}\;\Conid{Fin}\;\Varid{m}\;\Varid{→}\;\Conid{Fin}\;\Varid{n}\;\Varid{→}\;\Conid{Carrier}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+As with the algebraic structures previously, we would like a way to speak of equality among matrices. First, we make a helpful definition of the equality in the \nanring \ensuremath{\Conid{NAR}}:
+We will thus define matrix equality, which we denote by \ensuremath{\Varid{\char95 M≈\char95 }} to disambiguate it from the regular equality (in the library it is called \ensuremath{\Varid{\char95 ≈\char95 }}, since it is in its own module \todo{make sure that it really is called \ensuremath{\Varid{\char95 ≈\char95 }} in the library}). It should take two matrices to the proposition that they are equal, and two matrices \ensuremath{\Conid{A}} and \ensuremath{\Conid{B}} are equal if for all indices \ensuremath{\Varid{i}} and \ensuremath{\Varid{j}}, \ensuremath{\Conid{A}\;\Varid{i}\;\Varid{j}} and \ensuremath{\Conid{B}\;\Varid{i}\;\Varid{j}} are equal. \todo{note about extensionality ? }
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 M≈\char95 }\;\mathbin{:}\;\{\mskip1.5mu \Varid{m}\;\Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Matrix}\;\Varid{m}\;\Varid{n}\;\Varid{→}\;\Conid{Matrix}\;\Varid{m}\;\Varid{n}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Conid{A}\;\Conid{M≈}\;\Conid{B}\;\mathrel{=}\;\Varid{∀}\;\Varid{i}\;\Varid{j}\;\Varid{→}\;\Conid{A}\;\Varid{i}\;\Varid{j}\;\Conid{R≈}\;\Conid{B}\;\Varid{i}\;\Varid{j}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+If $R$ is a ring or a \nanring, we can define addition and multiplication of matrices with the usual formulas:
+\begin{align*}
+  (A + B)_{i j} &= A_{i j} + B_{i j} 
+  \intertext{and}
+  (A * B)_{i j} &= \sum_{k = 1}^n A_{i k} B_{k j} 
+\end{align*}
+Above, we used $*$ to denote matrix multiplication, even though it is normally written simply as $AB$, because in Agda we need to give it a name.
+
+
+To define the addition in Agda is straightforward: 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 M+\char95 }\;\mathbin{:}\;\{\mskip1.5mu \Varid{m}\;\Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Matrix}\;\Varid{m}\;\Varid{n}\;\Varid{→}\;\Conid{Matrix}\;\Varid{m}\;\Varid{n}\;\Varid{→}\;\Conid{Matrix}\;\Varid{m}\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\Conid{A}\;\Conid{M+}\;\Conid{B}\;\mathrel{=}\;\Varid{λ}\;\Varid{i}\;\Varid{j}\;\Varid{→}\;\Conid{A}\;\Varid{i}\;\Varid{j}\;\Conid{R+}\;\Conid{B}\;\Varid{i}\;\Varid{j}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+To define multiplication, on the other hand, we consider the alternative definition of the product as the matrix formed by taking scalar products between the rows of $A$ and the columns of $B$:
+\begin{equation}\label{Matrix-mul}
+  (A * B)_{i j} = \vec{a_i} \cdot \vec{b_j},
+\end{equation}
+where $\vec{a_i}$ is the $i$th row vector of $A$ and $\vec{b_j}$ is the $j$th column vector of $B$.
+
+For this, we define the datatype \ensuremath{\Conid{Vector}} of a (mathematical) vector, represented as a functino from indices to \nanring elements: \todo{note about difference between it and \ensuremath{\Conid{Vec}}?} %(not to be confused with the datatype called |Vec| in the Agda standard library, which represents a list with a given length)
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{Vector}\;\mathbin{:}\;(\Varid{n}\;\mathbin{:}\;\Conid{ℕ})\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Conid{Vector}\;\Varid{n}\;\mathrel{=}\;\Conid{Fin}\;\Varid{n}\;\Varid{→}\;\Conid{Carrier}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+We define the dot product by pattern matching on the length of the vector:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 ∙\char95 }\;\mathbin{:}\;\{\mskip1.5mu \Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Vector}\;\Varid{n}\;\Varid{→}\;\Conid{Vector}\;\Varid{n}\;\Varid{→}\;\Conid{Carrier}{}\<[E]%
+\\
+\>[B]{}\Varid{\char95 ∙\char95 }\;\{\mskip1.5mu \Varid{zero}\mskip1.5mu\}\;\Varid{u}\;\Varid{v}\;\mathrel{=}\;\Varid{0}\;\Varid{\#}{}\<[E]%
+\\
+\>[B]{}\Varid{\char95 ∙\char95 }\;\{\mskip1.5mu \Varid{suc}\;\Varid{n}\mskip1.5mu\}\;\Varid{u}\;\Varid{v}\;\mathrel{=}\;(\Varid{head}\;\Varid{u}\;\Conid{R*}\;\Varid{head}\;\Varid{v})\;\Conid{R+}\;(\Varid{tail}\;\Varid{u}\;\Varid{∙}\;\Varid{tail}\;\Varid{v}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{where}\;\Varid{head}\;\mathbin{:}\;\{\mskip1.5mu \Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Vector}\;(\Varid{suc}\;\Varid{n})\;\Varid{→}\;\Conid{Carrier}{}\<[E]%
+\\
+\>[3]{}\hsindent{6}{}\<[9]%
+\>[9]{}\Varid{head}\;\Varid{v}\;\mathrel{=}\;\Varid{v}\;\Varid{fzero}{}\<[E]%
+\\
+\>[3]{}\hsindent{6}{}\<[9]%
+\>[9]{}\Varid{tail}\;\mathbin{:}\;\{\mskip1.5mu \Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Vector}\;(\Varid{suc}\;\Varid{n})\;\Varid{→}\;\Conid{Vector}\;\Varid{n}{}\<[E]%
+\\
+\>[3]{}\hsindent{6}{}\<[9]%
+\>[9]{}\Varid{tail}\;\Varid{v}\;\mathrel{=}\;\Varid{λ}\;\Varid{i}\;\Varid{→}\;\Varid{v}\;(\Varid{fsuc}\;\Varid{i}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+With it, we define matrix multiplication:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 *\char95 }\;\mathbin{:}\;\{\mskip1.5mu \Varid{m}\;\Varid{n}\;\Varid{p}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Matrix}\;\Varid{m}\;\Varid{n}\;\Varid{→}\;\Conid{Matrix}\;\Varid{n}\;\Varid{p}\;\Varid{→}\;\Conid{Matrix}\;\Varid{m}\;\Varid{p}{}\<[E]%
+\\
+\>[B]{}(\Conid{A}\;\Varid{*}\;\Conid{B})\;\Varid{i}\;\Varid{j}\;\mathrel{=}\;(\Varid{λ}\;\Varid{k}\;\Varid{→}\;\Conid{A}\;\Varid{i}\;\Varid{k})\;\Varid{∙}\;(\Varid{λ}\;\Varid{k}\;\Varid{→}\;\Conid{B}\;\Varid{k}\;\Varid{j}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Here, the type system of Agda really helps in making sure that the definition is correct. If we start from the fact that the product of a $m \times n$ matrix and an $n \times p$ matrix is an $m \times p$ matrix, then the type system makes sure that our vectors are row vectors for \ensuremath{\Conid{A}} and column vectors for \ensuremath{\Conid{B}}.
+
+Alternatively, if we start from the formula \eqref{Matrix-mul}, the type system forces \ensuremath{\Conid{A}} to have as many rows as \ensuremath{\Conid{B}} has columns.
+
+
+\todo{fill in referecnes below}
+\label{Matrix-mul}
+
+The most interesting fact about matrices (to our application) is the following proposition:
+\begin{Proposition}
+If $R$ is a a ring (\nanring), then the matrices of size $n \times n$ over $R$ also form a ring (\nanring).
+\end{Proposition}
+The proof is fairly easy but boring. We prove the case where $R$ is a \nanring in Agda (because it is the case we will make use of later).
+
+As before, we put the proof in a parametrised module, so we always have access to our base \nanring called \ensuremath{\Conid{NAR}}.
+
+Then, the proof is an element 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{MatrixIsNonAssociativeNonRing}\;\mathbin{:}\;\{\mskip1.5mu \Varid{!!}\mskip1.5mu\}{}\<[E]%
+\\
+\>[B]{}\Conid{MatrixIsNonAssociativeNonRing}\;\mathrel{=}\;\{\mskip1.5mu \Varid{!!}\mskip1.5mu\}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\todo{DO PROOF AND WRITE STUFF!}
+\todo{write the proof that matrices are a ring}
+
+\subsection{Triangular Matrices}
+For our applications, we will be interested in matrices that have no non-zero elements on or below the diagonal.
+\begin{Definition}
+  A matrix is \emph{upper triangular} if all elements on or below its diagonal are equal to zero.
+\end{Definition}
+Since we are only interested in upper triangular matrices, we will sometimes refer to them as just \emph{triangular} matrices. We generalize the defintion to matrices that have zeros on their super diagonals too.
+%\begin{Definition}         TRIANGULARITY???
+%  An upper triangular matrix has \emph{triangularity} $d$ if all elements on or below its $d$th super diagonal are zero. \todo{are they called super diagonals?}
+%\end{Definition}
+%That is, if $i \le j + d$ implies that $A_{i j} = 0$. An upper triangular matrix thus has triangularity $0$, an upper triangular matrix where the line above the diagonal also contains \todo{line is not a good word} zeros has triangularity $1$ and so on. See Figure \ref{Figure:TriangularityExample}
+%\begin{figure}
+%  \centering
+%  \missingfigure{matrix with positive triangularity \label{Figure:TriangularityExample}}
+%\end{figure}
+
+
+In Agda, there are two obvious ways to define a triangular matrix. The first way would be to use records, where a triangular matix is a matrix along with a proof that it is triangular. The second way would be to use functions that take two arguments and return a ring element, but where the second argument must be strictly greater than the first. We show one difference between the two approaches in Figure \ref{Figure:TriangularMatrixOrTriangle}
+\begin{figure}
+  \centering
+  \missingfigure{draw figure of two matrices, one with zeros below diagonal, one with nothing (or stars or somethign)\label{Figure:TriangularMatrixOrTriangle}}
+\end{figure}
+
+We choose the first approach here, because it will make it possible to use the majority of the work from when we proved that matrices form a \nanring to show that triangular matrices also form a \nanring (or a ring, if their elements form a ring), under the obvious multiplication, addition and equality. The only problem we will have is proving that the multiplication is closed. Here it is important repeat that by triangular, we mean upper triangular (although everything would work equally well if we used it to mean lower triangular, as long as it doesn't include both upper and lower) if both upper and lower triangular matrices were allowed, we would not get a ring, , since it is well known that any matrix can be factorized as a product of a lower and an upper triangular matrix.
+
+One additional reason for not choosing the second approach is that inequalities among \ensuremath{\Conid{Fin}} are not very nice \todo{expand on this paragraph}.
+
+Thus we define triangular matrices of triangularity \ensuremath{\Varid{d}} (and give them the name \ensuremath{\Conid{Triangle}}):
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{record}\;\Conid{Triangle}\;(\Varid{n}\;\mathbin{:}\;\Conid{ℕ})\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}\;\mbox{\onelinecomment (d : Fin n) : Set where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{field}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{mat}\;\mathbin{:}\;\Conid{Matrix}\;\Varid{n}\;\Varid{n}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{tri}\;\mathbin{:}\;(\Varid{i}\;\Varid{j}\;\mathbin{:}\;\Conid{Fin}\;\Varid{n})\;\Varid{→}\;\Varid{i}\;\Varid{≤}\;\Varid{j}\;\Varid{→}\;\Varid{mat}\;\Varid{i}\;\Varid{j}\;\Conid{R≈}\;\Varid{0}\;\Varid{\#}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+We also define two \ensuremath{\Conid{Triangle}}s to be equal if they have the same underlying matrix, since the proof is only there to ensure us that they are actually upper triangular.\todo{do we actually want arbitrary triangularity? Pros: makes going from sum to different spec easier, do we want that? Cons: trickier definition. probably not}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 T≈\char95 }\;\mathbin{:}\;\{\mskip1.5mu \Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Triangle}\;\Varid{n}\;\Varid{→}\;\Conid{Triangle}\;\Varid{n}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Conid{A}\;\Conid{T≈}\;\Conid{B}\;\mathrel{=}\;\Conid{Triangle.mat}\;\Conid{A}\;\Conid{M≈}\;\Conid{Triangle.mat}\;\Conid{B}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Now, we go on to define addition and multiplication of triangles. We apply matrix addition on their matrices and modify their proofs. For addition, the proof modification is straightforward: \todo{maybe time to switch to standard library things?}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 T+\char95 }\;\mathbin{:}\;\{\mskip1.5mu \Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Triangle}\;\Varid{n}\;\Varid{→}\;\Conid{Triangle}\;\Varid{n}\;\Varid{→}\;\Conid{Triangle}\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\Conid{A}\;\Conid{T+}\;\Conid{B}\;\mathrel{=}\;\Keyword{record}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\{\mskip1.5mu \Varid{mat}\;\mathrel{=}\;\Conid{Triangle.mat}\;\Conid{A}\;\Conid{M+}\;\Conid{Triangle.mat}\;\Conid{B};{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{tri}\;\mathrel{=}\;\Varid{λ}\;\Varid{i}\;\Varid{j}\;\Varid{i≤j}\;\Varid{→}\;\{\mskip1.5mu \Varid{!A}\;\Varid{i}\;\Varid{j}\;\Varid{+}\;\Conid{B}\;\Varid{i}\;\Varid{j}\;\mathbin{!}\mskip1.5mu\}\mskip1.5mu\}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\todo{ write triangle multiplication. Then the end of the algebra chapter is hit}
+
+%continues until it is proven in Triangle.lagda, since there isn't really anthing mathematical to say
+\newcommand{\productions}{P}
+\newcommand{\nonterminals}{N}
+\newcommand{\terminals}{T}
+\newcommand{\startsymbol}{S}
+\newcommand{\grammar}{(\nonterminals, \terminals, \productions, \startsymbol)}
+\section{Parsing}
+Parsing is the process of annoting a string of tokens with structural properties. We will only give a fairly general overview of the process, to tie it in with the algebra we discussed in Section \ref{Section:Algebra}. We note that this section contains \todo{very little or no} very little Agda code, instead we move back to mathematical notation. In Section \ref{Section:Valiant}, we will then focus on a particular algorithm for parsing, Valiant's Algorithm, that we implement and prove the correctness of using Agda.
+
+
+\subsection{Definitions}
+The goal of parsing is to first decide if a given string of tokens belongs to a given language, and second to describe its structure in the language.
+
+To do these two things, one uses a \emph{grammar}, which contains rules for assigning structural properties to tokens and sequences of tokens.
+
+\begin{Definition}
+  A \emph{grammar} $G$ is a tuple $\grammar$, where 
+  \begin{itemize}
+  \item $\nonterminals$ is a finite set of nonterminals, 
+  \item $\terminals$,
+  \item $ $
+  \item $ $,
+  \end{itemize}
+\end{Definition}
+A grammar can generate a string of terminals by repeatedly applying production rules to the start symbol. 
+A grammar is used to describe a language (a set of strings of tokens). We say that  grammar $G$ generates a language $L$ if the strings in $L$ are exactly the strings that can be generated from $G$ by repeatedly applying \todo{this paragraph is a mess}
+
+\begin{Definition}
+  Context Free Grammar
+\end{Definition}
+\begin{Definition}
+  Chomsky Normal Form (or reduced CNF) --- probably only consider languages that don't contain the empty string, for simplicity.
+\end{Definition}
+Any Context Free Grammar can be converted into one in Chomsky Normal Form\todo{reference, and size increase}. Hence we only consider grammars in Chomsky Normal Form in the rest of the report.
+
+\subsection{Grammar as an algebraic structure}
+When looking at the set of production rules for a grammar in Chomsky Normal Form, we see some similarities with the definition of a multiplication in a magma in Section \ref{Section:Magma-multiplication}:
+If we only consider the production rules involving only nonterminals:
+\begin{equation*}
+  A \to BC,
+\end{equation*}
+and if we further reverse places of $A$ and $BC$, replace the arrow $\to$ by an equals sign $=$, we get
+\begin{equation*}
+  BC = A,
+\end{equation*}
+which we can consider as defining the product of $B$ and $C$ to be equal to $A$, giving us a multiplication table similar to \eqref{Equation:Magma-multiplication-table}.
+
+Note also that as in Section \ref{Section:Magma-multiplication}, the multiplication is little more than a binary operation. Grammars are usually not associative: \todo{what does associative represent here? also, commutative, have inverse, have unit --- write down the equations for each.}
+
+This looks very nice, but we note that we only considered a single production $A \to BC$. When we try to apply this to the whole of $\productions$, there are two problems:
+\begin{enumerate}
+\item What happens if $\productions$ contains $A \to BC$ and $D \to BC$, where $A$ and $D$ are different nonterminals?
+\item What happens if, for some pair $B$ and $C$ of nonterminals, $\productions$ contains no rule $A \to BC$?
+\end{enumerate}
+The first problem is related to the fact that some strings have different many parses, and the second problem is related to the fact that some strings have none (i.e., they don't belong to the language).
+
+The solution to these two problems is to consider \emph{sets} of nonterminals, with the following multiplication:
+\begin{equation*}
+  \{A_1, \ldots, A_n \} \cdot \{B_1 \ldots B_m\} = \{A_1B_1, \ldots, A_nB_m, A_2B_1 \ldots, A_2B_m, \ldots, A_nB_n\}
+\end{equation*}
+\subsubsection{Parsing as Trasitive Closure}
+\todo{was it valiant who came up with this idea? -- include reference to whoever}
+
+% here should be a ``proof'' that parsing can be seen as computing the transitive closure of a matrix
+When we consider the 
+
+
+\todo{fix references to other sections}
+\label{Section:Magma-multiplication}
+\newcommand{\zeromat}{\mathbf{0}}
+\section{Valiant's Algorithm}
+In his paper \cite{Valiant's-Algorithm}, Leslie G. Valiant gave a divide and conquer algorithm for chart parsing that has the same time complexity as matrix multiplication. The algorithm divides a string into two parts, and parses them recursively, and then puts them together through a fairly complicated procedure that requires a constant number of matrix multiplications.
+
+Since the algorithm is a divide and conquer algorithm (and the combining step is also fairly paralellizable), it could potentially be used for parsing in parallel, as suggested by Jean-Philippe Bernardy and Koen Claessen \todo{- or --}\cite{JP-PP}. 
+
+\subsection{Specification of transitive closure}\todo{should this be here? might not make sense}
+
+\subsection{The Algorithm} \todo{note that we want to compute the transitive closure here, not \emph{parse}.}
+We want to compute the transitive closure of the parse chart. The main idea of the algorithm is to split the chart along the diagonal, into two subcharts and a rectangular overlap region, see Figure \ref{Figure:ParseChart}. Next, compute the transitive closures of the subcharts, and combine them (somehow) to fill in the rectangular part. We note that charts of size $1 \times 1$ are the zero matrix, where the transitive closure is also the zero matrix. We also note that it is easy to compute the transitive closure of subcharts that have size $2 \times 2$, since all charts are nonzero on the diagonal, they have only one nonzero element:
+\begin{equation*}
+  \begin{pmatrix}
+    0 x \\
+    0 0
+  \end{pmatrix},
+\end{equation*}
+and hence the specification \eqref{Equation:SpecificationTC} is: 
+\begin{equation*}
+  \begin{pmatrix}
+    0 c
+    0 0
+  \end{pmatrix}
+  = 
+  \begin{pmatrix}
+    0 & c\\
+    0 & 0 
+  \end{pmatrix}
+  \begin{pmatrix}
+    0 & c \\
+    0 & 0
+  \end{pmatrix}
+  + 
+  \begin{pmatrix}
+    0 & x
+    0 & 0
+  \end{pmatrix}
+\end{equation*}
+which turns into $c = x$, since $CC = \zeromat$.
+
+When the chart $X$ is $n \times n$, with $n > 1$, we can write it down as a block matrix 
+\begin{equation*}
+  C = 
+  \begin{pmatrix}
+    U & R \\
+    0 & L
+  \end{pmatrix}
+\end{equation*}
+where $U$ is upper triangular and is the chart corresponding to the first part of the string (the \emph{upper} part of the chart), $L$ is upper triangular and is the chart corresponding to the second part of the string (the \emph{lower} part of the chart, and $R$ corresponds to the parses that start in the first string and end in the second string (the \emph{rectangular} part of the chart).
+
+If we put this into the specification, we get:
+\begin{equation*}
+  \begin{pmatrix}
+    U^+ & R^+ \\
+    0   & L^+
+  \end{pmatrix}
+  =  
+  \begin{pmatrix}
+    U^+ & R^+ \\
+    0   & L^+
+  \end{pmatrix}
+  \begin{pmatrix}
+    U^+ & R^+ \\
+    0   & L^+
+  \end{pmatrix}
+  +
+  \begin{pmatrix}
+    U & R \\
+    0 & L
+  \end{pmatrix}
+\end{equation*}
+where $U^+$, $R^+$, $L^+$ are the corresponding parts of (a priori, we don't know if $U^+$ and $L^+$ are the transitive closures of $U$, $L$). Multiplying together $C^+C^+$, and adding $C$, we get:
+\begin{equation*}
+    \begin{pmatrix}
+    U^+ & R^+ \\
+    0   & L^+
+  \end{pmatrix} 
+    =
+  \begin{pmatrix}
+    U^+U^+ + R^+\zeromat + U   &   U^+R^+     + R^+L^+ + R \\
+    0                          &   \zeromat R + L^+L^+ + L
+  \end{pmatrix}
+  = 
+  \begin{pmatrix}
+    U^+U^+ + U                 &   U^+R^+ + R^+L^+ + R \\
+    0                          &   L^+L^+ + L
+  \end{pmatrix},
+\end{equation*}
+since $\zeromat$ is an absorbing element. Since all elements of two matrices need to be equal for the matrices to be equal, we get the set of equations:
+\begin{align}
+  U^+ &= U^+U^+ + U \\
+  R^+ &= U^+R^+ + R^+L^+ + R \label{Equation:R-Specification}\\
+  L^+ &= L^+L^+ + L,
+\end{align}
+so we see that it the condition that $C^+$ is the transitive closure of $C$ is equivalent to the conditions that the upper and lower parts of $C^+$ are the transitive closures of the upper and lower parts of $C$, respectively (intuitively, this makes sense, since the transitive closure of the first part describes the ways to get between nodes in the first part, and these don't depend on the second part, and vice versa, since the matrix is upper triangular---i.e., while parsing a subset of the of the first part of a string, it doesn't matter what the second part of the string is, because the grammar is context free) and the rectangular part of $C^+$ satisfies the equation \eqref{Equation:R-Specification}.
+
+Hence, if we compute the transitive closures of the upper and lower part of the matrix recursively, we only need to put them together and compute the rectangular part of the matrix.
+To do this, we subdivide $R$ into four blocks:
+\begin{equation*}
+  R =
+  \begin{pmatrix}
+    A & B \\ 
+    C & D
+  \end{pmatrix}
+\end{equation*}
+
+So assuming 
+
+So Valiant's algorithm is: \todo{should it be written like this?}
+
+\subsection{Implementation}
+In this section, we are going to implement Valiant's Algorithm.
+\subsubsection{Data types}
+To implement this in Agda using the \ensuremath{\Conid{Matrix}} and \ensuremath{\Conid{Triangle}} datatype from Section \ref{Section:Triangle} would be very complicated since we would have to handle the splitting manually. Instead, we define concrete representations for the matrices and triangle that have the way we split them built in% (at least two levels down, for use with the rectangular part). 
+We will call the datatypes we use \ensuremath{\Conid{Mat}} and \ensuremath{\Conid{Tri}} for general matrices and upper triangular matrices, respectively.
+To build the split into the data types, we give them constructors for building a large \ensuremath{\Conid{Mat}} or \ensuremath{\Conid{Tri}} from four smaller \ensuremath{\Conid{Mat}}s or two \ensuremath{\Conid{Tri}} and one \ensuremath{\Conid{Mat}} respectively. Since we need \ensuremath{\Conid{Mat}} to define \ensuremath{\Conid{Tri}}, it should appear earlier on in the Agda code, and we begin by reasoning about it. By the above, we have one constructor ready, which we will call \ensuremath{\Varid{quad}}, and which takes four smaller matrices and puts them together into a big one. \todo{make note about us using matrix for \ensuremath{\Conid{Mat}} here.} Written mathematically, we want the meaning to be:
+\begin{equation}
+\operatorname{quad}(A,B,C,D) = 
+\begin{pmatrix} 
+  A & B \\
+  C & D
+\end{pmatrix},
+\end{equation}
+where $A$ has the same number of rows as $B$, $C$ has the same number of rows as $D$, $A$ has the same number of columns as $C$ and $B$ has the same number of columns as $D$.
+Thinking about what ``small'' structures should have constructors, we we realize that it is not enough to simply allow $1 \times 1$ matrices, since then, any matrix would be a $2^n \times 2^n$ matrix, where $n$ is the number of times we use \ensuremath{\Varid{quad}}. 
+
+One way to to solve this problem is to have a constructor for ``empty'' matrices of any dimension, that play two different roles. First, empty $0 \times n$ matrices are used to allow \ensuremath{\Varid{quad}} to put two matrices with the same number of rows next to each others:
+\begin{equation}
+\operatorname{quad}(A, B, e_{0\,m}, e_{0\,n}) =
+\begin{pmatrix}
+  A & B \\
+  e_{0\,m} & e_{0\,n}
+\end{pmatrix} = 
+\begin{pmatrix}
+  A & B
+\end{pmatrix},
+\end{equation}
+where $e_m$ and $e_n$ are empty $m \times 0$ and $n\times 0$ matrices respectively. Similarily, empty $n \times 0$ matrices are used to put two matrice with the same number of columns on top of each others. Second, an empty $m \times n$ matrix, $m \ne 0$, $n \ne 0$, represents a $m \times n$ matrix whose entries are all zero. This approach is taken in \cite{JP-PP}. One advantages of this method is that one can probably get some speedup when adding and multiplying with ``empty'' matrices:
+\begin{equation*}
+  e_{m\, n} + A = A + e_{m\,n} = A
+  e_{m\, n} * A = e_{m\,p}
+  A * e_{n\,p}  = e_{m\,p},
+\end{equation*}
+where $A$ is an arbitrary $m \times n$, $n \times p$ and $m \times n$ matrix, respectively.
+Another is that it keeps the number of constructors down (three constructors for the matrix type), and this is desirable when proving things with Agda, since one often has to deal separately with each constructor, to establish the base cases in an induction.
+
+One (potential) downside with this approach is that while it allows easy construction of zero-matrices of arbitrary size, non-zero matrices still require many constructor application. For example, to make a $2^k \times 1$ vector, we'd have to build a tree of ``n'' \todo{count} applications of \ensuremath{\Varid{quad}}.
+
+Another approach, which we take in this report, is to allow row and column vectors, that is $1 \times n$ and $n \times 1$ matrices for arbitrary $n > 1$, along with the single element matrices. That is, we define \ensuremath{\Varid{rVec}} and \ensuremath{\Varid{cVec}} to take a vector of length $n > 1$ and turn it into a $1 \times n$ or $n \times 1$ matrix respectively.
+This approach has the advantage that we can define all matrices in a simple way, and that we could potentially specialize algorithms when the input is a vector, but introduces one extra constructor (one for rows, one for columns and one for single elements and \ensuremath{\Varid{quad}}, as opposed to one for empty matrices, one for single element matrices and \ensuremath{\Varid{quad}}).
+
+Similarily to the matrices, we then want a concrete representation \ensuremath{\Conid{Vec}} of vectors. Since we (probably) want to be able to split vectors too along the middle, we give them a constructor \ensuremath{\Varid{two}} that takes a vector of length $m$ and one of length $n$ and appends them. For our base cases, we need to be able to build single element vectors, and this turns out to be enough, since we can then build any vector. 
+To implement this approach, we need to define the datatypes \ensuremath{\Conid{Vec}} of vectors and \ensuremath{\Conid{Mat}} of matrices (that shoud be concrete representations of \ensuremath{\Conid{Vector}} and \ensuremath{\Conid{Matrix}}).
+
+The naive (and not the way we finally decide on, for reasons that become clear later, hence we add a \ensuremath{\Varid{′}} to the datatypes) way, which stays close to the \ensuremath{\Conid{Vector}} and \ensuremath{\Conid{Matrix}} datatypes would be to define \ensuremath{\Conid{Vec′}} as something like
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{Vec′}\;\mathbin{:}\;\Conid{ℕ}\;\Varid{→}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{one}\;\mathbin{:}\;(\Varid{x}\;\mathbin{:}\;\Conid{Carrier})\;\Varid{→}\;\Conid{Vec′}\;\Varid{1}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{two}\;\mathbin{:}\;\{\mskip1.5mu \Varid{m}\;\Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Vec′}\;\Varid{m}\;\Varid{→}\;\Conid{Vec′}\;\Varid{n}\;\Varid{→}\;\Conid{Vec′}\;(\Varid{m}\;\Varid{+}\;\Varid{n}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+and then defining \ensuremath{\Conid{Mat′}} as \todo{should we call \ensuremath{\Conid{Vec′}} \ensuremath{\Conid{Vec}} or \ensuremath{\Conid{Vec′}} in text, and code?}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{30}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{Mat′}\;\mathbin{:}\;\Conid{ℕ}\;\Varid{→}\;\Conid{ℕ}\;\Varid{→}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{sing}\;\mathbin{:}\;(\Varid{x}\;\mathbin{:}\;\Conid{Carrier})\;\Varid{→}\;\Conid{Mat′}\;\Varid{1}\;\Varid{1}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{rVec}\;\mathbin{:}\;\{\mskip1.5mu \Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Vec′}\;(\Varid{suc}\;(\Varid{suc}\;\Varid{n}))\;\Varid{→}\;\Conid{Mat′}\;\Varid{1}\;(\Varid{suc}\;(\Varid{suc}\;\Varid{n})){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{cVec}\;\mathbin{:}\;\{\mskip1.5mu \Varid{n}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Vec′}\;(\Varid{suc}\;(\Varid{suc}\;\Varid{n}))\;\Varid{→}\;\Conid{Mat′}\;(\Varid{suc}\;(\Varid{suc}\;\Varid{n}))\;\Varid{1}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{quad}\;\mathbin{:}\;\{\mskip1.5mu \Varid{r₁}\;\Varid{r₂}\;\Varid{c₁}\;\Varid{c₂}\;\mathbin{:}\;\Conid{ℕ}\mskip1.5mu\}\;\Varid{→}\;\Conid{Mat′}\;\Varid{r₁}\;\Varid{c₁}\;\Varid{→}\;\Conid{Mat′}\;\Varid{r₁}\;\Varid{c₂}\;\Varid{→}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{27}{}\<[30]%
+\>[30]{}\Conid{Mat′}\;\Varid{r₂}\;\Varid{c₁}\;\Varid{→}\;\Conid{Mat′}\;\Varid{r₂}\;\Varid{c₂}\;\Varid{→}\;\Conid{Mat′}\;(\Varid{r₁}\;\Varid{+}\;\Varid{r₂})\;(\Varid{c₁}\;\Varid{+}\;\Varid{c₂}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Where we name the indices \ensuremath{\Varid{r₁}}, \ensuremath{\Varid{r₂}}, \ensuremath{\Varid{c₁}} and \ensuremath{\Varid{c₂}} to for rows and columns of the involved matrices, and the ordering is so that we can write it on two rows.
+
+While this looks like a very natural way to define the datatypes, it will not work well when we want to prove things about the matrices. As we have mentioned before, the main way to prove things in Agda is to use structural induction by pattern matching on the structures involved. However, if we pattern match on a \ensuremath{\Conid{Mat′}}, one problem that appears is that Agda is unable to see that in the \ensuremath{\Varid{quad}} case, both indices must be at least \ensuremath{\Varid{2}}, nor that both terms \ensuremath{\Varid{a}} and \ensuremath{\Varid{b}} have to be at least \ensuremath{\Varid{1}}. It is possible to write lemmas proving this, and use them at every step. However, there are worse cases, when Agda's ability to unify indices won't help us when doing more complicated things, like realizing that some integer \ensuremath{\Varid{n}} is equal to \ensuremath{\Varid{a}\;\Varid{+}\;\Varid{b}}, also, we can't tell whether \ensuremath{\Varid{a}} is a sum or not, so the second splitting step is complicated, for example \todo{include short example}.
+
+Instead we want to use a different approach for indexing our matrices, by building the splitting further into the data structures. Looking at the first attempt to define \ensuremath{\Varid{quad}}, we can perhaps guess that the indexing should have a constructor that puts two sub-indices together to form a new index (as in \ensuremath{\Varid{a}\;\Varid{+}\;\Varid{b}}), because then, \ensuremath{\Varid{quad}} would result in a \ensuremath{\Conid{Mat}} whose indices are clearly distinguishable from the single index (that is \ensuremath{\Varid{1}} above). Hence, we want something like \ensuremath{\Conid{ℕ}}, but, instead of having \ensuremath{\Varid{suc}} as a constructor, it should have \ensuremath{\Varid{+}}. \todo{ask JP where the idea is from}
+We call this datatype \ensuremath{\Conid{Splitting}}, since it indexes the splitting of the matrix, and define it as follows
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{Splitting}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{one}\;\mathbin{:}\;\Conid{Splitting}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{bin}\;\mathbin{:}\;(\Varid{s₁}\;\mathbin{:}\;\Conid{Splitting})\;\Varid{→}\;(\Varid{s₂}\;\mathbin{:}\;\Conid{Splitting})\;\Varid{→}\;\Conid{Splitting}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+where \ensuremath{\Varid{one}} plays the role of \ensuremath{\Varid{suc}\;\Varid{zero}} (since there's no reason to have dimensions $0$ for matrices, and \ensuremath{\Varid{bin}} plays the role of \ensuremath{\Varid{+}} (we have chosen the name \todo{change to bin in actual code} \ensuremath{\Varid{bin}} to connect it to binary trees: we can think of \ensuremath{\Conid{ℕ}} as the type of list with elements from \ensuremath{\Varid{⊤}}, where \ensuremath{\Varid{⊤}} is the one element type; then \ensuremath{\Conid{Splitting}} is the type of binary trees with elements \ensuremath{\Varid{⊤}}).
+
+We also define the translation function that takes a \ensuremath{\Conid{Splitting}} to an element of \ensuremath{\Conid{ℕ}}, by giving the \ensuremath{\Varid{one}}-splitting the value \ensuremath{\Varid{1}} and summing the sub splittings otherwise:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{splitToℕ}\;\mathbin{:}\;\Conid{Splitting}\;\Varid{→}\;\Conid{ℕ}{}\<[E]%
+\\
+\>[B]{}\Varid{splitToℕ}\;\Varid{one}\;\mathrel{=}\;\Varid{1}{}\<[E]%
+\\
+\>[B]{}\Varid{splitToℕ}\;(\Varid{bin}\;\Varid{s₁}\;\Varid{s₂})\;\mathrel{=}\;\Varid{splitToℕ}\;\Varid{s₁}\;\Varid{+}\;\Varid{splitToℕ}\;\Varid{s₂}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Using this data type we can finally define our data types \todo{data type or datatype?} \ensuremath{\Conid{Mat}} and \ensuremath{\Conid{Tri}}.
+Mimicking the above, but using \ensuremath{\Conid{Splitting}}s as indices (the code is essentially the same, with every instance of ``\ensuremath{\Conid{ℕ}}'' replaced by ``\ensuremath{\Conid{Splitting}}''), we first define \ensuremath{\Conid{Vec}} as: \todo{probably have \ensuremath{\Conid{Tri}} above too}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{Vec}\;\mathbin{:}\;\Conid{Splitting}\;\Varid{→}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{one}\;\mathbin{:}\;(\Varid{x}\;\mathbin{:}\;\Conid{Carrier})\;\Varid{→}\;\Conid{Vec}\;\Varid{one}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{two}\;\mathbin{:}\;\{\mskip1.5mu \Varid{s₁}\;\Varid{s₂}\;\mathbin{:}\;\Conid{Splitting}\mskip1.5mu\}\;\Varid{→}\;(\Varid{u}\;\mathbin{:}\;\Conid{Vec}\;\Varid{s₁})\;\Varid{→}\;(\Varid{v}\;\mathbin{:}\;\Conid{Vec}\;\Varid{s₂})\;\Varid{→}\;\Conid{Vec}\;(\Varid{bin}\;\Varid{s₁}\;\Varid{s₂}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+We can note that where \ensuremath{\Conid{Splitting}} is a binary tree of elements of the unit type, \ensuremath{\Conid{Vec}} is instead a binary tree of \ensuremath{\Conid{Carrier}} (with elements in the leaves). We move on to defining \ensuremath{\Conid{Mat}} as:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{38}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{Mat}\;\mathbin{:}\;\Conid{Splitting}\;\Varid{→}\;\Conid{Splitting}\;\Varid{→}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{sing}\;\mathbin{:}\;(\Varid{x}\;\mathbin{:}\;\Conid{Carrier})\;\Varid{→}\;\Conid{Mat}\;\Varid{one}\;\Varid{one}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{rVec}\;\mathbin{:}\;\{\mskip1.5mu \Varid{s₁}\;\Varid{s₂}\;\mathbin{:}\;\Conid{Splitting}\mskip1.5mu\}\;\Varid{→}\;(\Varid{v}\;\mathbin{:}\;\Conid{Vec}\;(\Varid{bin}\;\Varid{s₁}\;\Varid{s₂}))\;\Varid{→}\;\Conid{Mat}\;\Varid{one}\;(\Varid{bin}\;\Varid{s₁}\;\Varid{s₂}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{cVec}\;\mathbin{:}\;\{\mskip1.5mu \Varid{s₁}\;\Varid{s₂}\;\mathbin{:}\;\Conid{Splitting}\mskip1.5mu\}\;\Varid{→}\;(\Varid{v}\;\mathbin{:}\;\Conid{Vec}\;(\Varid{bin}\;\Varid{s₁}\;\Varid{s₂}))\;\Varid{→}\;\Conid{Mat}\;(\Varid{bin}\;\Varid{s₁}\;\Varid{s₂})\;\Varid{one}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{quad}\;\mathbin{:}\;\{\mskip1.5mu \Varid{r₁}\;\Varid{r₂}\;\Varid{c₁}\;\Varid{c₂}\;\mathbin{:}\;\Conid{Splitting}\mskip1.5mu\}\;\Varid{→}\;(\Conid{A}\;\mathbin{:}\;\Conid{Mat}\;\Varid{r₁}\;\Varid{c₁})\;\Varid{→}\;(\Conid{B}\;\mathbin{:}\;\Conid{Mat}\;\Varid{r₁}\;\Varid{c₂})\;\Varid{→}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{35}{}\<[38]%
+\>[38]{}(\Conid{C}\;\mathbin{:}\;\Conid{Mat}\;\Varid{r₂}\;\Varid{c₁})\;\Varid{→}\;(\Conid{D}\;\mathbin{:}\;\Conid{Mat}\;\Varid{r₂}\;\Varid{c₂})\;\Varid{→}\;\Conid{Mat}\;(\Varid{bin}\;\Varid{r₁}\;\Varid{r₂})\;(\Varid{bin}\;\Varid{c₁}\;\Varid{c₂}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+The definition of the last datatype involved, \ensuremath{\Conid{Tri}} is straightforward from the subdivision made above \ref{subdivision in derivation of Valiant}. There is only one base case, that of the $1 \times 1$ zero triangle (equal to the $1 \times 1$ zero matrix when viewed as an upper triangular marix), and putting together \ensuremath{\Conid{Tri}}s is straightforward since the upper triangular matrices need to be square, now that our matrices can have any shape, and the definition guarantees that the two step splitting in \ref{two step splitting in derivation of valiant} can be done:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{Tri}\;\mathbin{:}\;\Conid{Splitting}\;\Varid{→}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{one}\;\mathbin{:}\;\Conid{Tri}\;\Varid{one}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{two}\;\mathbin{:}\;\{\mskip1.5mu \Varid{s₁}\;\Varid{s₂}\;\mathbin{:}\;\Conid{Splitting}\mskip1.5mu\}\;\Varid{→}\;(\Conid{U}\;\mathbin{:}\;\Conid{Tri}\;\Varid{s₁})\;\Varid{→}\;(\Conid{R}\;\mathbin{:}\;\Conid{Mat}\;\Varid{s₁}\;\Varid{s₂})\;\Varid{→}\;(\Conid{L}\;\mathbin{:}\;\Conid{Tri}\;\Varid{s₂})\;\Varid{→}\;\Conid{Tri}\;(\Varid{bin}\;\Varid{s₁}\;\Varid{s₂}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Where again, the ordering of the arguments to \ensuremath{\Varid{two}} (it takes \emph{two} \ensuremath{\Conid{Tri}}s) is such that if we introduce a line break after \ensuremath{\Conid{Mat}\;\Varid{s₁}\;\Varid{s₂}}, and indent \ensuremath{\Conid{Tri}\;\Varid{s₂}} so it is below \ensuremath{\Conid{Mat}\;\Varid{s₁}\;\Varid{s₂}}, they have the shape of an upper triangular matrix.
+
+Here, we note that if we had chosen the approach with empty matrices (see \ref{empty matrices}), and correspondingly, empty \ensuremath{\Conid{Splitting}}s, we might have needed an extra constructor for triangles also \todo{think, is this true???}.
+
+
+To end this section, we define addition and multiplication for \ensuremath{\Conid{Mat}} and then for \ensuremath{\Conid{Tri}}.
+
+Addition is straightforward, since matrix addition is done pointwise, so we just recurse on the subparts, first we need to define it for \ensuremath{\Conid{Vec}}:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 V+\char95 }\;\mathbin{:}\;\{\mskip1.5mu \Varid{s}\;\mathbin{:}\;\Conid{Splitting}\mskip1.5mu\}\;\Varid{→}\;\Conid{Vec}\;\Varid{s}\;\Varid{→}\;\Conid{Vec}\;\Varid{s}\;\Varid{→}\;\Conid{Vec}\;\Varid{s}{}\<[E]%
+\\
+\>[B]{}\Varid{one}\;\Varid{x}\;\Conid{V+}\;\Varid{one}\;\Varid{x'}\;\mathrel{=}\;\Varid{one}\;(\Varid{x}\;\Conid{R+}\;\Varid{x'}){}\<[E]%
+\\
+\>[B]{}\Varid{two}\;\Varid{u}\;\Varid{v}\;\Conid{V+}\;\Varid{two}\;\Varid{u'}\;\Varid{v'}\;\mathrel{=}\;\Varid{two}\;(\Varid{u}\;\Conid{V+}\;\Varid{u'})\;(\Varid{v}\;\Conid{V+}\;\Varid{v'}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Then for \ensuremath{\Conid{Mat}}:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 M+\char95 }\;\mathbin{:}\;\{\mskip1.5mu \Varid{s₁}\;\Varid{s₂}\;\mathbin{:}\;\Conid{Splitting}\mskip1.5mu\}\;\Varid{→}\;\Conid{Mat}\;\Varid{s₁}\;\Varid{s₂}\;\Varid{→}\;\Conid{Mat}\;\Varid{s₁}\;\Varid{s₂}\;\Varid{→}\;\Conid{Mat}\;\Varid{s₁}\;\Varid{s₂}{}\<[E]%
+\\
+\>[B]{}\Varid{sing}\;\Varid{x}\;\Conid{M+}\;\Varid{sing}\;\Varid{x'}\;\mathrel{=}\;\Varid{sing}\;(\Varid{x}\;\Conid{R+}\;\Varid{x'}){}\<[E]%
+\\
+\>[B]{}\Varid{rVec}\;\Varid{v}\;\Conid{M+}\;\Varid{rVec}\;\Varid{v'}\;\mathrel{=}\;\Varid{rVec}\;(\Varid{v}\;\Conid{V+}\;\Varid{v'}){}\<[E]%
+\\
+\>[B]{}\Varid{cVec}\;\Varid{v}\;\Conid{M+}\;\Varid{cVec}\;\Varid{v'}\;\mathrel{=}\;\Varid{cVec}\;(\Varid{v}\;\Conid{V+}\;\Varid{v'}){}\<[E]%
+\\
+\>[B]{}\Varid{quad}\;\Conid{A}\;\Conid{B}\;\Conid{C}\;\Conid{D}\;\Conid{M+}\;\Varid{quad}\;\Conid{A'}\;\Conid{B'}\;\Conid{C'}\;\Conid{D'}\;\mathrel{=}\;\Varid{quad}\;(\Conid{A}\;\Conid{M+}\;\Conid{A'})\;(\Conid{B}\;\Conid{M+}\;\Conid{B'})\;(\Conid{C}\;\Conid{M+}\;\Conid{C'})\;(\Conid{D}\;\Conid{M+}\;\Conid{D'}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Finally for \ensuremath{\Conid{Tri}}:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 T+\char95 }\;\mathbin{:}\;\{\mskip1.5mu \Varid{s}\;\mathbin{:}\;\Conid{Splitting}\mskip1.5mu\}\;\Varid{→}\;\Conid{Tri}\;\Varid{s}\;\Varid{→}\;\Conid{Tri}\;\Varid{s}\;\Varid{→}\;\Conid{Tri}\;\Varid{s}{}\<[E]%
+\\
+\>[B]{}\Varid{one}\;\Conid{T+}\;\Varid{one}\;\mathrel{=}\;\Varid{one}{}\<[E]%
+\\
+\>[B]{}\Varid{two}\;\Conid{U}\;\Conid{R}\;\Conid{L}\;\Conid{T+}\;\Varid{two}\;\Conid{U'}\;\Conid{R'}\;\Conid{L'}\;\mathrel{=}\;\Varid{two}\;(\Conid{U}\;\Conid{T+}\;\Conid{U'})\;(\Conid{R}\;\Conid{M+}\;\Conid{R'})\;(\Conid{L}\;\Conid{T+}\;\Conid{L'}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+For multiplication, we need to do a bit more work (and in particular, we need to have already defined addition). The first thing to note is that if we have two matrices split into blocks, where the splitting of the columns of the first matrix equals the splitting of the rows of the second (similar to the fact that to multiply matrices $A$ and $B$, $A$ must  have as many columns as $B$ has rows), matrix multiplication works out nicely with regard to the block structures:
+\begin{equation}
+\begin{pmatrix}
+A & B \\
+C & D 
+\end{pmatrix}
+\begin{pmatrix}
+A' & B' \\
+C' & D'
+\end{pmatrix}
+=
+\begin{pmatrix}
+A A' + B C'    &    A B' + B D' \\
+C A' + D C'    &    C B' + D D'
+\end{pmatrix}
+\end{equation}
+We will use this formula to define multiplication for \ensuremath{\Conid{Mat}}. We will therefore not define multiplication for \ensuremath{\Conid{Mat}}s where the inner splittings are not equal---so our \ensuremath{\Conid{Mat}} multiplication is less general that arbitrary matrix multiplication, but it is all we need, and its simplicity is very helpful.
+
+Nevertheless, the definition takes quite a bit of work (we need to define multiplication of \ensuremath{\Conid{Mat}\;\Varid{s₁}\;\Varid{s₂}} and an \ensuremath{\Conid{Mat}\;\Varid{s₂}\;\Varid{s₃}}, for all cases of \ensuremath{\Varid{s₁}}, \ensuremath{\Varid{s₂}} and \ensuremath{\Varid{s₃}}, in all, $8$ different cases). The above equation takes care of the case when \ensuremath{\Varid{s₁}} \ensuremath{\Varid{s₂}} and \ensuremath{\Varid{s₃}} are all \ensuremath{\Varid{bin}} of something. To take care of the remaining cases, we should consider vector--vector multiplication (two cases, depending on whether we are multiplying a row vector by a column vector or a column vector by a row vector), vector--matrix multiplication, matrix--vector multiplication, scalar--vector multiplication, vector--scalar multiplication, and finally scalar--scalar multiplication. All of which are different, but all can be derived from the above equation, if we allow the submatrices to have $0$ as a dimension, for example, vector--matrix multiplication is given by
+\begin{align*}
+  \begin{pmatrix}
+    u & v
+  \end{pmatrix}
+  \begin{pmatrix}
+    A & B \\ 
+    C & D
+  \end{pmatrix}
+  &=
+  \begin{pmatrix}
+    uA + vC & uB + vD
+  \end{pmatrix},
+\end{align*}
+and column vector--row vector multiplication (the outer product) is given by
+\begin{equation}
+  \begin{pmatrix}
+    u \\
+    v
+  \end{pmatrix}
+  \begin{pmatrix}
+    u' & v'
+  \end{pmatrix} 
+= 
+  \begin{pmatrix}
+    uu' & uv' \\
+    
+  \end{pmatrix}
+\end{equation}
+
+\todo{fix these references}
+\label{subdivision in derivation of Valiant}
+\label{two step splitting in derivation of valiant}
+
+
+\todo{when getting to \ensuremath{\Conid{Tri}}, comment on the fact that \ensuremath{\Conid{Tri}} probably needs another constructor if we're doing things JP's way (does it have that in his papers / code?)}
+
+That is, we want 
+The way to do this in a way that works well with Agda is by using 
+\todo{smart Constructors}
+
+
+
+\subsection{Correctness Proof}
+Here we prove the correctness of Valiant's Algorithm.
+\section{Discussion}
+\subsection{Related work}
+\subsection{Future work}
+Some future work:
+Expand on the algebraic structures in Agda, perhaps useful to learn abstract algebra (proving that zero in a ring annihilates is a fun(!) exercise!). Also expand on it so that it becomes closer to what is doable in algebra packages -- create groups by generators and equations, for example.
+
+Fit into Algebra of Programming (maybe).
+
+\listoftodos
+\bibliography{references}
+\bibliographystyle{plainnat}
+
+\end{document}
