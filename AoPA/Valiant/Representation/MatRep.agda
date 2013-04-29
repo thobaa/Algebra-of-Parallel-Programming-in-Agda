@@ -333,16 +333,84 @@ row-col' {m} {suc n} A B C D A' B' C' D' i j | no ¬p | bb = {!!}
 --         Valiant.Abstract.Matrix.Four NAR A' B' C' D' (fsuc i') j
 --         | (suc (suc (toℕ i')) ≤? suc n | suc (toℕ i') ≤? n) | yes p0)
 --  where open EqR setoid
-
--- funktion som returnerar Four med "with"
---Four : ∀ {m n o p} → Matrix m n → Matrix m o → 
---                      Matrix p n → Matrix p o → 
 Four-cong : {m n o p : ℕ} {a a' : Matrix m n} {b b' : Matrix m o} {c c' : Matrix p n} {d d' : Matrix p o} → a M≈ a' → b M≈ b' → c M≈ c' → d M≈ d' → Four a b c d M≈ Four a' b' c' d'
 Four-cong {m} {n} a≈a' b≈b' c≈c' d≈d' i j with suc (toℕ i) ≤? m | suc (toℕ j) ≤? n
 Four-cong a≈a' b≈b' c≈c' d≈d' i j | yes p | yes p' = a≈a' (fromℕ≤ p) (fromℕ≤ p')
 Four-cong a≈a' b≈b' c≈c' d≈d' i j | yes p' | no ¬p = b≈b' (fromℕ≤ p') (reduce≥ j (≤-pred (≰⇒> ¬p)))
 Four-cong a≈a' b≈b' c≈c' d≈d' i j | no ¬p | yes p' = c≈c' (reduce≥ i (≤-pred (≰⇒> ¬p))) (fromℕ≤ p')
 Four-cong a≈a' b≈b' c≈c' d≈d' i j | no ¬p | no ¬p' = d≈d' (reduce≥ i (≤-pred (≰⇒> ¬p))) (reduce≥ j (≤-pred (≰⇒> ¬p')))
+
+row-col'' : {m n o p q r : ℕ} (A : Matrix m n) (B : Matrix m o) (C : Matrix p n) (D : Matrix p o) (A' : Matrix n q) (B' : Matrix n r) (C' : Matrix o q) (D' : Matrix o r) → (i : Fin (m + p)) → (j : Fin (q + r)) → Four (A M* A' M+ B M* C') (A M* B' M+ B M* D') (C M* A' M+ D M* C')
+                  (C M* B' M+ D M* D')
+                  i j
+                  ≈
+          row i (Four A B C D) V∙ col j (Four A' B' C' D')
+row-col'' {zero} {n} {o} {p} {zero} A B C D A' B' C' D' i j = {!!}
+row-col'' {zero} {n} {o} {p} {suc n'} A B C D A' B' C' D' i j = {!!}
+--row-col'' {zero} A B C D A' B' C' D' (fsuc i) j = {!!}
+row-col'' {suc n} A B C D A' B' C' D' f0 j = {!!}
+row-col'' {suc n} A B C D A' B' C' D' (fsuc i) j with row-col'' {n} (λ i' j' → A (fsuc i') j') (λ i' j' → B (fsuc i') j') C D A' B' C' D' i j --(λ i' j' → A (fsuc i') V∙ (λ k → A' k j')) (λ i' j' → B (fsuc i') V∙ (λ k → C' k j')) (λ i' j' → C i' V∙ (λ k → A' k j')) {!!} {!!} {!!} {!!} {!!}  i j
+...| aa  = begin 
+  _ 
+    ≈⟨ Four-index-change (λ i' j' → A i' V∙ (λ k → A' k j') R+ B i' V∙ (λ k → C' k j')) (λ i' j' → A i' V∙ (λ k → B' k j') R+ B i' V∙ (λ k → D' k j')) (λ i' j' → C i' V∙ (λ k → A' k j') R+ D i' V∙ (λ k → C' k j')) (λ i' j' → C i' V∙ (λ k → B' k j') R+ D i' V∙ (λ k → D' k j')) i j ⟩ --index-change {!Four A B C D!} {!!} {!!} ⟩
+  _
+    ≈⟨ aa ⟩
+  _
+    ≈⟨ V∙-cong (λ i' → R-sym (Four-index-change A B C D i i')) (λ i' → R-refl) ⟩
+  _ ∎ --with suc (toℕ i) ≤? m | suc (toℕ j) ≤? q
+{-Goal: (Valiant.Abstract.Matrix.Four NAR
+       (λ i' j' → A i' V∙ (λ k → A' k j') R+ B i' V∙ (λ k → C' k j'))
+       (λ i' j' → A i' V∙ (λ k → B' k j') R+ B i' V∙ (λ k → D' k j'))
+       (λ i' j' → C i' V∙ (λ k → A' k j') R+ D i' V∙ (λ k → C' k j'))
+       (λ i' j' → C i' V∙ (λ k → B' k j') R+ D i' V∙ (λ k → D' k j'))
+       (fsuc i) j
+       | (suc (suc (toℕ i)) ≤? suc n | suc (toℕ i) ≤? n)
+       | suc (toℕ j) ≤? .q)
+      ≈
+      (Valiant.Abstract.Matrix.Four NAR
+       (λ i' j' →
+          A (fsuc i') V∙ (λ k → A' k j') R+ B (fsuc i') V∙ (λ k → C' k j'))
+       (λ i' j' →
+          A (fsuc i') V∙ (λ k → B' k j') R+ B (fsuc i') V∙ (λ k → D' k j'))
+       (λ i' j' → C i' V∙ (λ k → A' k j') R+ D i' V∙ (λ k → C' k j'))
+       (λ i' j' → C i' V∙ (λ k → B' k j') R+ D i' V∙ (λ k → D' k j')) i j
+       | suc (toℕ i) ≤? n | suc (toℕ j) ≤? .q)
+-}
+{-Goal: (λ k →
+         Valiant.Abstract.Matrix.Four NAR (λ i' → A (fsuc i'))
+         (λ i' → B (fsuc i')) C D i k
+         | suc (toℕ i) ≤? n | suc (toℕ k) ≤? .n)
+      V∙
+      (λ k →
+         Valiant.Abstract.Matrix.Four NAR A' B' C' D' k j
+         | suc (toℕ k) ≤? .n | suc (toℕ j) ≤? .q)
+      ≈
+      (λ k →
+         Valiant.Abstract.Matrix.Four NAR A B C D (fsuc i) k
+         | (suc (suc (toℕ i)) ≤? suc n | suc (toℕ i) ≤? n)
+         | suc (toℕ k) ≤? .n)
+      V∙
+      (λ k →
+         Valiant.Abstract.Matrix.Four NAR A' B' C' D' k j
+         | suc (toℕ k) ≤? .n | suc (toℕ j) ≤? .q)
+-}
+
+
+  where open EqR setoid
+        index-change : {m n : ℕ} (A : Matrix (suc m) n) → (i : Fin m) → (j : Fin n) → A (fsuc i) j ≈ (λ i' j' → A (fsuc i') j') i j
+        index-change {m} {n} A i j = R-refl
+        Four-index-change : {m n o p : ℕ} (A : Matrix (suc m) n) (B : Matrix (suc m) o) (C : Matrix p n) (D : Matrix p o) → (i : Fin (m + p)) → (j : Fin (n + o)) → Four A B C D (fsuc i) j ≈ Four (λ i' j' → A (fsuc i') j') (λ i' j' → B (fsuc i') j' ) C D i j
+        Four-index-change {m} {n} A B C D i j with suc (suc (toℕ i)) ≤? suc m | suc (toℕ i) ≤? m | suc (toℕ j) ≤? n 
+        Four-index-change A0 B0 C0 D0 i' j' | yes p' | yes p0 | yes p1 = {!!}
+        Four-index-change A0 B0 C0 D0 i' j' | yes p' | yes p0 | no ¬p = {!!}
+        Four-index-change A0 B0 C0 D0 i' j' | yes p' | no ¬p | _ = ⊥-elim (¬p (≤-pred p'))
+        Four-index-change A0 B0 C0 D0 i' j' | no ¬p | aa' | bb = {!aa'!}
+        --V∙-Four-index-change : {m n o p : ℕ} (A : Matrix (suc m) n) (B : Matrix (suc m) o) (C : Matrix p n) (D : Matrix p o) → (i : Fin (m + p)) → (j : Fin (n + o)) → Four (λ i' j' → A (fsuc i') j') (λ i' j' → B (fsuc i') j' ) C D i j
+  --      V∙-Four-index-change = {!!}
+
+-- funktion som returnerar Four med "with"
+--Four : ∀ {m n o p} → Matrix m n → Matrix m o → 
+--                      Matrix p n → Matrix p o → 
 
 M*-Homomorphism : {s₁ s₂ s₃ : Splitting} {n₁ n₂ n₃ : ℕ} (|s₁|≡n₁ : splitSize s₁ ≡ n₁) (|s₂|≡n₂ : splitSize s₂ ≡ n₂) (|s₃|≡n₃ : splitSize s₃ ≡ n₃) → (A : Mat s₁ s₂) (B : Mat s₂ s₃)
   → (Mat-to-Matrix |s₁|≡n₁ |s₃|≡n₃ (A m* B)) M≈ (Mat-to-Matrix |s₁|≡n₁ |s₂|≡n₂  A) M* (Mat-to-Matrix |s₂|≡n₂ |s₃|≡n₃ B)
