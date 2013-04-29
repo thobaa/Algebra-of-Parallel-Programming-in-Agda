@@ -60,39 +60,39 @@ M+-isCommutativeMonoid = record { isSemigroup = M+-isSemigroup; identityˡ = M+-
 -- pf1 : u i' j' == v i' j'
 -- vill ha: (x i ∙ (λ k → u k j)) == (y i ∙ 
 -- vill ha AC = BD
-∙-cong : {n : _} → (_∙_ {n}) Preserves₂ _v≈_ ⟶ _v≈_ ⟶ _R≈_
+∙-cong : {n : _} → (_∙_ {n}) Preserves₂ _V≈_ ⟶ _V≈_ ⟶ _R≈_
 ∙-cong {zero} u≈u' v≈v' = IsEquivalence.refl (NonAssociativeNonRing.isEquivalence NAR)
 ∙-cong {suc n} {u} {u'} {v} {v'} u≈u' v≈v' = begin 
-  head u R* head v R+ tail u ∙ tail v 
+  head u R* head v R+ (tail u ∙ tail v) 
     ≈⟨ NonAssociativeNonRing.+-cong NAR (NonAssociativeNonRing.*-cong NAR (u≈u' fzero) (v≈v' fzero)) (∙-cong (λ i → u≈u' (fsuc i)) (λ i → v≈v' (fsuc i))) ⟩
   head u' R* head v' R+ tail u' ∙ tail v' ∎
   where open EqR (record { Carrier = Carrier; _≈_ = _R≈_; isEquivalence = NonAssociativeNonRing.isEquivalence NAR })
 
-lemma : {n : _} {A B : Matrix n n} → A M≈ B → (∀ i → A i v≈ B i)
+lemma : {n : _} {A B : Matrix n n} → A M≈ B → (∀ i → A i V≈ B i)
 lemma A≈B i j = A≈B i j
 
-lemma2 : {n : _} {A B : Matrix n n} → A M≈ B → (∀ j → (λ k → A k j) v≈ (λ k → B k j))
+lemma2 : {n : _} {A B : Matrix n n} → A M≈ B → (∀ j → (λ k → A k j) V≈ (λ k → B k j))
 lemma2 A≈B i j = A≈B j i
 
 M*-cong : {n : _} → (_*_ {n} {n} {n}) Preserves₂ _M≈_ ⟶ _M≈_ ⟶ _M≈_
 M*-cong {n} {A} {B} {C} {D} A≈B C≈D i j = ∙-cong (lemma A≈B i) (lemma2 C≈D j)
 
-v-distribˡ : {n : _} → (x y z : Vector n) → (x ∙ (y v+ z)) R≈ ((x ∙ y) R+ (x ∙ z))
+v-distribˡ : {n : _} → (x y z : Vector n) → (x ∙ (y V+ z)) R≈ ((x ∙ y) R+ (x ∙ z))
 v-distribˡ {zero} u v w = sym (proj₁ +-identity 0#)
 v-distribˡ {suc n} u v w = begin 
-           (head u R* (head v R+ head w)) R+ (tail u ∙ (tail v v+ tail w))
+           (head u R* (head v R+ head w)) R+ (tail u ∙ (tail v V+ tail w))
              ≈⟨ +-cong (proj₁ distrib (head u) (head v) (head w)) (v-distribˡ (tail u) (tail v) (tail w)) ⟩ 
-           (head u R* head v R+ head u R* head w) R+ (tail u ∙ tail v R+ tail u ∙ tail w)
+           (head u R* head v R+ head u R* head w) R+ ((tail u ∙ tail v) R+ (tail u ∙ tail w))
              ≈⟨ rearrangeLemma {cm = +-commutativeMonoid}  (head u R* head v) (head u R* head w) (tail u ∙ tail v) (tail u ∙ tail w) ⟩
            (head u R* head v R+ tail u ∙ tail v) R+ (head u R* head w R+ tail u ∙ tail w) ∎
   where open EqR (record { Carrier = Carrier; _≈_ = _R≈_; isEquivalence = NonAssociativeNonRing.isEquivalence NAR })
 
-v-distribʳ : {n : _} → (x y z : Vector n) → ((y v+ z) ∙ x) R≈ ((y ∙ x) R+ (z ∙ x))
+v-distribʳ : {n : _} → (x y z : Vector n) → ((y V+ z) ∙ x) R≈ ((y ∙ x) R+ (z ∙ x))
 v-distribʳ {zero} u v w = sym (proj₁ +-identity 0#)
 v-distribʳ {suc n} u v w = begin 
-           ((head v R+ head w) R* head u) R+ ((tail v v+ tail w) ∙ tail u)
+           ((head v R+ head w) R* head u) R+ ((tail v V+ tail w) ∙ tail u)
              ≈⟨ +-cong (proj₂ distrib (head u) (head v) (head w)) (v-distribʳ (tail u) (tail v) (tail w)) ⟩ 
-           (head v R* head u R+ head w R* head u) R+ (tail v ∙ tail u R+ tail w ∙ tail u) 
+           (head v R* head u R+ head w R* head u) R+ ((tail v ∙ tail u) R+ (tail w ∙ tail u)) 
              ≈⟨ rearrangeLemma {cm = +-commutativeMonoid} (head v R* head u) (head w R* head u) (tail v ∙ tail u) (tail w ∙ tail u) ⟩ 
            (head v R* head u R+ tail v ∙ tail u) R+ (head w R* head u R+ tail w ∙ tail u) ∎
   where open EqR (record { Carrier = Carrier; _≈_ = _R≈_; isEquivalence = NonAssociativeNonRing.isEquivalence NAR })
@@ -146,3 +146,12 @@ MisNonAssociativeNonRing = record
     distrib = M-distrib;
     zero = M-zero 
   }
+
+nonAssociativeNonRing : {n : _} → NonAssociativeNonRing _ _
+nonAssociativeNonRing {n} = record {
+                          Carrier = Matrix n n;
+                          _≈_ = _M≈_;
+                          _+_ = _+_;
+                          _*_ = _*_;
+                          0# = zeroMatrix;
+                          isNonAssociativeNonRing = MisNonAssociativeNonRing }

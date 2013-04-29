@@ -42,3 +42,6 @@ record NANRing-Isomorphism {l₁ l₂ l₃ l₄}
                                   (record { _⟨$⟩_ = ⟦_⟧; cong = ⟦⟧-cong })
 
          --inverse-hom : 
+
+--NANRing-Isomorphic : {l₁ l₂ l₃ l₄ : _} → (R₁ : NonAssociativeNonRing l₁ l₂) (R₂ : NonAssociativeNonRing l₃ l₄) → NANRing-Isomorphism R₁ R₂ → Set l₁
+--NANRing-Isomorphic = {!!}

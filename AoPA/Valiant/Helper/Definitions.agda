@@ -94,12 +94,12 @@ f1 = fsuc f0
 reduce≤ : ∀ {n m} -> (i : Fin (n + m)) -> (suc (toℕ i) ≤ n) -> Fin n
 reduce≤ i pf = fromℕ≤ pf
 
-postulate 
-  reduce′ : ∀ {n} → (i r : Fin n) → (suc (toℕ i) ≤ toℕ r) → Fin′ r
+--postulate 
+--  reduce′ : ∀ {n} → (i r : Fin n) → (suc (toℕ i) ≤ toℕ r) → Fin′ r
 --reduce′ = {!!} 
 
-postulate
-  reduce″ : ∀ {n} → (i r : Fin n) → (suc (toℕ i) ≤ toℕ r → ⊥) → Fin (n ℕ-ℕ fsuc r)
+--postulate
+--  reduce″ : ∀ {n} → (i r : Fin n) → (suc (toℕ i) ≤ toℕ r → ⊥) → Fin (n ℕ-ℕ fsuc r)
 
 -- inject
 injectF+F : ∀ {n} → (base : Fin (suc n)) → (i : Fin (n ℕ-ℕ base)) → Fin n
@@ -119,10 +119,10 @@ raise' {m} i (suc n) = subst Fin (begin suc (m + n)
 
 
 -- Nat stuff
-≰to> : ∀ {m n} -> m ≰ n -> m > n
-≰to> {zero} {m} pf = ⊥-elim (pf z≤n)
-≰to> {suc n} {zero} pf = s≤s z≤n
-≰to> {suc n} {suc n'} pf = s≤s (≰to> (λ z → pf (s≤s z)))
+--≰to> : ∀ {m n} -> m ≰ n -> m > n
+--≰to> {zero} {m} pf = ⊥-elim (pf z≤n)
+--≰to> {suc n} {zero} pf = s≤s z≤n
+--≰to> {suc n} {suc n'} pf = s≤s (≰to> (λ z → pf (s≤s z)))
 
 -- Pair stuff
 ⟨_,_,_⟩ : ∀ {x} {a b c d : Set x} -> 

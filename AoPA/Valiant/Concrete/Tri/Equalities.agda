@@ -25,26 +25,26 @@ open NonAssociativeNonRing NAR using (_≈_) renaming (refl to ≈refl; sym to �
 -- equality, only equal if have same splitting.
 infix 4 _v≈_ 
 data _v≈_ : ∀ {s'} → Vec s' → Vec s' → Set (l₁ ⊔ l₂) where
-  one-eq : ∀ {x y} → (x ≈ y) → one x v≈ one y
+  one-eq : ∀ {x y} → (x≈y : x ≈ y) → one x v≈ one y
   two-eq : ∀ {s₁ s₂} {u₁ v₁ : Vec s₁} {u₂ v₂ : Vec s₂} → 
-           (u₁ v≈ v₁) → (u₂ v≈ v₂) → two u₁ u₂ v≈ two v₁ v₂
+           (u₁≈v₁ : u₁ v≈ v₁) → (u₂≈v₂ : u₂ v≈ v₂) → two u₁ u₂ v≈ two v₁ v₂
 --open Algebra.FunctionProperties {!!}
 
 infix 4 _m≈_
 data _m≈_ : ∀ {s₁ s₂} → Mat s₁ s₂ → Mat s₁ s₂ → Set (l₁ ⊔ l₂) where
-  Sing-eq : ∀ {x y} → (x ≈ y) → Sing x m≈ Sing y
-  RVec-eq : ∀ {s₁ s₂} {u v : Vec (deeper s₁ s₂)} → (u v≈ v) → RVec u m≈ RVec v 
-  CVec-eq : ∀ {s₁ s₂} {u v : Vec (deeper s₁ s₂)} → (u v≈ v) → CVec u m≈ CVec v
+  Sing-eq : ∀ {x y} → (x≈y : x ≈ y) → Sing x m≈ Sing y
+  RVec-eq : ∀ {s₁ s₂} {u v : Vec (deeper s₁ s₂)} → (u≈v : u v≈ v) → RVec u m≈ RVec v 
+  CVec-eq : ∀ {s₁ s₂} {u v : Vec (deeper s₁ s₂)} → (u≈v : u v≈ v) → CVec u m≈ CVec v
   quad-eq : ∀ {r₁ r₂ c₁ c₂} {A₁ A₂ : Mat r₁ c₁} {B₁ B₂ : Mat r₁ c₂} → 
                             {C₁ C₂ : Mat r₂ c₁} {D₁ D₂ : Mat r₂ c₂} → 
-              (A₁ m≈ A₂) → (B₁ m≈ B₂) → (C₁ m≈ C₂) → (D₁ m≈ D₂) → quad A₁ B₁ C₁ D₁ m≈ quad A₂ B₂ C₂ D₂
+              (A₁≈A₂ : A₁ m≈ A₂) → (B₁≈B₂ :  B₁ m≈ B₂) → (C₁≈C₂ :  C₁ m≈ C₂) → (D₁≈D₂ : D₁ m≈ D₂) → quad A₁ B₁ C₁ D₁ m≈ quad A₂ B₂ C₂ D₂
 
 
 infix 4 _t≈_
 data _t≈_ : ∀ {s'} → Tri s' → Tri s' → Set (l₁ ⊔ l₂) where
   one-eq : one t≈ one
   two-eq : ∀ {s₁ s₂} {U₁ U₂ : Tri s₁} {R₁ R₂ : Mat s₁ s₂} {L₁ L₂ : Tri s₂} → 
-           U₁ t≈ U₂ → R₁ m≈ R₂ → L₁ t≈ L₂ → two U₁ R₁ L₁ t≈ two U₂ R₂ L₂
+           (U₁≈U₂ : U₁ t≈ U₂) → (R₁≈R₂ : R₁ m≈ R₂) → (L₁≈L₂ : L₁ t≈ L₂) → two U₁ R₁ L₁ t≈ two U₂ R₂ L₂
 
 
 reflV : ∀ {s} → Reflexive (_v≈_ {s})

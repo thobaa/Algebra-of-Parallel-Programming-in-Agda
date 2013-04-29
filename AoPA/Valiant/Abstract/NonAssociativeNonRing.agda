@@ -41,5 +41,4 @@ record NonAssociativeNonRing c ℓ : Set (suc (c ⊔ ℓ)) where
   +-commutativeMonoid : CommutativeMonoid _ _
   +-commutativeMonoid = record { isCommutativeMonoid = +-isCommutativeMonoid }
 
-  open CommutativeMonoid +-commutativeMonoid public using (setoid) renaming (monoid to +-monoid; rawMonoid to +-rawMonoid; semigroup to +-semigroup) 
-         --using () -- renaming (group to +-group)
+  open CommutativeMonoid +-commutativeMonoid public using (setoid) renaming (monoid to +-monoid; rawMonoid to +-rawMonoid; semigroup to +-semigroup)

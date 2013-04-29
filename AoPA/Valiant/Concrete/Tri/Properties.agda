@@ -93,3 +93,13 @@ isNonAssociativeNonRingM = record
   ; distrib = *-distribˡ , (λ x y z → *-distribʳ y z x)
   ; zero = *-zeroˡ , *-zeroʳ 
   }
+
+nonAssociativeNonRing : ∀ {s} → NonAssociativeNonRing _ _
+nonAssociativeNonRing {s} = record 
+  { Carrier = Tri s
+  ;  _≈_ = _t≈_
+  ; _+_ = _◂+_
+  ; _*_ = _◂_
+  ; 0# = zeroTri
+  ; isNonAssociativeNonRing = isNonAssociativeNonRing 
+  }

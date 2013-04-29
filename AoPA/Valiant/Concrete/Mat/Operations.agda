@@ -19,24 +19,25 @@ open Valiant.Helper.Definitions NAR
 
 -- slightly lower than multiplication of scalars
 --infixl 
-infix 6 _∙_
+infix 7 _∙_
 _∙_ : ∀ {t1} → Vec t1 → Vec t1 → R
 _∙_ {one} (one x) (one x') = x R* x'
 _∙_ {deeper y y'} (two y0 y1) (two y2 y3) = (y0 ∙ y2)  R+  (y1 ∙ y3)
 
 
 
-infix 6 _⊛|_
+infix 7 _⊛|_
 _⊛|_ : ∀ {s} → R → Vec s → Vec s
 _⊛|_ x (one x') = one (x R* x')
 _⊛|_ x (two v₁ v₂) = two (x ⊛| v₁) (x ⊛| v₂)
 
-infix 6 _|⊛_
+infix 7 _|⊛_
 _|⊛_ : ∀ {s} → Vec s → R → Vec s
 _|⊛_ (one x) x' = one (x R* x')
 _|⊛_ (two v₁ v₂) x = two (v₁ |⊛ x) (v₂ |⊛ x)
 
 -- exterior product:
+infix 7 _⊛_
 _⊛_ : ∀ {s₁ s₂} → Vec s₁ → Vec s₂ → Mat s₁ s₂
 one x ⊛ one y = Sing (x R* y)
 one x ⊛ two u v = RVec (two (x ⊛| u) (x ⊛| v))
@@ -44,12 +45,12 @@ two u v ⊛ one x = CVec (two (u |⊛ x) (v |⊛ x))
 two u₁ v₁ ⊛ two u₂ v₂ = quad (u₁ ⊛ u₂) (u₁ ⊛ v₂) (v₁ ⊛ u₂) (v₁ ⊛ v₂)
 
 
-infix 5 _⊕_
+infix 6 _⊕_
 _⊕_ : ∀ {rs} → Vec rs → Vec rs → Vec rs
 _⊕_ {one} (one x) (one x') = one (x R+ x')
 _⊕_ {deeper s₁ s₂} (two v₁ v₂) (two u₁ u₂) = two (v₁ ⊕ u₁) (v₂ ⊕ u₂)
 
-infix 5 _+_
+infix 6 _+_
 _+_ : ∀ {rs cs} → Mat rs cs → Mat rs cs → Mat rs cs
 _+_ {one} {one} (Sing x) (Sing x') = Sing (x R+ x')
 _+_ {one} {deeper s₁ s₂} (RVec u) (RVec v) = RVec (u ⊕ v)
@@ -57,14 +58,14 @@ _+_ {deeper s₁ s₂} {one} (CVec u) (CVec v) = CVec (u ⊕ v)
 _+_ {deeper s₁ s₂} {deeper t₁ t₂} (quad A₁ B₁ C₁ D₁) (quad A₂ B₂ C₂ D₂) = quad (A₁ + A₂) (B₁ + B₂) (C₁ + C₂) (D₁ + D₂)
 
 
-infix 6 _*|_
+infix 7 _*|_
 _*|_ : ∀ {t1 t2} → Mat t1 t2 → Vec t2 → Vec t1
 _*|_ (Sing x) (one x') = one (x R* x')
 _*|_ (RVec y) v = one (y ∙ v)
 _*|_ (CVec y) (one x) = y |⊛ x
 _*|_ (quad A B C D) (two v₁ v₂) = two ((A *| v₁) ⊕ (B *| v₂)) ((C *| v₁) ⊕ (D *| v₂))
 
-infix 6 _|*_
+infix 7 _|*_
 _|*_ : ∀ {t1 t2} → Vec t1 → Mat t1 t2 → Vec t2
 _|*_  (one x) (Sing x') = one (x R* x')
 _|*_ (one x) (RVec y) = x ⊛| y
@@ -72,7 +73,7 @@ _|*_ u (CVec v) = one (u ∙ v)
 _|*_ (two v₁ v₂) (quad A B C D) = two ((v₁ |* A) ⊕ (v₂ |* C)) ((v₁ |* B) ⊕ (v₂ |* D))
 
 
-infix 6 _*_
+infix 7 _*_
 _*_ : ∀ {t1 t2 t3} → Mat t1 t2 → Mat t2 t3 → Mat t1 t3
 _*_ {one} {one} {one} (Sing x) (Sing x') = Sing (x R* x')
 _*_ {one} {one} {deeper t₁ t₂} (Sing x) (RVec v) = RVec (x ⊛| v)

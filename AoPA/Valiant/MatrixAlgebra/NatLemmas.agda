@@ -52,7 +52,7 @@ m≤sm {zero} = z≤n
 m≤sm {suc m'} = s≤s m≤sm
 
 -- Oposite of s≤s
-p≤p : {a b : ℕ} -> suc a ≤ suc b -> a ≤ b
-p≤p {zero} {b} pf = z≤n
-p≤p {suc a} {zero} (s≤s ())
-p≤p {suc a} {suc b} (s≤s pf) = pf
+--p≤p : {a b : ℕ} -> suc a ≤ suc b -> a ≤ b
+--p≤p {zero} {b} pf = z≤n
+--p≤p {suc a} {zero} (s≤s ())
+--p≤p {suc a} {suc b} (s≤s pf) = pf

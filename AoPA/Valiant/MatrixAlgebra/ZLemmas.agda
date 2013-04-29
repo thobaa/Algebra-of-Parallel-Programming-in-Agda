@@ -1,6 +1,6 @@
 -- own
 open import Valiant.MatrixAlgebra.Definitions using (_≰_; _>_; _<_)
-open import Valiant.MatrixAlgebra.NatLemmas   using (m≤sm; m≤m; p≤p)
+open import Valiant.MatrixAlgebra.NatLemmas   using (m≤sm; m≤m)
 
 -- standard library
 open import Data.Sum                using (_⊎_) renaming (inj₁ to inj1; inj₂ to inj2)
@@ -8,7 +8,7 @@ open import Data.Integer as ℤ       using (ℤ; _+_; +_; -[1+_]; -≤+; -≤-;
 open import Data.Integer.Properties using (commutativeRing)
 open import Data.Nat.Properties using (m≤m+n) renaming (≰⇒> to n≰⇒>; 
                                          commutativeSemiring to ncsr)
-open import Data.Nat as ℕ using (ℕ; z≤n; s≤s) renaming (_+_ to _n+_; _≤_ to _n≤_; _≤?_ to _n≤?_; zero to nzero; suc to nsuc; _<_ to _n<_; _≰_ to _n≰_; _>_ to _n>_)
+open import Data.Nat as ℕ using (ℕ; z≤n; s≤s; ≤-pred) renaming (_+_ to _n+_; _≤_ to _n≤_; _≤?_ to _n≤?_; zero to nzero; suc to nsuc; _<_ to _n<_; _≰_ to _n≰_; _>_ to _n>_)
 open import Data.Product using () renaming (proj₁ to proj1; proj₂ to proj2)
 open import Relation.Nullary.Core using (yes; no)
 open import Algebra using (CommutativeRing)
@@ -154,7 +154,7 @@ open import Data.Empty
 ++≤++ { -[1+ nzero ]} { -[1+ nzero ]} (-≤- pf) = +≤+ z≤n
 ++≤++ { -[1+ nzero ]} { -[1+ nsuc b ]} (-≤- ())
 ++≤++ { -[1+ nsuc a ]} { -[1+ nzero ]} (-≤- pf) = -≤+
-++≤++ { -[1+ nsuc a ]} { -[1+ nsuc b ]} (-≤- pf) = -≤- (p≤p pf)
+++≤++ { -[1+ nsuc a ]} { -[1+ nsuc b ]} (-≤- pf) = -≤- (≤-pred pf)
 ++≤++ { -[1+ nzero ]} {+ b} (-≤+) = +≤+ z≤n
 ++≤++ { -[1+ nsuc a ]} {+ b} (-≤+) = -≤+
 ++≤++ {+ a} {+ b} (+≤+ pf) = +≤+ (nstart 
@@ -179,7 +179,7 @@ pre≤pre { + a }      { -[1+ b ]} ()
 pre≤pre { + nzero }   {+ 0}       _        = -≤- z≤n
 pre≤pre { + nzero }   {+ nsuc b}  _        = -≤+
 pre≤pre { + nsuc a } {+ nzero}    (+≤+ ())
-pre≤pre { + nsuc a } {+ nsuc b}  (+≤+ pf) = +≤+ (p≤p pf)
+pre≤pre { + nsuc a } {+ nsuc b}  (+≤+ pf) = +≤+ (≤-pred pf)
 
 
 
@@ -200,7 +200,7 @@ a≤b=>a+c≤b+c {a} {b} (+ nsuc c) pf = start
 a≤b=>a+c≤b+c {+ 0} {+ 0}           (-[1+ 0 ]) pf       = -≤- z≤n 
 a≤b=>a+c≤b+c {+ 0} {+ nsuc b}      (-[1+ 0 ]) pf       = -≤+ 
 a≤b=>a+c≤b+c {+ nsuc a} {+ 0}      (-[1+ 0 ]) (+≤+ ())
-a≤b=>a+c≤b+c {+ nsuc a} {+ nsuc b} (-[1+ 0 ]) (+≤+ pf) = +≤+ (p≤p pf) 
+a≤b=>a+c≤b+c {+ nsuc a} {+ nsuc b} (-[1+ 0 ]) (+≤+ pf) = +≤+ (≤-pred pf) 
 
 a≤b=>a+c≤b+c {+ a}       { -[1+ b ]} (-[1+ 0 ]) ()
 a≤b=>a+c≤b+c { -[1+ a ]} { -[1+ b ]} (-[1+ 0 ]) (-≤- pf) = -≤- (s≤s (nstart 
@@ -245,7 +245,7 @@ negate≤ {+ a}       { -[1+ b ]} ()
 negate≤ {+ nzero}    {+ nzero}    (+≤+ pf) = +≤+ z≤n
 negate≤ {+ nsuc a}  {+ nzero}    (+≤+ ())
 negate≤ {+ nzero}    {+ nsuc b}  (+≤+ pf) = -≤+
-negate≤ {+ nsuc a}  {+ nsuc b}  (+≤+ pf) = -≤- (p≤p pf)
+negate≤ {+ nsuc a}  {+ nsuc b}  (+≤+ pf) = -≤- (≤-pred pf)
 
 
 -- If a + b < c + d, then either a < c or b < d
