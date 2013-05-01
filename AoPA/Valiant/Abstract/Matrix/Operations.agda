@@ -64,6 +64,23 @@ infix 7 _*_
 _*_ : ∀ {m n p} → Matrix m n → Matrix n p → Matrix m p
 A * B = λ i j → (λ k → A i k) ∙ (λ k → B k j)
 
+-- Matrix vector multiplication
+infix 7 _MV*_
+_MV*_ : {m n : ℕ} → Matrix m n → Vector n → Vector m
+A MV* v = λ i → (row i A) ∙ v
+
+infix 7 _VM*_
+_VM*_ : {m n : ℕ} → Vector m → Matrix m n → Vector n
+v VM* A = λ i → v ∙ col i A
+
+
+
+
+infix 4 _M≈_
+_M≈_ : ∀ {m n} → Matrix m n → Matrix m n → Set l₂
+A M≈ B = (i : _) (j : _) → A i j R≈ B i j
+
+
 -- Non-associative powers
 _^[1+_] : ∀ {n} → Matrix n n → ℕ → Matrix n n
 _^[1+_] {n} A i = (foldr (λ _ → Matrix n n) _+_ A ∘ (map (uncurry (_*_))) ∘ (uncurry′ zip) ∘ < id , reverse >) (allPrevious i)
@@ -71,7 +88,3 @@ _^[1+_] {n} A i = (foldr (λ _ → Matrix n n) _+_ A ∘ (map (uncurry (_*_))) �
     allPrevious : (k : ℕ) -> Vec (Matrix n n) k
     allPrevious zero     = []
     allPrevious (suc n') = A ^[1+ n' ] ∷ allPrevious n'
-
-infix 4 _M≈_
-_M≈_ : ∀ {m n} → Matrix m n → Matrix m n → Set l₂
-A M≈ B = (i : _) (j : _) → A i j R≈ B i j
