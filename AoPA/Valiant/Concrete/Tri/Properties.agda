@@ -31,6 +31,8 @@ import Valiant.Concrete.Mat
 open Valiant.Concrete.Mat NAR
 import Valiant.Concrete.Mat.Operations
 open Valiant.Concrete.Mat.Operations NAR
+import Valiant.Concrete.Mat.Properties
+open Valiant.Concrete.Mat.Properties NAR
 
 import Valiant.Concrete.Tri.Equalities 
 open Valiant.Concrete.Tri.Equalities NAR
@@ -43,8 +45,8 @@ open Valiant.Concrete.Tri.Distributivities NAR
 import Valiant.Concrete.Tri.Zeros
 open Valiant.Concrete.Tri.Zeros NAR
 
-setoidM : ∀ {s₁ s₂} → Setoid l₁ (l₂ ⊔ l₁)
-setoidM {s₁} {s₂} = record { Carrier = Mat s₁ s₂; _≈_ = _m≈_; isEquivalence = isEquivalenceM }
+--setoidM : ∀ {s₁ s₂} → Setoid l₁ (l₂ ⊔ l₁)
+--setoidM {s₁} {s₂} = record { Carrier = Mat s₁ s₂; _≈_ = _m≈_; isEquivalence = isEquivalenceM }
 
 
 

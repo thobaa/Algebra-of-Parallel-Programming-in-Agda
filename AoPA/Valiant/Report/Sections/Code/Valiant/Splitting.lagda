@@ -12,7 +12,7 @@ data Splitting : Set where
 \end{code}
 where |one| plays the role of |suc zero| (since there's no reason to have dimensions $0$ for matrices, and |bin| plays the role of |+| (we have chosen the name \todo{change to bin in actual code} |bin| to connect it to binary trees: we can think of |ℕ| as the type of list with elements from |⊤|, where |⊤| is the one element type; then |Splitting| is the type of binary trees with elements |⊤|).
 
-We also define the translation function that takes a |Splitting| to an element of |ℕ|, by giving the |one|-splitting the value |1| and summing the sub splittings otherwise:
+We also define the translation function that takes a |Splitting| to an element of |ℕ|, by giving the |one|-splitting the value |1| and summing the sub splittings otherwise:\todo{THOMAS: maybe rename to ||| . |||}
 \begin{code}
 splitToℕ : Splitting → ℕ
 splitToℕ one = 1

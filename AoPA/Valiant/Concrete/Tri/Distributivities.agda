@@ -19,11 +19,13 @@ import Valiant.Concrete.Mat
 open Valiant.Concrete.Mat NAR
 import Valiant.Concrete.Mat.Operations
 open Valiant.Concrete.Mat.Operations NAR
+import Valiant.Concrete.Mat.Properties
+open Valiant.Concrete.Mat.Properties NAR renaming (commutativeMonoid to cmm; commutativeMonoidV to cmv)
 
 import Valiant.Concrete.Tri.Equalities 
 open Valiant.Concrete.Tri.Equalities NAR
 import Valiant.Concrete.Tri.CommutativeMonoid
-open Valiant.Concrete.Tri.CommutativeMonoid NAR renaming (commutativeMonoidM to cmm; commutativeMonoidV to cmv)
+open Valiant.Concrete.Tri.CommutativeMonoid NAR
 
 
 open NonAssociativeNonRing NAR using (_≈_) renaming (refl to ≈refl; sym to ≈sym; trans to ≈trans; +-assoc to R+-assoc; +-comm to R+-comm; +-identity to R+-identity; +-cong to R+-cong; *-cong to R*-cong; distrib to R-distrib; +-commutativeMonoid to cmr)
@@ -128,13 +130,13 @@ open NonAssociativeNonRing NAR using (_≈_) renaming (refl to ≈refl; sym to �
 |◂-distribʳ (two u v) (two u' v') (two U R L) = two-eq (|◂-distribʳ u u' U) (rearrangeLemma' {cm = cmv} ((u ⊕ u') |* R) ((v ⊕ v') |◂ L) (u |* R) (u' |* R) (v |◂ L) (v' |◂ L) (|*-distribʳ u u' R) (|◂-distribʳ v v' L))
 ◂*-distribˡ : ∀ {s₁ s₂} → (x : Tri s₁) (y z : Mat s₁ s₂) → x ◂* (y + z) m≈ (x ◂* y + x ◂* z)
 ◂*-distribˡ one (Sing _) (Sing _) = Sing-eq (≈sym (proj₁ R+-identity R0))
-◂*-distribˡ one (RVec _) (RVec _) = RVec-eq (two-eq (symV (identityˡV zeroVec)) (symV (identityˡV zeroVec)))
+◂*-distribˡ one (RVec _) (RVec _) = RVec-eq (two-eq (v-sym (identityˡV zeroVec)) (v-sym (identityˡV zeroVec)))
 ◂*-distribˡ (two U R L) (CVec u) (CVec v) = CVec-eq (◂|-distribˡ (two U R L) u v)
 ◂*-distribˡ (two U R L) (quad A B C D) (quad A' B' C' D') = quad-eq (rearrangeLemma' {cm = cmm} (U ◂* (A + A')) (R * (C + C')) (U ◂* A) (U ◂* A') (R * C) (R * C') (◂*-distribˡ U A A') (*-distribˡ R C C')) (rearrangeLemma' {cm = cmm} (U ◂* (B + B')) (R * (D + D')) (U ◂* B) (U ◂* B') (R * D) (R * D') (◂*-distribˡ U B B') (*-distribˡ R D D')) (◂*-distribˡ L C C') (◂*-distribˡ L D D')
 
 ◂*-distribʳ : ∀ {s₁ s₂} → (x y : Tri s₁) (z : Mat s₁ s₂) → (x ◂+ y) ◂* z m≈ x ◂* z + y ◂* z
 ◂*-distribʳ one one (Sing x) = Sing-eq (≈sym (proj₁ R+-identity R0))
-◂*-distribʳ one one (RVec y) = RVec-eq (two-eq (symV (identityˡV zeroVec)) (symV (identityˡV zeroVec)))
+◂*-distribʳ one one (RVec y) = RVec-eq (two-eq (v-sym (identityˡV zeroVec)) (v-sym (identityˡV zeroVec)))
 ◂*-distribʳ (two U R L) (two U' R' L') (CVec (two u v)) = CVec-eq (two-eq (rearrangeLemma' {cm = cmv} ((U ◂+ U') ◂| u) ((R + R') *| v) (U ◂| u) (U' ◂| u) (R *| v) (R' *| v) (◂|-distribʳ U U' u) (*|-distribʳ R R' v)) (◂|-distribʳ L L' v))
 ◂*-distribʳ (two U R L) (two U' R' L') (quad A B C D) = quad-eq (rearrangeLemma' {cm = cmm} ((U ◂+ U') ◂* A) ((R + R') * C) (U ◂* A) (U' ◂* A) (R * C) (R' * C) (◂*-distribʳ U U' A) (*-distribʳ R R' C)) (rearrangeLemma' {cm = cmm} ((U ◂+ U') ◂* B) ((R + R') * D) (U ◂* B) (U' ◂* B) (R * D) (R' * D) (◂*-distribʳ U U' B) (*-distribʳ R R' D)) (◂*-distribʳ L L' C) (◂*-distribʳ L L' D)
 
@@ -144,13 +146,13 @@ open NonAssociativeNonRing NAR using (_≈_) renaming (refl to ≈refl; sym to �
 *◂-distribˡ : ∀ {s₁ s₂} → (x : Mat s₁ s₂) (y z : Tri s₂) → x *◂ (y ◂+ z) m≈ (x *◂ y + x *◂ z)
 *◂-distribˡ (Sing x) one one = Sing-eq (≈sym (proj₁ R+-identity R0))
 *◂-distribˡ (RVec v) x y = RVec-eq (|◂-distribˡ v x y)
-*◂-distribˡ (CVec v) one one = CVec-eq (two-eq (symV (identityˡV zeroVec)) (symV (identityˡV zeroVec)))
+*◂-distribˡ (CVec v) one one = CVec-eq (two-eq (v-sym (identityˡV zeroVec)) (v-sym (identityˡV zeroVec)))
 *◂-distribˡ (quad A B C D) (two U R L) (two U' R' L') = quad-eq (*◂-distribˡ A U U') (rearrangeLemma' {cm = cmm} (A * (R + R')) (B *◂ (L ◂+ L')) (A * R) (A * R') (B *◂ L) (B *◂ L') (*-distribˡ A R R') (*◂-distribˡ B L L')) (*◂-distribˡ C U U') (rearrangeLemma' {cm = cmm} (C * (R + R')) (D *◂ (L ◂+ L')) (C * R) (C * R') (D *◂ L) (D *◂ L') (*-distribˡ C R R') (*◂-distribˡ D L L')) 
 
 *◂-distribʳ : ∀ {s₁ s₂} → (x y : Mat s₁ s₂) (z : Tri s₂) → (x + y) *◂ z m≈ x *◂ z + y *◂ z
 *◂-distribʳ (Sing x) (Sing y) one = Sing-eq (≈sym (proj₁ R+-identity R0))
 *◂-distribʳ (RVec (two u v)) (RVec (two u' v')) (two U R L) = RVec-eq (two-eq (|◂-distribʳ u u' U) (rearrangeLemma' {cm = cmv} ((u ⊕ u') |* R) ((v ⊕ v') |◂ L) (u |* R) (u' |* R) (v |◂ L) (v' |◂ L) (|*-distribʳ u u' R) (|◂-distribʳ v v' L)))
-*◂-distribʳ (CVec v) (CVec v') one = CVec-eq (two-eq (symV (identityˡV zeroVec)) (symV (identityˡV zeroVec)))
+*◂-distribʳ (CVec v) (CVec v') one = CVec-eq (two-eq (v-sym (identityˡV zeroVec)) (v-sym (identityˡV zeroVec)))
 *◂-distribʳ (quad A B C D) (quad A' B' C' D') (two U R L) = quad-eq (*◂-distribʳ A A' U) (rearrangeLemma' {cm = cmm} ((A + A') * R) ((B + B') *◂ L) (A * R) (A' * R) (B *◂ L) (B' *◂ L) (*-distribʳ A A' R) (*◂-distribʳ B B' L)) (*◂-distribʳ C C' U) (rearrangeLemma' {cm = cmm} ((C + C') * R) ((D + D') *◂ L) (C * R) (C' * R) (D *◂ L) (D' *◂ L) (*-distribʳ C C' R) (*◂-distribʳ D D' L))
 --*◂-distrib : 
 

@@ -6,9 +6,14 @@ module ImportAll {l₁ l₂} (NAR : NonAssociativeNonRing l₁ l₂) where
 
 -- Abstract (excluding NANR, NANR.Structure)
 import Valiant.Abstract.Matrix
+
 import Valiant.Abstract.Triangle
+
 import Valiant.Abstract.Matrix.Operations
 import Valiant.Abstract.Triangle.Operations
+import Valiant.Abstract.Matrix.NANRing
+import Valiant.Abstract.Triangle.NANRing
+
 --import Valiant.Abstract.Proofs -- empty
 
 -- Algorithm
@@ -17,8 +22,9 @@ import Valiant.Algorithm.Algorithm
 -- Concrete
 import Valiant.Concrete.Mat
 import Valiant.Concrete.Splitting
-import Valiant.Concrete.Tri
+import Valiant.Concrete.Tri 
 import Valiant.Concrete.Mat.Operations
+import Valiant.Concrete.Mat.Properties
 import Valiant.Concrete.Tri.CommutativeMonoid
 import Valiant.Concrete.Tri.Congruences
 import Valiant.Concrete.Tri.Distributivities
@@ -26,7 +32,7 @@ import Valiant.Concrete.Tri.Equalities
 import Valiant.Concrete.Tri.Operations
 import Valiant.Concrete.Tri.Properties
 import Valiant.Concrete.Tri.Zeros
-
+{-
 -- Helper
 import Valiant.Helper.Definitions
 
@@ -56,6 +62,8 @@ open Valiant.Abstract.Matrix NAR
 open Valiant.Abstract.Triangle NAR
 open Valiant.Abstract.Matrix.Operations NAR
 open Valiant.Abstract.Triangle.Operations NAR
+open Valiant.Abstract.Matrix.NANRing NAR
+open Valiant.Abstract.Triangle.NANRing NAR
 --open Valiant.Abstract.Proofs NAR -- empty
 
 -- Algorithm
@@ -66,6 +74,7 @@ open Valiant.Concrete.Mat NAR
 open Valiant.Concrete.Splitting -- Not parametrized
 open Valiant.Concrete.Tri NAR
 open Valiant.Concrete.Mat.Operations NAR
+open Valiant.Concrete.Mat.Properties
 open Valiant.Concrete.Tri.CommutativeMonoid NAR
 open Valiant.Concrete.Tri.Congruences NAR
 open Valiant.Concrete.Tri.Distributivities NAR
@@ -93,3 +102,5 @@ open Valiant.Representation.TriRep NAR
 -- Specs
 open Valiant.Specs.JPSpec NAR
 open Valiant.Specs.Overlap NAR
+
+-}

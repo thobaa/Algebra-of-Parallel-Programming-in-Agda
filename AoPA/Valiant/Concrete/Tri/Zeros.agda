@@ -17,11 +17,13 @@ import Valiant.Concrete.Mat
 open Valiant.Concrete.Mat NAR
 import Valiant.Concrete.Mat.Operations
 open Valiant.Concrete.Mat.Operations NAR
+import Valiant.Concrete.Mat.Properties
+open Valiant.Concrete.Mat.Properties NAR renaming (commutativeMonoid to cmm; commutativeMonoidV to cmv)
 
 import Valiant.Concrete.Tri.Equalities 
 open Valiant.Concrete.Tri.Equalities NAR
 import Valiant.Concrete.Tri.CommutativeMonoid
-open Valiant.Concrete.Tri.CommutativeMonoid NAR renaming (commutativeMonoidM to cmm; commutativeMonoidV to cmv)
+open Valiant.Concrete.Tri.CommutativeMonoid NAR
 
 open NonAssociativeNonRing NAR using (_≈_) renaming (refl to ≈refl; sym to ≈sym; trans to ≈trans; +-assoc to R+-assoc; +-comm to R+-comm; +-identity to R+-identity; +-cong to R+-cong; *-cong to R*-cong; distrib to R-distrib; +-commutativeMonoid to cmr; zero to R-zero)
 
@@ -81,16 +83,16 @@ open NonAssociativeNonRing NAR using (_≈_) renaming (refl to ≈refl; sym to �
 
 
 ◂|-zeroˡ : ∀ {s} (v : Vec s) → zeroTri ◂| v v≈ zeroVec
-◂|-zeroˡ (one x) = reflV
+◂|-zeroˡ (one x) = v-refl
 ◂|-zeroˡ (two u v) = two-eq (sumLemma {cm = cmv} (◂|-zeroˡ u) (*|-zeroˡ v)) (◂|-zeroˡ v)
 ◂|-zeroʳ : ∀ {s} (x : Tri s) → x ◂| zeroVec v≈ zeroVec
-◂|-zeroʳ one = reflV
+◂|-zeroʳ one = v-refl
 ◂|-zeroʳ (two U R L) = two-eq (sumLemma {cm = cmv} (◂|-zeroʳ U) (*|-zeroʳ R)) (◂|-zeroʳ L)
 |◂-zeroˡ : ∀ {s} (x : Tri s) → zeroVec |◂ x v≈ zeroVec
-|◂-zeroˡ one = reflV
+|◂-zeroˡ one = v-refl
 |◂-zeroˡ (two U R L) = two-eq (|◂-zeroˡ U) (sumLemma {cm = cmv} (|*-zeroˡ R) (|◂-zeroˡ L))
 |◂-zeroʳ : ∀ {s} (v : Vec s) → v |◂ zeroTri v≈ zeroVec
-|◂-zeroʳ (one x) = reflV
+|◂-zeroʳ (one x) = v-refl
 |◂-zeroʳ (two u v) = two-eq (|◂-zeroʳ u) (sumLemma {cm = cmv} (|*-zeroʳ u) (|◂-zeroʳ v))
 
 
@@ -115,13 +117,13 @@ open NonAssociativeNonRing NAR using (_≈_) renaming (refl to ≈refl; sym to �
 
 ◂*-zeroˡ : {s₁ s₂ : _} → (x : Mat s₁ s₂) → zeroTri ◂* x m≈ zeroMat
 ◂*-zeroˡ (Sing x) = Sing-eq ≈refl
-◂*-zeroˡ (RVec v) = reflM
+◂*-zeroˡ (RVec v) = m-refl
 ◂*-zeroˡ (CVec (two u v)) = CVec-eq (two-eq (sumLemma {cm = cmv} (◂|-zeroˡ u) (*|-zeroˡ v)) (◂|-zeroˡ v))
 ◂*-zeroˡ (quad A B C D) = quad-eq (sumLemma {cm = cmm} (◂*-zeroˡ A) (*-zeroˡ C)) (sumLemma {cm = cmm} (◂*-zeroˡ B) (*-zeroˡ D)) (◂*-zeroˡ C) (◂*-zeroˡ D)
 
 *◂-zeroˡ : {s₁ s₂ : _} → (x : Tri s₂) → zeroMat {s₁} {s₂}*◂ x m≈ zeroMat
 *◂-zeroˡ {one} {one} one = Sing-eq ≈refl
-*◂-zeroˡ {deeper s₁ s₂} {one} one = CVec-eq reflV
+*◂-zeroˡ {deeper s₁ s₂} {one} one = CVec-eq v-refl
 *◂-zeroˡ {one} {deeper s₁ s₂} (two U R L) = RVec-eq (two-eq (|◂-zeroˡ U) (sumLemma {cm = cmv} (|*-zeroˡ R) (|◂-zeroˡ L)))
 *◂-zeroˡ {deeper s₁ s₂} {deeper s₁' s₂'} (two U R L) = quad-eq (*◂-zeroˡ U) (sumLemma {cm = cmm} (*-zeroˡ R) (*◂-zeroˡ L)) (*◂-zeroˡ U) (sumLemma {cm = cmm} (*-zeroˡ R) (*◂-zeroˡ L))
 
@@ -129,13 +131,13 @@ open NonAssociativeNonRing NAR using (_≈_) renaming (refl to ≈refl; sym to �
 ◂*-zeroʳ : {s₁ s₂ : _} → (x : Tri s₁) → x ◂* zeroMat {s₁} {s₂} m≈ zeroMat
 ◂*-zeroʳ {one} {one} one = Sing-eq ≈refl
 ◂*-zeroʳ {deeper s₁ s₂} {one} (two U R L) = CVec-eq (two-eq (sumLemma {cm = cmv} (◂|-zeroʳ U) (*|-zeroʳ R)) (◂|-zeroʳ L))
-◂*-zeroʳ {one} {deeper s₁ s₂} one = RVec-eq (two-eq reflV reflV)
+◂*-zeroʳ {one} {deeper s₁ s₂} one = RVec-eq (two-eq v-refl v-refl)
 ◂*-zeroʳ {deeper s₁ s₂} {deeper s₁' s₂'} (two U R L) = quad-eq (sumLemma {cm = cmm} (◂*-zeroʳ U) (*-zeroʳ R)) (sumLemma {cm = cmm} (◂*-zeroʳ U) (*-zeroʳ R)) (◂*-zeroʳ L) (◂*-zeroʳ L)
 
 *◂-zeroʳ : {s₁ s₂ : _} → (x : Mat s₁ s₂) → x *◂ zeroTri m≈ zeroMat
 *◂-zeroʳ (Sing x) = Sing-eq ≈refl
 *◂-zeroʳ (RVec (two u v)) = RVec-eq (two-eq (|◂-zeroʳ u) (sumLemma {cm = cmv} (|*-zeroʳ u) (|◂-zeroʳ v)))
-*◂-zeroʳ (CVec (two u v)) = CVec-eq (two-eq reflV reflV)
+*◂-zeroʳ (CVec (two u v)) = CVec-eq (two-eq v-refl v-refl)
 *◂-zeroʳ (quad A B C D) = quad-eq (*◂-zeroʳ A) (sumLemma {cm = cmm} (*-zeroʳ A) (*◂-zeroʳ B)) (*◂-zeroʳ C) (sumLemma {cm = cmm} (*-zeroʳ C) (*◂-zeroʳ D))
 
 ◂-zeroˡ : {s : _} → (x : Tri s) → zeroTri ◂ x t≈ zeroTri

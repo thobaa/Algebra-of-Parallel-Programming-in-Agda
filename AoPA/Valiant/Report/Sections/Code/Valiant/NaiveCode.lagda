@@ -12,7 +12,7 @@ data Vec′ : ℕ → Set where
   one : (x : Carrier) → Vec′ 1 
   two : {m n : ℕ} → Vec′ m → Vec′ n → Vec′ (m + n)
 \end{code}
-and then defining |Mat′| as \todo{should we call |Vec′| |Vec| or |Vec′| in text, and code?}
+and then defining |Mat′| as \todo{THOMAS: should we call |Vec′| |Vec| or |Vec′| in text, and code?}
 \begin{code}
 data Mat′ : ℕ → ℕ → Set where
   sing : (x : Carrier) → Mat′ 1 1
@@ -23,4 +23,10 @@ data Mat′ : ℕ → ℕ → Set where
 \end{code}
 Where we name the indices |r₁|, |r₂|, |c₁| and |c₂| to for rows and columns of the involved matrices, and the ordering is so that we can write it on two rows.
 
-While this looks like a very natural way to define the datatypes, it will not work well when we want to prove things about the matrices. As we have mentioned before, the main way to prove things in Agda is to use structural induction by pattern matching on the structures involved. However, if we pattern match on a |Mat′|, one problem that appears is that Agda is unable to see that in the |quad| case, both indices must be at least |2|, nor that both terms |a| and |b| have to be at least |1|. It is possible to write lemmas proving this, and use them at every step. However, there are worse cases, when Agda's ability to unify indices won't help us when doing more complicated things, like realizing that some integer |n| is equal to |a + b|, also, we can't tell whether |a| is a sum or not, so the second splitting step is complicated, for example \todo{include short example}.
+Finally, we define |Tri′| as
+\begin{code}
+data Tri′ : ℕ → Set where
+  one : Tri′ 1
+  two : {m n : ℕ} → (U : Tri′ m) → (R : Mat′ m n) → (L : Tri′ n) → Tri′ (m + n)
+\end{code}
+While the above looks like a very natural way to define the datatypes, it will not work well when we want to prove things about the matrices. As we have mentioned before, the main way to prove things in Agda is to use structural induction by pattern matching on the structures involved. However, if we pattern match on a |Mat′|, one problem that appears is that Agda is unable to see that in the |quad| case, both indices must be at least |2|, nor that both terms |a| and |b| have to be at least |1|. It is possible to write lemmas proving this, and use them at every step. However, there are worse cases, when Agda's ability to unify indices won't help us when doing more complicated things, like realizing that some integer |n| is equal to |a + b|, also, we can't tell whether |a| is a sum or not, so the second splitting step is complicated, for example \todo{THOMAS: include short example}.

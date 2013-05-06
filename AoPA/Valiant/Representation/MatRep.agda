@@ -26,15 +26,15 @@ import Valiant.Concrete.Tri.Equalities
 
 open Valiant.Helper.Definitions NAR using ()
 open Valiant.Concrete.Mat NAR
-open Valiant.Concrete.Mat.Operations NAR using (_|⊛_; _⊛|_; _|*_; _*|_) renaming (_+_ to _m+_; _*_ to _m*_; _⊕_ to _v+_; _∙_ to _v∙_; _⊛_ to _v⊗_)
+open Valiant.Concrete.Mat.Operations NAR using (_|⊛_; _⊛|_; _|*_; _*|_; _v≈_; _m≈_; Sing-eq; one-eq; two-eq; CVec-eq; RVec-eq; quad-eq) renaming (_+_ to _m+_; _*_ to _m*_; _⊕_ to _v+_; _∙_ to _v∙_; _⊛_ to _v⊗_)
 open Valiant.Abstract.Matrix NAR
 
 open Valiant.Abstract.Matrix.Operations NAR using (_M≈_; _V≈_; _V+_; _Vs*_; _sV*_; _MV*_; _VM*_; trans-∙) renaming (_+_ to _M+_;_*_ to _M*_; _∙_ to _V∙_; _⊗_ to _V⊗_)
-open Valiant.Concrete.Tri.Equalities NAR using (_m≈_; _v≈_)
+--open Valiant.Concrete.Tri.Equalities NAR using (_m≈_; _v≈_)
 
 
 open NonAssociativeNonRing NAR renaming (_+_ to _R+_; _*_ to _R*_; zero to R-zero; refl to R-refl; sym to R-sym; +-identity to R+-identity; +-cong to R+-cong; +-assoc to R+-assoc; *-cong to R*-cong)
-
+{-
 -- vector stuff
 projVec : ∀ {s} → Vec s → Vector (splitSize s)
 projVec (one x) = λ i → x
@@ -55,7 +55,7 @@ embedVec {zero} v = one (v f0)
 embedVec {suc n} v = two (one (v f0)) (embedVec (λ x → v (fsuc x)))
 
 
-
+-}
 -- these are new!
 Vec-to-Vector : {s : Splitting} {n : ℕ} → (|s|≡n : splitSize s ≡ n) → Vec s → Vector n
 Vec-to-Vector {one} ≡-refl (one x) f0 = x
@@ -76,7 +76,7 @@ Mat-to-Matrix {deeper s₁ s₂} {deeper s₁' s₂'} ≡-refl ≡-refl (quad A 
 -- typ lista -> tree, den viktika delen är att vilket träd som helst kan formas
 -- om till en lista. inte så viktigt att 
 -- 
-
+{-
 splitToMat : ∀ {s₁ s₂} → Mat s₁ s₂ → Matrix (splitSize s₁) (splitSize s₂)
 {-splitToMat {zero} {zero} (Sing x) = λ i j → x
 splitToMat {suc n} {zero} (CVec y) = {!!}
@@ -92,7 +92,7 @@ splitToMat {deeper y y'} {deeper y0 y1} (quad A B
                                                 C D) = Four (splitToMat A) (splitToMat B) 
                                                             (splitToMat C) (splitToMat D)
 
-
+-}
 -- should not be this way.???
 -- nej. vi har inte en metod som skapar element av godtyckliga splittar.
 --matToSplit : ∀ {s₁ s₂} → Matrix (splitSize s₁) (splitSize s₂) → Mat s₁ s₂
@@ -136,28 +136,28 @@ abstract
   M0-Preserved {deeper s₁ s₂} {deeper s₁' s₂'} ≡-refl ≡-refl i j | no ¬p | no ¬p' = M0-Preserved {s₂} {s₂'} ≡-refl ≡-refl (reduce≥ i (≤-pred (≰⇒> ¬p))) (reduce≥ j (≤-pred (≰⇒> ¬p')))
 
   Vec-to-Vector-cong : {s : Splitting} {n : ℕ} → {u v : Vec s} → (|s|≡n : splitSize s ≡ n) → u v≈ v → Vec-to-Vector |s|≡n u V≈ Vec-to-Vector |s|≡n v 
-  Vec-to-Vector-cong {one} ≡-refl (Valiant.Concrete.Tri.Equalities.one-eq x≈y) f0 = x≈y
-  Vec-to-Vector-cong {one} ≡-refl (Valiant.Concrete.Tri.Equalities.one-eq x≈y) (fsuc ())
-  Vec-to-Vector-cong {deeper s₁ s₂} ≡-refl (Valiant.Concrete.Tri.Equalities.two-eq u₁≈v₁ u₂≈v₂) i with suc (toℕ i) ≤? splitSize s₁
-  Vec-to-Vector-cong {deeper s₁ s₂} ≡-refl (Valiant.Concrete.Tri.Equalities.two-eq u₁≈v₁ u₂≈v₂) i | yes p = Vec-to-Vector-cong ≡-refl u₁≈v₁ (fromℕ≤ p)
-  Vec-to-Vector-cong {deeper s₁ s₂} ≡-refl (Valiant.Concrete.Tri.Equalities.two-eq u₁≈v₁ u₂≈v₂) i | no ¬p = Vec-to-Vector-cong ≡-refl u₂≈v₂ (reduce≥ i (≤-pred (≰⇒> ¬p)))
+  Vec-to-Vector-cong {one} ≡-refl (one-eq x≈y) f0 = x≈y
+  Vec-to-Vector-cong {one} ≡-refl (one-eq x≈y) (fsuc ())
+  Vec-to-Vector-cong {deeper s₁ s₂} ≡-refl (two-eq u₁≈v₁ u₂≈v₂) i with suc (toℕ i) ≤? splitSize s₁
+  Vec-to-Vector-cong {deeper s₁ s₂} ≡-refl (two-eq u₁≈v₁ u₂≈v₂) i | yes p = Vec-to-Vector-cong ≡-refl u₁≈v₁ (fromℕ≤ p)
+  Vec-to-Vector-cong {deeper s₁ s₂} ≡-refl (two-eq u₁≈v₁ u₂≈v₂) i | no ¬p = Vec-to-Vector-cong ≡-refl u₂≈v₂ (reduce≥ i (≤-pred (≰⇒> ¬p)))
 
 
   Mat-to-Matrix-cong : {s₁ s₂ : Splitting} {n₁ n₂ : ℕ} → 
                        {A B : Mat s₁ s₂} → (|s₁|≡n₁ : splitSize s₁ ≡ n₁) → (|s₂|≡n₂ : splitSize s₂ ≡ n₂) → 
                           A m≈ B → Mat-to-Matrix |s₁|≡n₁ |s₂|≡n₂ A M≈ Mat-to-Matrix |s₁|≡n₁ |s₂|≡n₂ B
-  Mat-to-Matrix-cong {one} {one} ≡-refl ≡-refl (Valiant.Concrete.Tri.Equalities.Sing-eq x≈y) f0 f0 = x≈y
-  Mat-to-Matrix-cong {one} {one} ≡-refl ≡-refl (Valiant.Concrete.Tri.Equalities.Sing-eq x≈y) f0 (fsuc ())
-  Mat-to-Matrix-cong {one} {one} ≡-refl ≡-refl (Valiant.Concrete.Tri.Equalities.Sing-eq x≈y) (fsuc ()) j
-  Mat-to-Matrix-cong {deeper s₁ s₂} {one} ≡-refl ≡-refl (Valiant.Concrete.Tri.Equalities.CVec-eq u≈v) i f0 = Vec-to-Vector-cong ≡-refl u≈v i
-  Mat-to-Matrix-cong {deeper s₁ s₂} {one} ≡-refl ≡-refl (Valiant.Concrete.Tri.Equalities.CVec-eq u≈v) i (fsuc ())
-  Mat-to-Matrix-cong {one} {deeper s₁' s₂} ≡-refl ≡-refl (Valiant.Concrete.Tri.Equalities.RVec-eq u≈v) f0 j = Vec-to-Vector-cong ≡-refl u≈v j
-  Mat-to-Matrix-cong {one} {deeper s₁' s₂} ≡-refl ≡-refl (Valiant.Concrete.Tri.Equalities.RVec-eq u≈v) (fsuc ()) j
-  Mat-to-Matrix-cong {deeper s₁ s₂} {deeper s₁' s₂'} ≡-refl ≡-refl (Valiant.Concrete.Tri.Equalities.quad-eq A₁≈A₂ B₁≈B₂ C₁≈C₂ D₁≈D₂) i j with suc (toℕ i) ≤? splitSize s₁ | suc (toℕ j) ≤? splitSize s₁'
-  Mat-to-Matrix-cong {deeper s₁ s₂} {deeper s₁' s₂'} ≡-refl ≡-refl (Valiant.Concrete.Tri.Equalities.quad-eq A₁≈A₂ B₁≈B₂ C₁≈C₂ D₁≈D₂) i j | yes p | yes p' = Mat-to-Matrix-cong ≡-refl ≡-refl A₁≈A₂ (fromℕ≤ p) (fromℕ≤ p')
-  Mat-to-Matrix-cong {deeper s₁ s₂} {deeper s₁' s₂'} ≡-refl ≡-refl (Valiant.Concrete.Tri.Equalities.quad-eq A₁≈A₂ B₁≈B₂ C₁≈C₂ D₁≈D₂) i j | yes p | no ¬p = Mat-to-Matrix-cong ≡-refl ≡-refl B₁≈B₂ (fromℕ≤ p) (reduce≥ j (≤-pred (≰⇒> ¬p)))
-  Mat-to-Matrix-cong {deeper s₁ s₂} {deeper s₁' s₂'} ≡-refl ≡-refl (Valiant.Concrete.Tri.Equalities.quad-eq A₁≈A₂ B₁≈B₂ C₁≈C₂ D₁≈D₂) i j | no ¬p | yes p = Mat-to-Matrix-cong ≡-refl ≡-refl C₁≈C₂ (reduce≥ i (≤-pred (≰⇒> ¬p))) (fromℕ≤ p)
-  Mat-to-Matrix-cong {deeper s₁ s₂} {deeper s₁' s₂'} ≡-refl ≡-refl (Valiant.Concrete.Tri.Equalities.quad-eq A₁≈A₂ B₁≈B₂ C₁≈C₂ D₁≈D₂) i j | no ¬p | no ¬p' = Mat-to-Matrix-cong ≡-refl ≡-refl D₁≈D₂ (reduce≥ i (≤-pred (≰⇒> ¬p))) (reduce≥ j (≤-pred (≰⇒> ¬p')))
+  Mat-to-Matrix-cong {one} {one} ≡-refl ≡-refl (Sing-eq x≈y) f0 f0 = x≈y
+  Mat-to-Matrix-cong {one} {one} ≡-refl ≡-refl (Sing-eq x≈y) f0 (fsuc ())
+  Mat-to-Matrix-cong {one} {one} ≡-refl ≡-refl (Sing-eq x≈y) (fsuc ()) j
+  Mat-to-Matrix-cong {deeper s₁ s₂} {one} ≡-refl ≡-refl (CVec-eq u≈v) i f0 = Vec-to-Vector-cong ≡-refl u≈v i
+  Mat-to-Matrix-cong {deeper s₁ s₂} {one} ≡-refl ≡-refl (CVec-eq u≈v) i (fsuc ())
+  Mat-to-Matrix-cong {one} {deeper s₁' s₂} ≡-refl ≡-refl (RVec-eq u≈v) f0 j = Vec-to-Vector-cong ≡-refl u≈v j
+  Mat-to-Matrix-cong {one} {deeper s₁' s₂} ≡-refl ≡-refl (RVec-eq u≈v) (fsuc ()) j
+  Mat-to-Matrix-cong {deeper s₁ s₂} {deeper s₁' s₂'} ≡-refl ≡-refl (quad-eq A₁≈A₂ B₁≈B₂ C₁≈C₂ D₁≈D₂) i j with suc (toℕ i) ≤? splitSize s₁ | suc (toℕ j) ≤? splitSize s₁'
+  Mat-to-Matrix-cong {deeper s₁ s₂} {deeper s₁' s₂'} ≡-refl ≡-refl (quad-eq A₁≈A₂ B₁≈B₂ C₁≈C₂ D₁≈D₂) i j | yes p | yes p' = Mat-to-Matrix-cong ≡-refl ≡-refl A₁≈A₂ (fromℕ≤ p) (fromℕ≤ p')
+  Mat-to-Matrix-cong {deeper s₁ s₂} {deeper s₁' s₂'} ≡-refl ≡-refl (quad-eq A₁≈A₂ B₁≈B₂ C₁≈C₂ D₁≈D₂) i j | yes p | no ¬p = Mat-to-Matrix-cong ≡-refl ≡-refl B₁≈B₂ (fromℕ≤ p) (reduce≥ j (≤-pred (≰⇒> ¬p)))
+  Mat-to-Matrix-cong {deeper s₁ s₂} {deeper s₁' s₂'} ≡-refl ≡-refl (quad-eq A₁≈A₂ B₁≈B₂ C₁≈C₂ D₁≈D₂) i j | no ¬p | yes p = Mat-to-Matrix-cong ≡-refl ≡-refl C₁≈C₂ (reduce≥ i (≤-pred (≰⇒> ¬p))) (fromℕ≤ p)
+  Mat-to-Matrix-cong {deeper s₁ s₂} {deeper s₁' s₂'} ≡-refl ≡-refl (quad-eq A₁≈A₂ B₁≈B₂ C₁≈C₂ D₁≈D₂) i j | no ¬p | no ¬p' = Mat-to-Matrix-cong ≡-refl ≡-refl D₁≈D₂ (reduce≥ i (≤-pred (≰⇒> ¬p))) (reduce≥ j (≤-pred (≰⇒> ¬p')))
 
 
   V+-Homomorphism : {s : Splitting} {n : ℕ} (|s|≡n : splitSize s ≡ n) → (u v : Vec s) →
