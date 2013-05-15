@@ -12,6 +12,39 @@
 
 %include agda.fmt
 
+\newcommand{\un}{\mbox{\texttt{\_}}}   % short underscore
+\newcommand{\unopun}[1]{\ensuremath{\un{#1}\un}}
+%format _∷_   = "\unopun{∷}"
+%format _≡_   = "\unopun{≡}"
+%format _<_   = "\unopun{<}"
+%format _∧_   = "\unopun{∧}"
+%format _,_   = "\unopun{,}"
+%format _∨_   = "\unopun{∨}"
+%format _+_   = "\unopun{+}"
+%format _v+_  = "\unopun{v+}"
+%format _m+_  = "\unopun{m+}"
+%format _t+_  = "\unopun{t+}"
+%format _v≈_  = "\unopun{v≈}"
+%format _m≈_  = "\unopun{m≈}"
+%format _t≈_  = "\unopun{t≈}"
+%format _tm*_ = "\unopun{tm*}"
+%format _∙_   = "\unopun{∙}"
+%format _M+_  = "\unopun{M+}"
+%format _M≈_  = "\unopun{M≈}"
+%format _M*_  = "\unopun{M*}"
+%format _T≈_  = "\unopun{T≈}"
+%format _T+_  = "\unopun{T+}"
+%format _≤?_  = "\unopun{≤?}"
+%format _≤?′_ = "\unopun{≤?′}"
+%format _∼_   = "\unopun{∼}"
+
+
+
+%subst dummy = "\un"
+%**It is also possible to adjust the spacing for space (function appl.)
+% %subst space = "\,"
+% %subst space = "\;"
+
 \DeclareMathOperator{\overlap}{Overlap}
 \DeclareMathOperator{\valiant}{Valiant}
 \usepackage[utf8x]{inputenc}

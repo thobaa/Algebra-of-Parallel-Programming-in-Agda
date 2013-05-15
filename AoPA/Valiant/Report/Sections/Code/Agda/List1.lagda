@@ -30,6 +30,7 @@ two  : ℕ
 two  = 2
 \end{code}
 Next, we define lists, 
+
 \begin{code}
 infixr 8 _∷_
 data [_] (a : Set) : Set where
