@@ -5,7 +5,7 @@
 --   . is commutative.
 --   . is associative.
 --   . has zero
---   . does not have inverse -> Commutative Monoid
+--   . does not have inverse, hence: Commutative Monoid
 -- Multiplication linear
 -- not neccessarily multiplicative identity.
 -- Should have annihilating zero.
@@ -41,4 +41,18 @@ record NonAssociativeNonRing c ℓ : Set (suc (c ⊔ ℓ)) where
   +-commutativeMonoid : CommutativeMonoid _ _
   +-commutativeMonoid = record { isCommutativeMonoid = +-isCommutativeMonoid }
 
-  open CommutativeMonoid +-commutativeMonoid public using (setoid) renaming (monoid to +-monoid; rawMonoid to +-rawMonoid; semigroup to +-semigroup)
+  open CommutativeMonoid +-commutativeMonoid public using (setoid) 
+                         renaming (monoid     to +-monoid
+                                  ; rawMonoid to +-rawMonoid
+                                  ; semigroup to +-semigroup)
+
+
+-- TODO: these should not be here!
+import Relation.Binary.EqReasoning as EqR
+module NANRing-Reasoning {l₁ l₂ : Level} (NANR : NonAssociativeNonRing l₁ l₂) where
+  open NonAssociativeNonRing NANR public
+  open EqR setoid public
+
+module CM-Reasoning {l₁ l₂ : Level} (CM : CommutativeMonoid l₁ l₂) where
+  open CommutativeMonoid CM public
+  open EqR setoid public

@@ -1,31 +1,35 @@
 \newcommand{\productions}{P}
 \newcommand{\nonterminals}{N}
-\newcommand{\terminals}{T}
+\newcommand{\terminals}{\Sigma}
 \newcommand{\startsymbol}{S}
 \newcommand{\grammar}{(\nonterminals, \terminals, \productions, \startsymbol)}
 \section{Parsing}
-Parsing is the process of annoting a string of tokens with structural properties. We will only give a fairly general overview of the process, to tie it in with the algebra we discussed in Section \ref{Section:Algebra}. We note that this section contains \todo{very little or no} very little Agda code, instead we move back to mathematical notation. In Section \ref{Section:Valiant}, we will then focus on a particular algorithm for parsing, Valiant's Algorithm, that we implement and prove the correctness of using Agda.
-
+Parsing is the process of annoting a sequence of tokens from some alphabet with with structural properties of a language the sequence comes from. We will only give a fairly general overview of the process, to tie it in with the algebra we discussed in Section \ref{Section:Algebra}. We note that this section contains no Agda code, instead we move back to mathematical notation. In Section \ref{Section:Valiant}, we will then focus on a particular algorithm for parsing, Valiant's Algorithm, that we implement and prove the correctness of using Agda.
 
 \subsection{Definitions}
-The goal of parsing is to first decide if a given string of tokens belongs to a given language, and second to describe its structure in the language.
+The goal of parsing is to first decide if a given sequence of tokens belongs to a given language, and second to describe its structure in the language.
 
-To do these two things, one uses a \emph{grammar}, which contains rules for assigning structural properties to tokens and sequences of tokens.
-
+To do these two things, one uses a \emph{grammar} for the language, which contains rules that can either be used to build sequences belonging to the language, or to try assign structural properties to a sequences of tokens.
 \begin{Definition}
   A \emph{grammar} $G$ is a tuple $\grammar$, where 
   \begin{itemize}
-  \item $\nonterminals$ is a finite set of nonterminals, 
-  \item $\terminals$,
-  \item $ $
-  \item $ $,
+  \item $\nonterminals$ is a finite set of nonterminals.
+  \item $\terminals$, is a finite set of terminals, with $\nonterminals \cap \terminals = \emptyset$.
+  \item $\productions$, is a finite set of production rules, written as $\alpha \to \beta$.
+  \item $\startsymbol \in \nonterminals$ is the start symbol.
   \end{itemize}
+  We use upper case letters to denote nonterminals, lower case letters to denote terminals and Greek letters to denote sequences of both terminals and nonterminals.
 \end{Definition}
-A grammar can generate a string of terminals by repeatedly applying production rules to the start symbol. 
+A grammar can generate a string of terminals by repeatedly applying production rules to the start symbol.
 A grammar is used to describe a language (a set of strings of tokens). We say that  grammar $G$ generates a language $L$ if the strings in $L$ are exactly the strings that can be generated from $G$ by repeatedly applying \todo{this paragraph is a mess}
-
+\begin{Example}
+  We present a simple example grammar for a language of arithmetic expressions:
+  \begin{itemize}
+  \item 
+  \end{itemize}
+\end{Example}
 \begin{Definition}
-  Context Free Grammar
+  A grammar is \emph{context free} if the left hand side of every production rule is a single nonterminal: $A \to \omega$.
 \end{Definition}
 \begin{Definition}
   Chomsky Normal Form (or reduced CNF) --- probably only consider languages that don't contain the empty string, for simplicity.
@@ -63,6 +67,79 @@ The solution to these two problems is to consider \emph{sets} of nonterminals, w
 % here should be a ``proof'' that parsing can be seen as computing the transitive closure of a matrix
 When we consider the 
 
+\subsection{Specification of non-associative transitive closure}
+In Section \ref{Parsing as transitive closure}, we showed that parsing can be considered as computing the (non-associative) transitive closure of a matrix. To get an algorithm from this, we want to create a specification for the problem of finding the (non-associative) transitive closure of a matrix. As before, we let $C^+$ denote the transitive closure of $C$. In \cite{Valiant}, the specification is given as \todo{THOMAS: check if valiant has a word for this, also if he uses $\infty$, or not}
+\begin{equation}
+  \label{VSpec}
+  C^+ = \sum_{i = 1}^{\infty}\nap{C}{i}
+\end{equation}
+where $\nap{C}{n}$ is defined recursively by:
+\begin{equation}
+  \nap{C}{1} = C,
+\end{equation}
+\begin{equation}
+  \label{VSpec-rec}
+  \nap{C}{n} = \sum_{i = 1}^n(\nap{C}{i})(\nap{C}{n-i}).
+\end{equation}
+Hence, $\nap{C}{n}$ is the sum of all possible bracketings of products containing $n$ copies of $C$ (this is the $n$th Catalan number, $(2n)!/(n!(n+1)!)$ \cite{mathworld-catalan}).
+The idea behind the specification, and the justification that it specifies the transitive closure of $C$, is that $c_{ij} \ge x$ if there is ? an element belongs in the matrix if it \todo{THOMAS: Continue --- mention reduction when associative, looks good, because it looks lika a calculation}.
+
+We note that it is enough to only consider the sum from $1$ to $n$, since the matrix is upper triangular and hence $\nap{C}{m} = \zeromatrix$ when $m > n$.
+
+However, working with this specification is complicated, and seems to require considering individual matrix elements, and how an element was formed in previous steps (for example, when Valiant proves the correctness of his algorithm, he looks at an arbitrary matrix element and its bracketing \cite{Valiant} \todo{THOMAS: Check valiant --- and expand on bracketing stuff}). 
+
+This specification is not easy to work with in Agda for a number of reasons:
+\begin{itemize}
+\item The sum \eqref{VSpec} is finite and doesn't make sense.
+\item The other source of recursion: \eqref{VSpec-req} is complicated.
+\item The proof by Valiant would probably be hard to adapt since it includes even more consepts, moving away from our algebraic structure view---considers bracketings of elements.
+\item Other reasons?
+\end{itemize}
+
+A big problem with the above specification along with Valiant's proof using it, is that it was too concerned by syntactical matters (how a particular element of the transitive closure was built with regards to where the parentheses were placed), which we want to abstract away by considering algebraic structures (which, once a product is formed, destroy the information as to how it was formed). \todo{JPPJ: Deep/Shallow embedding}. So we move towards a more semantical specification of the problem of computing the transitive closure.
+
+The simple fact we use is that if an element belongs to the transitive closure $C^+$, then it either belonged to $C$, or it must also belong to $C^+C^+$.\todo{Expand / prove} This gives us the following specification:
+\begin{equation}
+  \label{JPTSPec}
+  C^+ = C^+C^+ + C
+\end{equation}
+\todo{THOMAS: words to use to refer to the elements of the matrices}
+We note that this specification doesn't explicitly mention the non-associativity of multiplication. If we expand the equation once (by replacing $C^+$ on the right hand side by $C^+C^+ + C$), we get
+\begin{equation}
+  C^+ = (C^+C^+ + C)(C^+C^+ + C) + C = (C^+C^+)(C^+C^+) + (C^+C^+)C + C(C^+C^+) + CC + C,
+\end{equation}
+and if we repeat this again, we get
+\begin{equation}
+  C^+ = ((C^+C^+ + C)(C^+C^+ + C))((C^+C^+ + C)(C^+C^+ + C)) + ((C^+C^+ + C)(C^+C^+ + C))C + C((C^+C^+ + C)(C^+C^+ + C)) + CC + C = .
+\end{equation}\todo{THOMAS: Expand, maybe, or remove equation}
+We prove that the two specifications are equivalent \eqref{VSpec} and \eqref{JPTSpec}:
+\begin{Theorem}
+The transitive closure $C^+$ of $C$ satisfies \todo{THOMAS: Need upper triang here?} 
+\begin{equation}
+  \label{JPTSpec'}
+  C^+ = C^+C^+ + C
+\end{equation}
+if and only if it satisfies
+\begin{equation}
+  \label{VSpec'}
+  C^+ = \sum_{i = 1}^{\infty}\nap{C}{i}
+\end{equation}
+\end{Theorem}
+\begin{proof}
+We prove this by showing by induction on the index $i$ in the sum \eqref{VSpec'} that if $C^+$ satisfies \eqref{JPTSpec'}, then the products of $i$ copies of $C$ contain all possible bracketings of the factors. For $i = 1$, this is obvious since the terms resulting from $C^+C^+$ contain at least two $C$s. If it is true for $i < k$, then for $i = k$, \todo{THOMAS: finish} 
+\end{proof}
+
+This specification turns out to work very well with Agda (once we define appropriate concrete datatypes for the matrices---which will be different from the abstract ones given in Section \ref{matrix-datatype}---we will do this in Section \ref{datatype-section}).
+
+To end this section, we note that other possible specifications of the transitive closure, similar to \eqref{JPTSpec}, that are equivalent to it if we assume associativity (and that addition is idempotent) fail to be correct without associativity, one such is:
+\begin{equation}
+  C^+ = C^+C + C,
+\end{equation}
+and adding the extra term $CC^+$, to get
+\begin{equation}
+  C^+ = C^+C + CC^+ + C
+\end{equation}
+fails to make the specification correct, since when expanding them, these two only ever produce bracketings of the form $(\cdots(CC)\cdots) C$ (and $C(\cdots(CC)\cdots)$.
 
 \todo{fix references to other sections}
 \label{Section:Magma-multiplication}

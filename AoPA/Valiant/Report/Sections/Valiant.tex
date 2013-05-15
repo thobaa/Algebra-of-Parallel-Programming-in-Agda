@@ -1,88 +1,10 @@
-\newcommand{\zeromat}{\mathbf{0}}
-\newcommand{\zeromatrix}{\zeromat}
-\newcommand{\nap}[2]{#1^{(#2)}}
-\newcommand{\tc}[1]{#1^+}
-\newcommand{\rc}[1]{#1^*}
 \section{Valiant's Algorithm}
 In his paper \cite{Valiant}, Leslie G. Valiant gave a divide and conquer algorithm for chart parsing that has the same time complexity as matrix multiplication. The algorithm divides a string into two parts, and parses them recursively, and then puts them together through a fairly complicated procedure that requires a constant number of matrix multiplications.
 
 Since the algorithm is a divide and conquer algorithm (and the combining step is also fairly paralellizable), it could potentially be used for parsing in parallel, as suggested by Jean-Philippe Bernardy and Koen Claessen \todo{THOMAS: - or --}\cite{JP-PP}. 
 
-\subsection{Specification of non-associative transitive closure}\todo{JPPJ, THOMAS: should this be here? might not make sense}
-In Section \ref{Parsing as transitive closure}, we showed that parsing can be considered as computing the (non-associative) transitive closure of a matrix. To get an algorithm from this, we want to create a specification for the problem of finding the (non-associative) transitive closure of a matrix. As before, we let $C^+$ denote the transitive closure of $C$. In \cite{Valiant}, the specification is given as \todo{THOMAS: check if valiant has a word for this, also if he uses $\infty$, or not}
-\begin{equation}
-  \label{VSpec}
-  C^+ = \sum_{i = 1}^{\infty}\nap{C}{i}
-\end{equation}
-where $\nap{C}{n}$ is defined recursively by:
-\begin{equation}
-  \nap{C}{1} = C,
-\end{equation}
-\begin{equation}
-  \label{VSpec-rec}
-  \nap{C}{n} = \sum_{i = 1}^n(\nap{C}{i})(\nap{C}{n-i}).
-\end{equation}
-Hence, $\nap{C}{n}$ is the sum of all possible bracketings of products containing $n$ copies of $C$ (this is the $n$th Catalan number, $(2n)!/(n!(n+1)!)$ \cite{mathworld-catalan}).
-The idea behind the specification, and the justification that it specifies the transitive closure of $C$, is that $c_{ij} \ge x$ if there is ? an element belongs in the matrix if it \todo{THOMAS: Continue --- mention reduction when associative, looks good, because it looks lika a calculation}.
-
-We note that it is enough to only consider the sum from $1$ to $n$, since the matrix is upper triangular and hence $\nap{C}{m} = \zeromatrix$ when $m > n$.
-
-However, working with this specification is complicated, and seems to require considering individual matrix elements, and how an element was formed in previous steps (for example, when Valiant proves the correctness of his algorithm, he looks at an arbitrary matrix element and its bracketing \cite{Valiant} \todo{THOMAS: Check valiant --- and expand on bracketing stuff}). 
-
-This specification is not easy to work with in Agda for a number of reasons:
-\begin{itemize}
-\item The sum \eqref{VSpec} is finite and doesn't make sense.
-\item The other source of recursion: \eqref{VSpec-req} is complicated.
-\item The proof by Valiant would probably be hard to adapt since it includes even more consepts, moving away from our algebraic structure view---considers bracketings of elements.
-\item Other reasons?
-\end{itemize}
-
-A big problem with the above specification along with Valiant's proof using it, is that it was too concerned by syntactical matters (how a particular element of the transitive closure was built with regards to where the parentheses were placed), which we want to abstract away by considering algebraic structures (which, once a product is formed, destroy the information as to how it was formed). \todo{JPPJ: Deep/Shallow embedding}. So we move towards a more semantical specification of the problem of computing the transitive closure.
-
-The simple fact we use is that if an element belongs to the transitive closure $C^+$, then it either belonged to $C$, or it must also belong to $C^+C^+$.\todo{Expand / prove} This gives us the following specification:
-\begin{equation}
-  \label{JPTSPec}
-  C^+ = C^+C^+ + C
-\end{equation}
-\todo{THOMAS: words to use to refer to the elements of the matrices}
-We note that this specification doesn't explicitly mention the non-associativity of multiplication. If we expand the equation once (by replacing $C^+$ on the right hand side by $C^+C^+ + C$), we get
-\begin{equation}
-  C^+ = (C^+C^+ + C)(C^+C^+ + C) + C = (C^+C^+)(C^+C^+) + (C^+C^+)C + C(C^+C^+) + CC + C,
-\end{equation}
-and if we repeat this again, we get
-\begin{equation}
-  C^+ = ((C^+C^+ + C)(C^+C^+ + C))((C^+C^+ + C)(C^+C^+ + C)) + ((C^+C^+ + C)(C^+C^+ + C))C + C((C^+C^+ + C)(C^+C^+ + C)) + CC + C = .
-\end{equation}\todo{THOMAS: Expand, maybe, or remove equation}
-We prove that the two specifications are equivalent \eqref{VSpec} and \eqref{JPTSpec}:
-\begin{Theorem}
-The transitive closure $C^+$ of $C$ satisfies \todo{THOMAS: Need upper triang here?} 
-\begin{equation}
-  \label{JPTSpec'}
-  C^+ = C^+C^+ + C
-\end{equation}
-if and only if it satisfies
-\begin{equation}
-  \label{VSpec'}
-  C^+ = \sum_{i = 1}^{\infty}\nap{C}{i}
-\end{equation}
-\end{Theorem}
-\begin{proof}
-We prove this by showing by induction on the index $i$ in the sum \eqref{VSpec'} that if $C^+$ satisfies \eqref{JPTSpec'}, then the products of $i$ copies of $C$ contain all possible bracketings of the factors. For $i = 1$, this is obvious since the terms resulting from $C^+C^+$ contain at least two $C$s. If it is true for $i < k$, then for $i = k$, \todo{THOMAS: finish} 
-\end{proof}
-
-This specification turns out to work very well with Agda (once we define appropriate concrete datatypes for the matrices---which will be different from the abstract ones given in Section \ref{matrix-datatype}---we will do this in Section \ref{datatype-section}).
-
-To end this section, we note that other possible specifications of the transitive closure, similar to \eqref{JPTSpec}, that are equivalent to it if we assume associativity (and that addition is idempotent) fail to be correct without associativity, one such is:
-\begin{equation}
-  C^+ = C^+C + C,
-\end{equation}
-and adding the extra term $CC^+$, to get
-\begin{equation}
-  C^+ = C^+C + CC^+ + C
-\end{equation}
-fails to make the specification correct, since when expanding them, these two only ever produce bracketings of the form $(\cdots(CC)\cdots) C$ (and $C(\cdots(CC)\cdots)$.
 \subsection{The Algorithm} \todo{THOMAS: note that we want to compute the transitive closure here, not \emph{parse}.}
-We want to compute the transitive closure of the parse chart. The main idea of the algorithm is to split the chart along the diagonal, into two subcharts and a rectangular overlap region, see Figure \ref{Figure:ParseChart}. Next, compute the transitive closures of the subcharts, and combine them (somehow) to fill in the rectangular part. We note that charts of size $1 \times 1$ are the zero matrix, where the transitive closure is also the zero matrix. We also note that it is easy to compute the transitive closure of subcharts that have size $2 \times 2$, since all charts are nonzero on the diagonal, they have only one nonzero element:
+We want to compute the transitive closure of the parse chart. The main idea of the algorithm is to split the chart along the diagonal, into two subcharts and a rectangular overlap region, see Figure \ref{Figure:ParseChart}. Next, compute the transitive closures of the subcharts, and combine them (somehow) to fill in the rectangular part. We note that charts of size $1 \times 1$ are the zero matrix, where the transitive closure is also the zero matrix. We also note that it is easy to compute the transitive closure of subcharts that have size $2 \times 2$, since all charts are nonzero on the diagonal, they have only one nonzero element: \todo{THOMAS: remove the $2 \times 2$ stuff!}
 \begin{equation*}
   \begin{pmatrix}
     0 & x \\
@@ -111,7 +33,7 @@ and hence the specification \eqref{Equation:SpecificationTC} is:
   \end{pmatrix}
 \end{equation*}
 which turns into $c = x$, since $CC = \zeromat$.
-
+\label{Section:Subdivision-in-Specification}
 When the chart $X$ is $n \times n$, with $n > 1$, we can write it down as a block matrix 
 \begin{equation*}
   C = 
@@ -125,16 +47,16 @@ where $U$ is upper triangular and is the chart corresponding to the first part o
 If we put this into the specification, we get:
 \begin{equation*}
   \begin{pmatrix}
-    U^+ & R^+ \\
+    \tc{U} & \rc{R} \\
     0   & L^+
   \end{pmatrix}
   =  
   \begin{pmatrix}
-    U^+ & R^+ \\
+    \tc{U} & \rc{R} \\
     0   & L^+
   \end{pmatrix}
   \begin{pmatrix}
-    U^+ & R^+ \\
+    \tc{U} & \rc{R} \\
     0   & L^+
   \end{pmatrix}
   +
@@ -143,34 +65,35 @@ If we put this into the specification, we get:
     0 & L
   \end{pmatrix}
 \end{equation*}
-where $U^+$, $R^+$, $L^+$ are the corresponding parts of (a priori, we don't know if $U^+$ and $L^+$ are the transitive closures of $U$, $L$). Multiplying together $C^+C^+$, and adding $C$, we get:
+where $\tc{U}$, $\rc{R}$, $L^+$ are the corresponding parts of (a priori, we don't know if $\tc{U}$ and $L^+$ are the transitive closures of $U$, $L$). Multiplying together $\tc{C}\tc{C}$, and adding $C$, we get:
 \begin{equation*}
     \begin{pmatrix}
-    U^+ & R^+ \\
-    0   & L^+
+    \tc{U} & \rc{R} \\
+    0   & \tc{L}
   \end{pmatrix} 
     =
   \begin{pmatrix}
-    U^+U^+ + R^+\zeromat + U   &   U^+R^+     + R^+L^+ + R \\
+    \tc{U}\tc{U} + \rc{R}\zeromat + U   &   \tc{U}\rc{R}     + \rc{R}L^+ + R \\
     0                          &   \zeromat R + L^+L^+ + L
   \end{pmatrix}
   %= 
   %\begin{pmatrix}
-  %  U^+U^+ + U                 &   U^+R^+ + R^+L^+ + R \\
+  %  \tc{U}\tc{U} + U                 &   \tc{U}\rc{R} + \rc{R}L^+ + R \\
   %  0                          &   L^+L^+ + L
   %\end{pmatrix}
   ,
 \end{equation*}
 since $\zeromat$ is an absorbing element. Since all elements of two matrices need to be equal for the matrices to be equal, we get the set of equations:
 \begin{align}
-  U^+ &= U^+U^+ + U \\
-  R^+ &= U^+R^+ + R^+L^+ + R \label{Equation:R-Specification}\\
+  \tc{U} &= \tc{U}\tc{U} + U \\
+  \rc{R} &= \tc{U}\rc{R} + \rc{R}L^+ + R \label{Equation:R-Specification}\\
   L^+ &= L^+L^+ + L,
 \end{align}
 so we see that it the condition that $C^+$ is the transitive closure of $C$ is equivalent to the conditions that the upper and lower parts of $C^+$ are the transitive closures of the upper and lower parts of $C$, respectively (intuitively, this makes sense, since the transitive closure of the first part describes the ways to get between nodes in the first part, and these don't depend on the second part, and vice versa, since the matrix is upper triangular---i.e., while parsing a subset of the of the first part of a string, it doesn't matter what the second part of the string is, because the grammar is context free) and the rectangular part of $C^+$ satisfies the equation \eqref{Equation:R-Specification}.
 
 Hence, if we compute the transitive closures of the upper and lower part of the matrix recursively, we only need to put them together and compute the rectangular part of the matrix.
 \subsubsection{The overlap case}
+\label{Section:Two-Step-Splitting}
 To do this, we need to separate four cases, depending on the dimensions of $R$. We will give a recursive function, for computing $\rc{R}$ from $R$, $\tc{U}$ and $\tc{L}$, that we will call $\overlap(\tc{U}, R, \tc{L})$ , because when used for parsing, \todo{THOMAS: come up with good reason for name (overlap). Also, it should be $\tc{U}$ everywhere!}. 
 
 First, if $R$ is a $1 \times 1$ matrix, in which case, we must have that $\tc{U}$ and $\tc{L}$ are also $1 \times 1$ matrices, and since they are upper triangular, they are both equal to the zero matrix. Hence, by \eqref{Equation:R-Specification}, $\rc{R} = R$, so we define 
@@ -224,8 +147,8 @@ Next, if $R$ is a $n \times 1$ matrix, as in the case above, we can subdivide $R
 \begin{equation*}
   \tc{U} = 
   \begin{pmatrix}
-    \tc{U_U} & \rc{L_R}
-    0   & \tc{L_L}
+    \tc{U_U} & \rc{U_R} \\
+    0   & \tc{U_L}
   \end{pmatrix},
 \end{equation*}
 and since $L = 0$, the rectangular specification turns into 
@@ -240,8 +163,8 @@ which gives us
     \rc{v}
   \end{pmatrix}
   = \begin{pmatrix}
-    \tc{U_U} & \rc{L_R} \\
-    0        & \tc{L_L}
+    \tc{U_U} & \rc{U_R} \\
+    0        & \tc{U_L}
   \end{pmatrix}
   \begin{pmatrix}
     \rc{u} \\
@@ -254,17 +177,17 @@ which gives us
   \end{pmatrix}
   = 
   \begin{pmatrix}
-    \tc{U_U}\rc{u} + \rc{L_R}\rc{v} + u \\
-    \tc{L_L}\rc{v} + v
+    \tc{U_U}\rc{u} + \rc{U_R}\rc{v} + u \\
+    \tc{U_L}\rc{v} + v
   \end{pmatrix},
 \end{equation*}
-so $\rc{u}$ and $\rc{v}$ satisfy the rectangular specification for a column vector \eqref{R-Spec-Col} with $R = \rc{L_R}\rc{v} + u$, $U = \tc{U_U}$ and $R = v$, $U = \tc{L_L}$, respectively. Hence, we have 
+so $\rc{u}$ and $\rc{v}$ satisfy the rectangular specification for a column vector \eqref{R-Spec-Col} with $R = \rc{U_R}\rc{v} + u$, $U = \tc{U_U}$ and $R = v$, $U = \tc{U_L}$, respectively. Hence, we have 
 \begin{equation}
 \label{overlap3}
 \overlap\left(
 \begin{pmatrix}
-  \tc{U_U} & \rc{L_R} \\
-    0      & \tc{L_L}
+  \tc{U_U} & \rc{U_R} \\
+    0      & \tc{U_L}
 \end{pmatrix}
 , 
 \begin{pmatrix}
@@ -277,8 +200,8 @@ so $\rc{u}$ and $\rc{v}$ satisfy the rectangular specification for a column vect
 \end{pmatrix}
 \right) = 
 \begin{pmatrix}
-  \overlap(\tc{U_U} , \rc{L_R}\rc{v} + u , (0) ) \\ 
-  \overlap(\tc{L_L} , v, (0) ) 
+  \overlap(\tc{U_U} , \rc{U_R}\rc{v} + u , (0) ) \\ 
+  \overlap(\tc{U_L} , v, (0) ) 
 \end{pmatrix},
 \end{equation}
 where, we can compute $\rc{v}$ first, so as not to repeat anything.
@@ -329,7 +252,7 @@ Inserting this in the specification for $R$, \eqref{Equation:R-Specification}, g
     C & D
   \end{pmatrix}
 \end{align*}
-where we have again written $\tc{R_{11}}$, $\tc{R_{12}}$, $\tc{C}$ and $\tc{D}$, for the parts of $R^+$ corresponding to $R_{11}$, $R_{12}$, $C$ and $D$, which a priori are not the transitive closures of anything, while $\tc{U_U}$, $\tc{U_L}$, $\tc{L_U}$ and $\tc{L_L}$ \emph{are} the transitive closures of $U_U$¸ $U_L$, $L_U$ and $L_L$, respectively, and $\rc{U_R}$ and $\rc{L_R}$ satisfy the rectangular specification for $U_R$ and $L_R$, respectively, since we assume that we have computed the transitive closures of $U$ and $L$ recursively.
+where we have again written $\tc{A}$, $\tc{B}$, $\tc{C}$ and $\tc{D}$, for the parts of $\rc{R}$ corresponding to $A$, $B$, $C$ and $D$, which a priori are not the transitive closures of anything, while $\tc{U_U}$, $\tc{U_L}$, $\tc{L_U}$ and $\tc{L_L}$ \emph{are} the transitive closures of $U_U$¸ $U_L$, $L_U$ and $L_L$, respectively, and $\rc{U_R}$ and $\rc{L_R}$ satisfy the rectangular specification for $U_R$ and $L_R$, respectively, since we assume that we have computed the transitive closures of $U$ and $L$ recursively.
 \todo{THOMAS: maybe give better names to parts}
 Hence, after rearranging, we get the equations
 \begin{align*}
@@ -381,10 +304,17 @@ Summing up, and going back to the original matrix for the parse chart, $C$, and 
     0   &   0 & 0   & L_L 
   \end{pmatrix}.
 \end{equation}
-We can then compute the transitive closure of $C$ by the following algorithm, which is (roughly) the algorithm introduced by Valiant \cite{Valiant}.
+We can then compute the transitive closure of $C$ by the following algorithm, which is (roughly) the algorithm introduced by Valiant \cite{Valiant}:
 \begin{enumerate}
 \item Recursively compute the transitive closures $\tc{U}$ of $U$ and $\tc{L}$ of $L$.
-\item Compute $\overlap(U,R,L)$ by recursively computing $\rc{C} = \overlap(U_L, C, L_U)$, then $\rc{A} = \overlap( \tc{U_U} , \tc{U_L}\rc{C} + A , \tc{L_U} )$ and $\rc{D} = \overlap( \tc{U_L} , \rc{C}\rc{L_R} +  D , \tc{L_L} )$, and finally $\rc{B} = \overlap( \tc{U_U} , \rc{U_R}\rc{D} + \rc{A}\rc{L_R} + B , \tc{L_L})$ 
+\item Compute $\rc{U} = \overlap(U,R,L)$ by recursively computing $\rc{C} = \overlap(U_L, C, L_U)$, then $\rc{A} = \overlap( \tc{U_U} , \tc{U_L}\rc{C} + A , \tc{L_U} )$ and $\rc{D} = \overlap( \tc{U_L} , \rc{C}\rc{L_R} +  D , \tc{L_L} )$, and finally $\rc{B} = \overlap( \tc{U_U} , \rc{U_R}\rc{D} + \rc{A}\rc{L_R} + B , \tc{L_L})$ and putting them together into 
+  \begin{equation*}
+    \rc{U} = 
+    \begin{pmatrix}
+      \rc{A} & \rc{B} \\
+      \rc{C} & \rc{D} 
+    \end{pmatrix}.
+  \end{equation*}
 \end{enumerate}
 \subsection{Implementation}
 In this section, we are going to implement Valiant's Algorithm.
@@ -402,6 +332,7 @@ To build the split into the data types, we give them constructors for building a
 where $A$ has the same number of rows as $B$, $C$ has the same number of rows as $D$, $A$ has the same number of columns as $C$ and $B$ has the same number of columns as $D$.
 Thinking about what ``small'' structures should have constructors, we we realize that it is not enough to simply allow $1 \times 1$ matrices, since then, any matrix would be a $2^n \times 2^n$ matrix, where $n$ is the number of times we use |quad|. 
 
+\label{Section:Empty-Matrices}
 One way to to solve this problem is to have a constructor for ``empty'' matrices of any dimension, that play two different roles. First, empty $0 \times n$ matrices are used to allow |quad| to put two matrices with the same number of rows next to each others:
 \begin{equation}
 \operatorname{quad}(A, B, e_{0\,m}, e_{0\,n}) =
@@ -437,9 +368,11 @@ Instead we want to use a different approach for indexing our matrices, by buildi
 
 Using this data type we can finally define our data types \todo{THOMAS: data type or datatype?} |Mat| and |Tri|.
 %include Code/Valiant/MatAndTri.lagda
+%include Code/Valiant/Operations.lagda
+%include Code/Valiant/NANRings.lagda
+%include Code/Valiant/Specification.lagda
 
 
-\todo{THOMAS: when getting to |Tri|, comment on the fact that |Tri| probably needs another constructor if we're doing things JP's way (does it have that in his papers / code?)}
 
 That is, we want 
 The way to do this in a way that works well with Agda is by using 

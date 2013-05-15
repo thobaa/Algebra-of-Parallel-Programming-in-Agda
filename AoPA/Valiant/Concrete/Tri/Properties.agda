@@ -89,7 +89,7 @@ isNonAssociativeNonRing = record
 
 isNonAssociativeNonRingM : ∀ {s} → IsNonAssociativeNonRing _m≈_ (_+_ {s} {s}) (_*_) zeroMat
 isNonAssociativeNonRingM = record 
-  { +-isCommutativeMonoid = isCommutativeMonoidM
+  { +-isCommutativeMonoid = m-isCommutativeMonoid
   --; +-idempotent = +-idempotent
   ; *-cong = *-cong
   ; distrib = *-distribˡ , (λ x y z → *-distribʳ y z x)

@@ -18,7 +18,7 @@ open Valiant.Concrete.Mat NAR
 import Valiant.Concrete.Mat.Operations
 open Valiant.Concrete.Mat.Operations NAR
 import Valiant.Concrete.Mat.Properties
-open Valiant.Concrete.Mat.Properties NAR renaming (commutativeMonoid to cmm; commutativeMonoidV to cmv)
+open Valiant.Concrete.Mat.Properties NAR renaming (commutativeMonoid to cmm; v-commutativeMonoid to cmv)
 
 import Valiant.Concrete.Tri.Equalities 
 open Valiant.Concrete.Tri.Equalities NAR

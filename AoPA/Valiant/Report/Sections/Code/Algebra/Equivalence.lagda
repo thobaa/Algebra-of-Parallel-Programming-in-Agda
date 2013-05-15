@@ -25,3 +25,4 @@ record IsEquivalence {X : Set} (_∼_ : Rel X) : Set where
     sym   : Symmetric  _∼_
     trans : Transitive _∼_
 \end{code}
+In the remainder of the report, we use the slightly more general |IsEquivalence| definition from the Agda Standard Library, because it lets us use the standard library modules for equational reasoning.

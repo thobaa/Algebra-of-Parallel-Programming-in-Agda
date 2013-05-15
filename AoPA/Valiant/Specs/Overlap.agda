@@ -16,11 +16,13 @@ import Valiant.Concrete.Tri using (Tri; foldTri-intro; one; two)
 import Valiant.Concrete.Tri.Operations
 import Valiant.Concrete.Mat --using (Mat; Sing; RVec; CVec; quad; one; two)
 import Valiant.Concrete.Mat.Operations
+import Valiant.Concrete.Mat.Properties
 import Valiant.Helper.Definitions
 import Valiant.Algorithm.Algorithm
 open Valiant.Concrete.Tri NAR
 open Valiant.Concrete.Tri.Operations NAR
 open Valiant.Concrete.Mat.Operations NAR
+open Valiant.Concrete.Mat.Properties NAR
 open Valiant.Concrete.Mat NAR
 open Valiant.Helper.Definitions NAR
 open Valiant.Algorithm.Algorithm NAR
@@ -58,13 +60,13 @@ overlapRow-corr : ∀ {s} (v : Vec s) (T : Tri s) → rowSpec (overlapRow v T) (
 overlapRow-corr (one x) one = one-eq (proj₁ R+-identity x) --lätt
 overlapRow-corr {deeper s₁ s₂} (two u v) (two U R L) = two-eq (overlapRow-corr u U) (begin 
   (overlapRow u U |* R ⊕ overlapRow (overlapRow u U |* R ⊕ v) L |◂ L) ⊕ v 
-    ≈⟨ ⊕-cong (commV (overlapRow u U |* R) (overlapRow (overlapRow u U |* R ⊕ v) L |◂ L)) reflV ⟩
+    ≈⟨ ⊕-cong (commV (overlapRow u U |* R) (overlapRow (overlapRow u U |* R ⊕ v) L |◂ L)) v-refl ⟩
   (overlapRow (overlapRow u U |* R ⊕ v) L |◂ L ⊕ overlapRow u U |* R) ⊕ v
     ≈⟨ assocV (overlapRow (overlapRow u U |* R ⊕ v) L |◂ L) (overlapRow u U |* R) v ⟩
   overlapRow (overlapRow u U |* R ⊕ v) L |◂ L ⊕ (overlapRow u U |* R ⊕ v)
     ≈⟨ overlapRow-corr (overlapRow u U |* R ⊕ v) L ⟩
   overlapRow (overlapRow u U |* R ⊕ v) L ∎)
-  where open EqR (record { Carrier = Vec s₂; _≈_ = _v≈_; isEquivalence = isEquivalenceV })
+  where open EqR (record { Carrier = Vec s₂; _≈_ = _v≈_; isEquivalence = v-isEquivalence })
 
 
 overlapCol-corr : ∀ {s} (T : Tri s) (v : Vec s) → colSpec (overlapCol T v) (T , v) 
@@ -79,7 +81,7 @@ overlapCol-corr {deeper s₁ s₂} (two U R L) (two u v) = two-eq pf1 (overlapCo
               U ◂| overlapCol U (R *| overlapCol L v ⊕ u) ⊕ (R *| overlapCol L v ⊕ u)
                 ≈⟨ overlapCol-corr U (R *| overlapCol L v ⊕ u) ⟩
               overlapCol U (R *| overlapCol L v ⊕ u) ∎
-          where open EqR (record { Carrier = Vec s₁; _≈_ = _v≈_; isEquivalence = isEquivalenceV })
+          where open EqR (record { Carrier = Vec s₁; _≈_ = _v≈_; isEquivalence = v-isEquivalence })
 
 
 

@@ -70,13 +70,17 @@ v-isEquivalence = record
   }
 
 
-m-isEquivalence : ∀ {s₁ s₂ : Splitting} → IsEquivalence (_m≈_ {s₁} {s₂})
+m-isEquivalence : {s₁ s₂ : Splitting} → IsEquivalence (_m≈_ {s₁} {s₂})
 m-isEquivalence = record 
   { refl = m-refl
   ; sym = m-sym
   ; trans = m-trans }
 
--- not to be here
+-- not to be here (why???)
+v-setoid : {s : Splitting} → Setoid l₁ (l₂ ⊔ l₁)
+v-setoid {s} = record { Carrier = Vec s; _≈_ = _v≈_; isEquivalence = v-isEquivalence }
+
+
 m-setoid : ∀ {s₁ s₂} → Setoid l₁ (l₂ ⊔ l₁)
 m-setoid {s₁} {s₂} = record { Carrier = Mat s₁ s₂; _≈_ = _m≈_; isEquivalence = m-isEquivalence }
 
@@ -121,30 +125,30 @@ identityˡM (quad A B C D) = quad-eq (identityˡM A) (identityˡM B) (identityˡ
 +-cong (CVec-eq pf₁) (CVec-eq pf₂) = CVec-eq (⊕-cong pf₁ pf₂)
 +-cong (quad-eq pf₁ pf₂ pf₃ pf₄) (quad-eq pf₁' pf₂' pf₃' pf₄') = quad-eq (+-cong pf₁ pf₁') (+-cong pf₂ pf₂') (+-cong pf₃ pf₃') (+-cong pf₄ pf₄')
 
-isSemigroupM : ∀ {s₁ s₂} → IsSemigroup _m≈_ (_+_ {s₁} {s₂})
-isSemigroupM = record 
+m-isSemigroup : ∀ {s₁ s₂} → IsSemigroup _m≈_ (_+_ {s₁} {s₂})
+m-isSemigroup = record 
   { isEquivalence = m-isEquivalence
   ; assoc = assocM
   ; ∙-cong = +-cong }
 
-isSemigroupV : ∀ {s} → IsSemigroup _v≈_ (_⊕_ {s})
-isSemigroupV = record 
+v-isSemigroup : ∀ {s} → IsSemigroup _v≈_ (_⊕_ {s})
+v-isSemigroup = record 
   { isEquivalence = v-isEquivalence
   ; assoc         = assocV
   ; ∙-cong        = ⊕-cong
   }
 
-isCommutativeMonoidM : ∀ {s₁ s₂} → IsCommutativeMonoid _m≈_ (_+_ {s₁} {s₂}) zeroMat
-isCommutativeMonoidM = record 
-  { isSemigroup = isSemigroupM
+m-isCommutativeMonoid : ∀ {s₁ s₂} → IsCommutativeMonoid _m≈_ (_+_ {s₁} {s₂}) zeroMat
+m-isCommutativeMonoid = record 
+  { isSemigroup = m-isSemigroup
   ; identityˡ   = identityˡM
   ; comm        = commM
   }
 
 
-isCommutativeMonoidV : ∀ {s} → IsCommutativeMonoid _v≈_ (_⊕_ {s}) zeroVec
-isCommutativeMonoidV = record 
-  { isSemigroup = isSemigroupV
+v-isCommutativeMonoid : ∀ {s} → IsCommutativeMonoid _v≈_ (_⊕_ {s}) zeroVec
+v-isCommutativeMonoid = record 
+  { isSemigroup = v-isSemigroup
   ; identityˡ   = identityˡV
   ; comm        = commV
   }
@@ -157,16 +161,16 @@ commutativeMonoid {s₁} {s₂} = record
   ; _≈_                 = _m≈_
   ; _∙_                 = _+_
   ; ε                   = zeroMat
-  ; isCommutativeMonoid = isCommutativeMonoidM
+  ; isCommutativeMonoid = m-isCommutativeMonoid
   }
 
-commutativeMonoidV : ∀ {s} → CommutativeMonoid _ _
-commutativeMonoidV {s} = record
+v-commutativeMonoid : ∀ {s} → CommutativeMonoid _ _
+v-commutativeMonoid {s} = record
   { Carrier             = Vec s
   ; _≈_                 = _v≈_
   ; _∙_                 = _⊕_
   ; ε                   = zeroVec
-  ; isCommutativeMonoid = isCommutativeMonoidV
+  ; isCommutativeMonoid = v-isCommutativeMonoid
   }
 
     
