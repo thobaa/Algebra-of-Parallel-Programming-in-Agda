@@ -19,18 +19,18 @@ maxL : (xs : [ ℕ ]) → (0 < length xs) → ℕ
 \end{code}
 That is, |maxL| takes a list of natural numbers |xs| and a proof that the length of |xs| is greater than zero and returns the maximum of the list. To define the function, we pattern match on the first argument:
 \begin{code}
-maxL [] ()
-maxL (x ∷ []) _ = x
-maxL (x ∷ (x′ ∷ xs)) _ = max x (maxL (x′ ∷ xs) (s≤s z≤n))
+maxL []               ()
+maxL (x ∷ [])         _ = x
+maxL (x ∷ (x' ∷ xs))  _ = max x (maxL (x' ∷ xs) (s≤s z≤n))
 \end{code}
 On the first line, we use the absurd pattern |()| to denote the empty case resulting from pattern matching on the proof (there are no cases when pattern matchin on an element of |1 ≤ 0|, and |()| is used to denote this, since Agda does not allow us to just leave out a case). On the second two lines, we do not care about what the input proof is (it is |s≤s z≤n| in both cases, so we write |_|, which takes the place of the variable but does not allow it to be used in the definition to signify that it is not important).
 
 We also need an indexing function (to specify that |maxL xs _| is in the list), and again, we only define it for sensible inputs (nonempty lists). The simplest definition would probably be:
 \begin{code}
 index : ∀ {a} → (xs : [ a ]) → (n : ℕ) → (n < length xs) → a
-index [] n ()
-index (x ∷ xs) zero _ = x
-index (x ∷ xs) (suc n) (s≤s m≤n) = index xs n m≤n
+index []        n        ()
+index (x ∷ xs)  0        _         = x
+index (x ∷ xs)  (suc n)  (s≤s m≤n) = index xs n m≤n
 \end{code}
 Where we need the proof in the last line, to call the |index| function recursively.
 
@@ -45,7 +45,7 @@ We can now use the Haskell notation |‼| for indexing:
 \begin{spec}
 _‼_ : ∀ {a} → (xs : [ a ]) → Σ ℕ (λ n → n < length xs) → a
 []         ‼  (n       , ())
-(x ∷ xs)   ‼  (zero    , _)         = x
+(x ∷ xs)   ‼  (0       , _)         = x
 (x ∷ xs)   ‼  (suc n   , s≤s m≤n)   = xs ‼ (n , m≤n)
 \end{spec}
 \todo{THOMAS: note about standard library, maybe}
@@ -54,21 +54,21 @@ We note, however, that we do not really use the proof for anything important. Th
 We choose to define type family |Fin|, where |Fin n| containing the numbers less than |n|, using the simple fact that if $n = 1 + n'$, then $0 \le n$, and if $n = 1 + n'$ and $i \le n'$, then $1 + i \le n$:
 \begin{code}
 data Fin : ℕ → Set where
-  fzero  : {n : ℕ} → Fin (suc n)
+  f0     : {n : ℕ} → Fin (suc n)
   fsuc   : {n : ℕ} → Fin n → Fin (suc n)
 \end{code}
-That is, |fzero| (representing |0|, but given a different name for clarity---it is not equal to the natural number |0|, they do not even have the same type) is less than any number of the form |suc n|, and for any number |i|, less than some number |n|, |fsuc i| is less than |suc n| (we can see this definition as instansiating the second argument of |_≤_| to |suc n|).
+That is, |f0| (representing |0|, but given a different name for clarity---it is not equal to the natural number |0|, they do not even have the same type) is less than any number of the form |suc n|, and for any number |i|, less than some number |n|, |fsuc i| is less than |suc n| (we can see this definition as instansiating the second argument of |_≤_| to |suc n|).
 As with |_≤_|, the |ℕ| is on the right hand side of the colon since again, we are defining a type family.
 One disadvantage of the choice of |Fin| is that we are not dealing with natural numbers, at all. Instead, we have to define functions like
 \begin{code}
 toℕ : {n : ℕ} → Fin n → ℕ
-toℕ fzero     = zero
+toℕ f0        = 0
 toℕ (fsuc i)  = suc (toℕ i)
 \end{code}
 and
 \begin{code}
 fromℕ : (n : ℕ) → Fin (suc n)
-fromℕ zero     = fzero
+fromℕ 0        = f0
 fromℕ (suc y)  = fsuc (fromℕ y)
 \end{code}
 and prove that they do what we expect (like that |toℕ (fromℕ i)| equals |i|).
@@ -86,7 +86,7 @@ infix 10 _‼_
 \begin{code}
 _‼_ : ∀ {a} → (xs : [ a ]) → (n : Fin (length xs)) → a
 []         ‼ ()
-(x ∷ xs)   ‼ fzero    = x
+(x ∷ xs)   ‼ f0       = x
 (x ∷ xs)   ‼ fsuc i   = xs ‼ i
 \end{code}
 
@@ -97,104 +97,123 @@ max-greatest : (xs : [ ℕ ]) → (pf : 0 < length xs) →
 \end{code}
 To prove this property of the |maxL| function, we must produce an inhabitant of the above type. We do this in the next section. %This takes quite a bit of work is actually quite a substantial task.
 \subsection{Proving the correctness}
-We have made the list and the proof that the length is greater than $0$ implicit arguments because they can be infered from the resulting type |xs ‼ n ≤ maxL xs pf|. However, when we prove the lemma, we are going to need to pattern match on those arguments many times.
-
 To prove a proposition in Agda, it is important to look at the structure of the proposition. Then one needs to determine which part of the proposition one should pattern match on. To do this, it is a good idea to have a plan for the proof.
 
-We begin by formulating the proof informally. The main idea we use is pattern matching the index into the list, if it is $0$, we want to prove the simpler proposition that |x ≤ maxL (x ∷ xs) pf|, which we call |max-greatest-base|, because it is the base case in an induction on the index:
+We formulate the proof informally. The main idea we use is pattern matching the index into the list, if it is $0$, we want to prove the simpler proposition that |x ≤ maxL (x ∷ xs) pf|, which we call |max-greatest-base|, because it is the base case in an induction on the index:
 \begin{code}
 max-greatest-base : {x : ℕ} {xs : [ ℕ ]} → x ≤ maxL (x ∷ xs) (s≤s z≤n)
 \end{code}
-On the other hand, if the index is $i + 1$, we must have that the list must has length at least $2$, we proceed by doing noting:
+On the other hand, if the index is $i + 1$, the list has length at least $2$, and we proceed by doing noting:
 \begin{enumerate}
 \item \label{Ex.List.Induction1} By induction, the $i$th element of the tail is less than the greatest element of the tail.
 \item \label{Ex.List.Induction2} The $i$th element of the tail equals the $i + 1$th element of the list.
-\item \label{Ex.List.Induction3} By the definition of |max|, |maxL (x ∷ (x′ ∷ xs)) pf| expands to |max x (maxL (x′ ∷ xs) pf′)|, and for any |x| and |y|, we have |y ≤ max x y|.
+\item \label{Ex.List.Induction3} By the definition of |maxL|, we get that |maxL (x ∷ (x' ∷ xs)) pf| reduces to |max x (maxL (x' ∷ xs) pf')|, and for any |x| and |y|, we should have |y ≤ max x y|.
 \end{enumerate}
-To translate the induction case into Agda code, we need to introduce two new lemmas. By induction, we already know that Point \ref{Ex.List.Induction1} is true. Additionally, Agda infers Point \ref{Ex.List.Induction2}. However, we still need to prove the second part of Point \ref{Ex.List.Induction3}:
+To translate the induction case into Agda code, we need to introduce two new lemmas. By induction, we already know that Point \ref{Ex.List.Induction1} is true. Additionally, Agda infers Point \ref{Ex.List.Induction2}, so there is nothing to prove. However, we still need to prove the second part of Point \ref{Ex.List.Induction3}:
 \begin{code}
-max-increasing₂ : {m n : ℕ} → n ≤ max m n
+max-≤₂ : {m n : ℕ} → n ≤ max m n
 \end{code}
-Where the subscript $2$ refers to the fact that it is the second argument of |max| that is on the left hand side of the inequality. Finally, we need a way to piece together inequalities, if |i ≤ j| and |j ≤ k|, then |i ≤ k| (that is, |≤| is transitive):
+Where the subscript |₂| refers to the fact that it is the second argument of |max| that is on the left hand side of the inequality. Then, to combine the three points, we need a way to piece together inequalities, if |i ≤ j| and |j ≤ k|, then |i ≤ k| (i.e., |_≤_| is transitive, see Section \ref{transitive-def}):
 \begin{code}
 ≤-trans : {i j k : ℕ} → i ≤ j → j ≤ k → i ≤ k
 \end{code}
 
-Now we begin proving these lemmas, beginning with |≤-trans|, since it does not depend on the others (all the other lemmas will require further sublemmas to prove). We pattern match on the first proof, |i ≤ j|. If it is |z≤n|, Agda infers that |i| is |0|, so the resulting proof if |z≤n|:
+Now we begin proving these lemmas, starting with |≤-trans| as it does not depend on the others (all the other lemmas will require further sub-lemmas to prove). We pattern match on the first proof, |i ≤ j|. If it is |z≤n|, Agda infers that |i| is |0|, so the resulting proof if |z≤n|:
+\savecolumns
 \begin{code}
-≤-trans z≤n j≤k = z≤n
+≤-trans  z≤n          j≤k          = z≤n
 \end{code}
-If it is |s≤s i′≤j′|, Agda infers that |i == suc i′|, and |j == suc j′|, and |i′≤j′| is a proof that |i′ ≤ j′|. We pattern match on the proof of |j ≤ k|, which must be |s≤s j′≤k′|, because |j| is |suc j′|. Hence, we can use induction to get a proof that |i′ ≤ k′|, and apply |s≤s| to that proof:
+If it is |s≤s i'≤j'|, Agda infers that |i| is |suc i'|, and |j| is |suc j'| for some |i'|, |j'|, where |i'≤j'| is a proof that |i' ≤ j'|. We then pattern match on the proof of |j ≤ k|, which has to be |s≤s j'≤k'| since |j| is |suc j'|. Hence, we can use induction to get a proof that |i' ≤ k'|, and apply |s≤s| to that proof:
+\restorecolumns
 \begin{code}
-≤-trans (s≤s i′≤j′) (s≤s j′≤k′) = s≤s (≤-trans i′≤j′ j′≤k′)
+≤-trans  (s≤s i'≤j')  (s≤s j'≤k')  = s≤s (≤-trans i'≤j' j'≤k')
 \end{code}
+and we are done.
 
-We continue by proving |max-increasing₂|, for this, we introduce a lemma: |≤-refl|, stating that for any |n|, |n ≤ n| (that is, |≤| is reflexive), which is very easy to prove (if |n == 0|, a proof is given by the constructor |z≤n|, and if |n == suc n′|, by induction, |n′ ≤ n′| and |s≤s| takes the proof of this to a proof that |n ≤ n|:
+We continue by proving |max-≤₂|, for this, we introduce another lemma about |_≤_|: |≤-refl|, stating that for any |n|, |n ≤ n| (i.e., |_≤_| is reflexive), which is very easy to prove (if |n| is |0|, a proof is given by the constructor |z≤n|, and if |n| is |suc n'|, by induction, we find a proof of |n' ≤ n'| and |s≤s| takes that proof to a proof that |n ≤ n|:
 \begin{code}
 ≤-refl : {n : ℕ} → n ≤ n
-≤-refl {zero} = z≤n
-≤-refl {suc n} = s≤s ≤-refl
+≤-refl  {0}      = z≤n
+≤-refl  {suc n}  = s≤s ≤-refl
 \end{code}
-Now we prove |max-increasing₂|.
-%if False
+Now we define |max-≤₂|.
+We do this by pattern matching on the second argument (because it is the one involved in the inequality, and depending on its value, we need different constructors for the inequality proof). If it is |0|, we use the constructor |z≤n|, regardless of what the first argument is:
+\savecolumns
 \begin{code}
-max-increasing₁ : {m n : ℕ} → m ≤ max m n
-max-increasing₁ {zero} {y} = z≤n
-max-increasing₁ {suc n} {zero} = ≤-refl
-max-increasing₁ {suc n} {suc n′} = s≤s max-increasing₁
+max-≤₂  {m}       {0}       = z≤n
 \end{code}
-%endif
-We do this by pattern matching on the second argument (because it is the one involved in the inequality, and depending on its value, we need different constructors for the inequality proof). If it is |zero|, we use the constructor |z≤n|, regardless of what the first argument is. If it is |suc n′|, we need to know what the first argument was, so we pattern match on it. If the first argument is |zero|, then, from the definition of |max|, we know that |max zero (suc n′) == suc n′|, so we want to prove that |suc n′ ≤ suc n′|, which we do by using the lemma |≤-refl| (we note here that we didn't actually need the fact that the second argument was non-zero). On the other hand, if the first argument is |suc m′|, we know by induction (we call |max-increasing₂| where we need to supply at least the first argument, since it doesn't appear anywhere, and hence Agda is unable to infer it) that |n′ ≤ max m′ n′|, so we use |s≤s| to get |suc n′ ≤ suc (max m′ n′)|, and from the definition of |max|, we (and more importantly Agda) get that |suc (max m′ n′) == max (suc m′) (suc n′)|, so we are in fact done.
+If it is |suc n'|, we need to know what the first argument was, so we pattern match on it. If the first argument is |0|, then, |max 0 (suc n')| reduces to |suc n'|, so we want to prove that |suc n' ≤ suc n'|, which we do by using the lemma |≤-refl| (we can note that we did not actually need the fact that the second argument was non-zero, since |max 0 n| reduces to |n| no matter what |n| is).
+\restorecolumns
+\begin{code}  
+max-≤₂  {0}       {suc n'}  = ≤-refl
+\end{code}
+On the other hand, if the first argument is |suc m'|, by induction, we find a proof of |n' ≤ max m' n'| (we call |max-≤₂|---we need to supply the first implicit argument which Agda is unable to infer), and use |s≤s| on it to get |suc n' ≤ suc (max m' n')|. Agda then uses the definition of |max| to reduce |max (suc m') (suc n')| to |suc (max m' n')|, so we are in fact done.
+\restorecolumns
 \begin{code}
-max-increasing₂ {m} {zero} = z≤n
-max-increasing₂ {zero} {suc n′} = ≤-refl
-max-increasing₂ {suc m′} {suc n′} = s≤s (max-increasing₂ {m′} {n′})
+max-≤₂  {suc m'}  {suc n'}  = s≤s (max-≤₂ {m'})
 \end{code}
-We also prove the similar proposition, |max-increasing₁ : {m n : ℕ} → m ≤ max m n|, that |max| is greater than its first argument, in essentially the same way (we pattern match first on the first argument instead).\todo{check that variable names are reasonably consistent}
-
-Using |max-increasing₁| and |≤-refl|, we are able to prove the initial step in the induction proof, |max-greatest-base|. We pattern match on the remainter of the list, if it is |[]|, we need to show that |x ≤ x|, which is done with |≤-refl|, and if it is |x′ ∷ xs|, we need to prove that |x ≤ maxL (x ∷ (x′ ∷ xs)) pf|, and expanding this using the definition of |max|, we find that we need to prove that |x ≤ max x (maxL (x′ ∷ xs) pf′)|, which is exactly what |max-increasing₁| does.
+We also prove the similar proposition, that |max| is greater than its first argument, in essentially the same way (we pattern match first on the first argument instead, and this time, Agda is able to infer the arguments of |max-≤₁| in the induction case, so we leave them out):
 \begin{code}
-max-greatest-base {x} {[]} = ≤-refl
-max-greatest-base {x} {x′ ∷ xs} = max-increasing₁
+max-≤₁ : {m n : ℕ} → m ≤ max m n
+max-≤₁  {0}       {n}       = z≤n
+max-≤₁  {suc m'}  {0}       = ≤-refl
+max-≤₁  {suc m'}  {suc n'}  = s≤s max-≤₁
 \end{code}
-Finally, we are able to finish our proof of |max-greatest|. As we said above, we want to pattern match on the index, however, this is not possible to do right away, since the available constructors (if any) for |Fin (length xs)| depends on the length of |xs|. Therefore, we begin by pattern matching on the list. If the list is empty, we fill in the absurd pattern |()| for the proof that it is nonempty. Otherwise, we pattern match on the index. 
-If the index is |fzero|, we use the initial step |max-greatest-base|, to prove that |x ≤ maxL (x ∷ xs) pf|. 
-If the index is |fsuc i|, we pattern match on the tail of the list. If it is empty, we know that the index shouldn't have been |fsuc i|, because we'd have |i : Fin zero|, so we fill in |i| with the absurd pattern |()|.
-The case we have left is when the list is |x ∷ (x′ ∷ xs)|, and the index is |fsuc i|. As we said above, we use induction to prove that |(x′ ∷ xs) ‼ i ≤ maxL (x′ ∷ xs) pf|. By the definition of |‼|, we have that
-\begin{spec}
-(x ∷ (x′ ∷ xs)) ‼ (fsuc i) == (x′ ∷ xs) ‼ i
-\end{spec}
-So by induction, |max-greatest i| proves that |(x ∷ (x′ ∷ xs)) ‼ (fsuc i) ≤ maxL (x′ ∷ xs) pf|, and additionally, from the definition of |max|, 
-\begin{spec}
-maxL (x ∷ (x′ ∷ xs)) pf == maxℕ x (maxL (x′ ∷ xs) pf′)
-\end{spec}
-So using |maxℕ-increasing₂|, and |≤-trans| to put things together, we get \todo{clean up the proofs ``pf'' that are input to max} the desired result:
+
+Using |max-≤₁| and |≤-refl|, we are able to prove the initial step in the induction proof, |max-greatest-base|. We pattern match on |xs|. If it is |[]|, we need to show that |x ≤ x|, which we do with |≤-refl|, again:
+\savecolumns
 \begin{code}
-max-greatest [] () _
-max-greatest (x ∷ xs) (s≤s z≤n) fzero = max-greatest-base {x} {xs}
-max-greatest (x ∷ []) (s≤s z≤n) (fsuc ())
-max-greatest (x ∷ (x′ ∷ xs)) (s≤s z≤n) (fsuc i) = ≤-trans (max-greatest _ _ i) (max-increasing₂ {x})
+max-greatest-base  {x}  {[]}       = ≤-refl
 \end{code}
-
-
-
-
-
-
-
-\subsection{Finish}
-Now, we are able to finish our proof of the specification by putting together the parts of the two previous sections. 
-
-If the list is empty, the proof would be an element of |1 ≤ 0|, and that type is empty, so we can put in the absurd patern |()|. On the other hand, if the list is |x ∷ xs|, we make a pair of the above proofs, and are done:
+If it is |x' ∷ xs|, we need to prove that |x ≤ maxL (x ∷ (x' ∷ xs)) _|. Agda reduces the right hand side to |max x (maxL (x' ∷ xs) _)|, so we just need to use |max-≤₁| does:
+\restorecolumns
 \begin{code}
---max-spec [] ()
---max-spec (x ∷ xs) (s≤s z≤n) = max-greatest , max-in-list
+max-greatest-base  {x}  {x' ∷ xs}  = max-≤₁
 \end{code}
 
-To end this example, we note that proving even simple (obvious) propositions in Agda takes quite a bit of work, and a lot of code, but generally not much thinking. After this extended example, we feel that we have illustrated most of the techniques that will be used later on in the report. As we wrote in the introduction to the section, we will often only give the types of the propositions, followed with the types of important lemmas and note what part of the arguments we pattern match on and in what order.
+Finally, we finish our proof, |max-greatest|. As we said above, we want to pattern match on the index, however, this is not possible to do right away, since the available constructors (if any) for |Fin (length xs)| depends on the length of |xs|. Therefore, we begin by pattern matching on the list. If the list is empty, we fill in the absurd pattern |()| for the proof that it is nonempty:
+\savecolumns
+\begin{code}
+max-greatest  []                 ()         _
+\end{code}
+Otherwise, |Fin (length xs)| is non-empty, and can pattern match on the index.
+If the index is |f0|, we use the initial step |max-greatest-base|, to prove that |x ≤ maxL (x ∷ xs) pf|:
+\restorecolumns
+\begin{code}
+max-greatest  (x ∷ xs)           (s≤s z≤n)  f0          =  max-greatest-base {x} {xs}
+\end{code}
+If the index is |fsuc i|, we pattern match on the tail of the list. If it is empty, we know that the index cannot be |fsuc i|, because we would have |i : Fin 0|, so we fill in |i| with the absurd pattern |()|:
+\restorecolumns
+\begin{code}
+max-greatest  (x ∷ [])           (s≤s z≤n)  (fsuc ())
+\end{code}
+The last case is when the list is |x ∷ (x' ∷ xs)|, and the index is |fsuc i|. As we said above, we use induction to prove that |(x' ∷ xs) ‼ i ≤ maxL (x' ∷ xs) _|. By the definition of |‼|, |(x ∷ (x' ∷ xs)) ‼ (fsuc i)| reduces to |(x' ∷ xs) ‼ i|.
+So by induction, |max-greatest i| proves that |(x ∷ (x' ∷ xs)) ‼ (fsuc i) ≤ maxL (x' ∷ xs) pf|. From the definition of |maxL|, |maxL (x ∷ (x' ∷ xs)) _| reduces to |max x (maxL (x' ∷ xs) _)|.
+So using |max-≤₂|, and |≤-trans| to put things together, we finish the proof:
+\restorecolumns
+\begin{code}
+max-greatest  (x ∷ (x' ∷ xs))    (s≤s z≤n)  (fsuc i)    =  ≤-trans 
+                                                           (max-greatest _ _ i)
+                                                           (max-≤₂ {x})
+\end{code}
 
-We also feel that we have illustrated the fact that proving something in Agda often requires a lot of code, but not much thinking, as the above proof essentially proceeds as one would intuitively think to prove the specification correct. Most of the standard concepts used are available in one form or another from the standard library, and we have attempted to keep our names consistent with it (the actual code given in later sections uses the standard library when possible, but we try to include simplified definitions in this report).
+%To end this example, we note that proving even simple (obvious) propositions in Agda takes quite a bit of work, and a lot of code, but generally not much thinking. After this extended example, we feel that we have illustrated most of the techniques that will be used later on in the report. As we wrote in the introduction to the section, we will often only give the types of the propositions, followed with the types of important lemmas and note what part of the arguments we pattern match on and in what order.
 
+%We also feel that we have illustrated the fact that proving something in Agda often requires a lot of code, but not much thinking, as the above proof essentially proceeds as one would intuitively think to prove the specification correct. Most of the standard concepts used are available in one form or another from the standard library, and we have attempted to keep our names consistent with it (the actual code given in later sections uses the standard library when possible, but we try to include simplified definitions in this report).
+\subsection{Final remarks about Agda}
+We end the section about Agda by going over a few parts of Agda that we have not mentioned but will be used in the remainder of the report. 
 
-\todo{fix references below (only visible in source)}
-\label{decidable-def}
+First, Agda has Standard Library that contains most of the definitions we have made above (sometimes under slightly different names, for example, |_∧_| is called |_×_|, and in more generality---definitions are made to work for all of |Set₁|, |Set₂|, \ldots). In the remainder of the report, and in our library proving the correctness of Valiant's algorithm, we use the Standard Library definitions whenever possible.
+
+Our second comment is about the structure of Agda programs. Agda code is partitioned into modules, which contain a sequence of function and datatype definitions. 
+Modules can be imported, and an imported module can be opened to bring all definitions into scope in the current module. Additionally, modules can be parametrised by elements of a datatype, which basically means that all functions in the module take an extra argument of that type. To open a parametrised module, an element of the parameter type is needed. We use parametrised modules frequently in this report and in our library, starting in Section \ref{Matrices}.
+\missingfigure{A MODULE DEFINITION}
+
+Finally, there is another way to define a datatype: as a record. A record is similar to a product type, but each field is given a name. This is useful when there is a lot of fields and there is no natural ordering of them. Records behave like small modules, they can contain function definitions, and they can be parametrised and opened, like modules, bringing all their fields and definitions into scope. We define a record type of a dependent pair:
+\begin{code}
+record Pair (A B : Set) : Set where
+  field
+    fst : A
+    snd : B
+\end{code}
+When defining algebraic structures in Section \ref{Algebra}, records are very useful for handling the axioms needed, since they have no natural ordering.
