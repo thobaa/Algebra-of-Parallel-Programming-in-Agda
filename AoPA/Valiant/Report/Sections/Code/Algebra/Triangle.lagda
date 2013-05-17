@@ -1,9 +1,10 @@
 %if False
 \begin{code}
-open import Agda.CH
+open import Data.Nat
+open import Data.Product using (proj₁)
+open import Data.Fin using (Fin; toℕ) renaming (zero to fzero; suc to fsuc)
 open import Algebra.NANRing
-open import Agda.List1
-open import Agda.List2 using (Fin; fsuc; fzero)
+open import Algebra.Monoid
 module Algebra.Triangle (NAR : NonAssociativeNonRing) where
 
 import Algebra.Matrix
@@ -28,7 +29,7 @@ One additional reason for not choosing the second approach is that inequalities 
 
 Thus we define triangular matrices of triangularity |d| (and give them the name |Triangle|):
 %if False
-\begin{code}
+\begin{spec}
 infix 6 _-_
 _-_ : {n : ℕ} → Fin n → Fin n → Fin n
 fzero - j = fzero
@@ -41,13 +42,13 @@ infix 5 _≤_
 data _≤_ : {n : ℕ} → Fin n → Fin n →  Set where
   fz≤i  : {n : ℕ} {i : Fin (suc n)} → fzero ≤ i
   fs≤fs : {n : ℕ} {i j : Fin (suc n)} → i ≤ j → fsuc i ≤ fsuc j
-\end{code}
+\end{spec}
 %endif
 \begin{code}
 record Triangle (n : ℕ) : Set where --(d : Fin n) : Set where
   field 
     mat : Matrix n n
-    tri : (i j : Fin n) → i ≤ j → mat i j R≈ 0#
+    tri : (i j : Fin n) → toℕ i ≤ toℕ j → mat i j R≈ R0
 \end{code}
 
 We also define two |Triangle|s to be equal if they have the same underlying matrix, since the proof is only there to ensure us that they are actually upper triangular.\todo{do we actually want arbitrary triangularity? Pros: makes going from sum to different spec easier, do we want that? Cons: trickier definition. probably not}
@@ -56,12 +57,18 @@ _T≈_ : {n : ℕ} → Triangle n → Triangle n → Set
 A T≈ B = Triangle.mat A M≈ Triangle.mat B
 \end{code}
 
-Now, we go on to define addition and multiplication of triangles. We apply matrix addition on their matrices and modify their proofs. For addition, the proof modification is straightforward: \todo{maybe time to switch to standard library things?}
+Now, we go on to define addition and multiplication of triangles. We apply matrix addition on their matrices and modify their proofs. For addition, the proof modification is straightforward:
 \begin{code}
 _T+_ : {n : ℕ} → Triangle n → Triangle n → Triangle n
 A T+ B = record 
-  { mat = Triangle.mat A M+ Triangle.mat B; 
-    tri = λ i j i≤j → {!A i j + B i j !} }
+  { mat = Triangle.mat A M+ Triangle.mat B
+  ; tri = λ i j i≤j → 0′+0″≈0 +-commutativeMonoid (Triangle.tri A i j i≤j) (Triangle.tri B i j i≤j) }
 \end{code}
 
-\todo{ write triangle multiplication. Then the end of the algebra chapter is hit}
+For multiplication, the proof modification required is a bit more complicated, and requires a lemma related to dot-products.
+\begin{code}
+_T*_ : {n : ℕ} → Triangle n → Triangle n → Triangle n
+A T* B = record 
+  { mat = Triangle.mat A M* Triangle.mat B
+  ; tri = {!!} }
+\end{code}

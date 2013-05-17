@@ -22,7 +22,7 @@ The part |(NAR : NonAssociativeNonRing)| is an argument to the module matrix.
 We open the record |NonAssociativeNonRing| with |NAR| so that we will be able to use the definitions in the ring easily, and rename things so that they do not clash with concepts we will define for the matrices (and also to help us figure out what operation we are using):
 %if False
 \begin{code}
-open NonAssociativeNonRing NAR public renaming (_+_ to _R+_; _*_ to _R*_; _≈_ to _R≈_; zero to R-zero; +-comm to R+-comm)
+open NonAssociativeNonRing NAR public renaming (_+_ to _R+_; _*_ to _R*_; _≈_ to _R≈_; zero to R-zero; +-comm to R+-comm; +-identity to R+-identity)
 \end{code}
 %endif
 \begin{spec}

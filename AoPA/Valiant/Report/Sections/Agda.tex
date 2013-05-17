@@ -1,28 +1,12 @@
 \section{Agda}
-Agda is a dependently typed functional language based on Martin-Löf type theory \cite{Martin-Löf}.
-
+Agda is a dependently typed functional language based on Martin-Löf type theory \cite{Martin-Löf}. The current version of Agda, Agda 2, was implemented by Ulf Norell as a part of his PhD thesis \cite{NorellAgda}.
 %That Agda is a functional language means that an Agda program consists of definitions of datatypes and (recursive) functions. %..............
 %That Agda has dependent types means that the datatypes in Agda can depend on the \emph{values} of other datatypes (which need not be known at compile time). %For example, we can define a datatype of matrices and a function that performs matrix multiplication in such a way that the typechecker %....................
 %That it is based on Martin-Löf type theory means that it %......................
-The current version of Agda, Agda 2, was implemented by Ulf Norell as a part of his PhD thesis \cite{Agda}.
-
 In this section, we give a short introduction to using Agda to write programs and proofs.
-\todo{THOMAS: Emacs mode?}
-% emacs mode ???
-%To help with programming, there is an Emacs interface for Agda that allows type checking of 
 
-
-%whitespace important
-% implicit arguments
-% total
-\subsection{Programming in Agda}
-\todo{Notes by JP:
-  1. Every binding can be given a name. (important?)
-  %2. Explain |_|.
-  %3. Use of spacing.
-  %4. Totality.
-}
-That Agda is a functional programming language means that programs consist of a sequence of definitions of datatypes and functions. One of the simplest datatypes we can define is the type |Bool| of truth values, consisting of the elements |True| and |False|. In Agda, we define it like this:
+\subsection{Introduction}
+Agda is a functional programming language. This means that programs consist of a sequence of definitions of datatypes and functions. One of the simplest datatypes we can define is the type |Bool| of truth values, consisting of the elements |True| and |False|. In Agda, we define it like this:
 \begin{code}
 data Bool : Set where
   True   : Bool
@@ -32,9 +16,9 @@ There are a couple of things to note about the definition:
 \begin{itemize}
 \item The word |data| states that we are defining a new datatype. The list of constructors follow the word |where|. 
 \item Following |data|, we give the name of the new type, |Bool|.
-\item Everything has a type, and we generally need to provide the types (as opposed to in Haskell, where it is usually possible for the compiler can infer them) and statements of the form |a : b| mean that |a| is an element of type |b|. In this case, |True| and |False| are elements of type |Bool|, while |Bool| is an element of type |Set|, the type of small types (which itself is an element of |Set₁|, which is an element of |Set₂|, and so on).
+\item Everything has a type, and we generally need to provide the types (as opposed to Haskell or ML, where it is usually possible for the compiler to infer them) and statements of the form |a : b| mean that |a| is an element of type |b|. In this case, |True| and |False| are elements of type |Bool|, while |Bool| is an element of type |Set|, the type of small types (which itself is an element of |Set₁|, which is an element of |Set₂|, and so on).
 \end{itemize}
-Additionally, the spacing in the above example is important. Agda allows identifiers to be almost any sequence of unicode symbols ,excluding spaces and parenthesis (but including unicode characters like |₁| in |Set₁|), so in particular, we need a spaces  between |Bool| and |:| and |Set|, because |Bool:Set| is a valid identifier. In the same spirit, there are no rules specifying that some identifiers need to begin with upper or lower case letters (compared to Haskell's requirement that constructors and types begin with an upper case letter, while variables begin with a lower case letter. We could define a (different, but isomorphic) type |bool|:
+Additionally, the spacing in the above example is important. Agda allows identifiers to be almost any sequence of unicode symbols, excluding spaces and parentheses (but including unicode characters like |₁| in |Set₁|), so for example, we need to write spaces in |Bool : Set|, because |Bool:Set| is a valid identifier. In the same spirit, there are no rules specifying that some identifiers need to begin with upper or lower case letters (as opposed to Haskell's requirement that constructors and types begin with an upper case letter and variables begin with a lower case letter). We could define a (different, but isomorphic) type |bool|:
 \begin{code}
 data bool : Set where
   true  : bool
@@ -48,35 +32,29 @@ not : Bool → Bool
 not True = False
 not False = True
 \end{code}
-The first line is the type definition. |not| has type |Bool → Bool| (function from |Bool| to |Bool|). Next, we define |not|, and this is done by pattern matching. |not True = False| states that |not| applied to |True| is |False|, and similarily with the last line. As in Haskell, function application is written without parenthesis: |f x| means |f| applied to |x|, and associates to the left: |g x y| means |(g x) y|, where |g : X → Y → Z| (the arrow |→| associates to the right, |X → Y → Z| means |X → (Y → Z)|, so that |g x : Y → Z|).
+The first line is the type definition. |not| has type |Bool → Bool| (function from |Bool| to |Bool|). Next, we define |not|, and this is done by pattern matching. |not True = False| states that |not| applied to |True| is |False|, and similarily with the last line. As in Haskell, function application is written without parentheses: |f x| means |f| applied to |x|, and associates to the left: |g x y| means |(g x) y|, where |g : X → Y → Z| (the arrow |→| associates to the right, |X → Y → Z| means |X → (Y → Z)|, so that |g x : Y → Z|).
 
-Agda is a total programming language, which means that the type checker makes sure that a program never crashes, and every function terminates. In particular, the following definitions are not legal Agda code. First,
+Agda is a total programming language, which means that the language ensures that a program never crashes, and that every function terminates. In particular, the following definitions are not legal Agda code. First,
 \begin{code}
 not' : Bool → Bool
 not' True = False
 \end{code}
-is illegal, since if |not'| is applied to |False|, there is no case, and the program would crash. This is fairly easy to control, the type checker just needs to make sure that all available constructors appear in the definition. Second,
+is illegal, since if |not'| is applied to |False|, there is no case, and the program would crash. This is fairly easy to control, roughly speaking, the system just needs to make sure that all available constructors appear in the definition. Second,
 \begin{code}
 not'' : Bool → Bool
 not'' x = not'' x
 \end{code}
-is illegal since evaluating |not'' x| would reduce it to |not'' x|, which then has to be evaluated, creating an infinite loop. This is more difficult to control, since it is well known that there is no program that can determine if an arbitrary program eventually terminates or not (the Halting problem \cite{Turing}). Agda sidesteps this problem by ensuring that when a function is recursive, it can only call itself on arguments that are structurally smaller than the input. 
+is illegal since evaluating |not'' x| would reduce it to |not'' x|, which then has to be evaluated, creating an infinite loop. This is more difficult to control, since it is well known that there is no program that can determine if an arbitrary program eventually terminates or not (the Halting problem cannot be solved \cite{Turing}). Agda sidesteps this problem by using a concervative termination-checker, that only accepts a subset of terminating programs. %ensuring that when a function is recursive, it can only call itself on arguments that are structurally smaller than the input.
 
-In particualar, the fact that every Agda function terminates implies that not every computable (mathematical) function can be computed with Agda.
-
-\subsubsection{Proving in Agda}
-In this section, we will define a function that takes a list of natural numbers and returns the maximum. Then we are going to state two properties we expect the function to have: 
-\begin{itemize}
-\item The return value should be in the list.
-\item The return value should be greater than every element in the list.
-\end{itemize}
-Finally, we are going to prove that these properties hold. All of this will be done in Agda code, which means that the Agda type checker guarantees that our proofs are correct!
+\subsection{Beginning to write a program}
+In this section, we will define a function that takes a list of natural numbers and returns its maximum. Then we are going to state a property we expect the function to have:  The return value should be greater than every element in the list.
+Finally, we are going to prove that this property hold. All of this will be done in Agda, which means that the Agda system guarantees that our proofs are correct!
 
 The first reason for doing this is to continue our introduction to Agda, by defining more complicated functions and poining out additional features of the language (and in particular proving things with it). The second reason is that a proof in Agda can require quite a bit of boilerplate code, and hence, in later sections, we only include parts of them, and we feel that there should be a complete proof written in Agda somewhere in this thesis.
-\subsubsection{Some datatypes and functions}
+%\subsubsection{Some datatypes and functions}
 %include /Code/Agda/List1.lagda
 
 %include /Code/Agda/CH.lagda
 
-\subsubsection{More datatypes and functions}
+\subsection{Finishing the program}
 %include /Code/Agda/List2.lagda

@@ -1,18 +1,34 @@
 \section{Introduction}
+Agda is a dependently typed functional programming language based on Martin--Löf type theory that can also be used as a proof assistant. Valiant's algorithm is a highly parallel algorithm for computing the transitive closure of a matrix in the time needed to multiply two matrices. Computing the transitive closure of an upper triangular matrix is a problem that appears when parsing a context free language.
+
+For this thesis, we use Agda to formalize enough matrix algebra to formally prove the correctness of Valiant's algorithm.
+The full formalization and proof is made up of around 3500 lines of code, partitioned into around 30 modules, all of which is available at [URL]\todo{THOMAS: include URL at later stage}.
 
 % questions to answer: what are we doing? Why are we doing it?
-\subsection{What?}
-In this thesis, we use the programming language Agda to formalize enough matrix algebra to formally prove the correctness of Valiant's algorithm for computing the transitive closure of a matrix.
+%\subsection{What?}
+% 
+%In this thesis, we use the programming language Agda to formalize enough matrix algebra to formally prove the correctness of Valiant's algorithm for computing the transitive closure of a matrix.
 
 % begin by
-We begin by giving a short introduction to Agda, where we use it to define and prove the correctness of a maximum function on lists. Then we introduce the algebra relevant for parsing (some parts of which are fairly non-standard, in particular, we need to consider non-associative multiplication). We give definitions of algebraic structures both as ``mathematical'' definitions (as seen in an algebra textbook) and as Agda definitions to display the similarity between Agda syntax and ordinary mathematics, and to provide the base for later chapters. The main algebraic structures we discuss are commutative monoids and nonassociative semirings. We also define matrices over the nonassociative semirings. Next, we give a short introduction to Parsing, mainly to relate it to the algebra we have just presented, and show that Parsing is equivalent to computing the transitive closure of an upper triangular matrix. In the final part of our thesis, we first present Valiant's algorithm and implement it in Agda, and then we combine the algebra with the ideas in the parsing section to prove the correctness of the algorithm.
-
+% \subsection{Forward look}
 % Why 
-\subsection{Why?}
+%\subsection{Why?}
 % parsing -- 
 % formal proofs
 % Agda!
-Finally, we use Agda because it 
+
+% functional program
+Parsing is used in a large number of areas [examples].
+With the advent of CPUs with multiple cores, it becomes increasingly attractive to try and parse in parallel.
+Because their computations lack side effects, functional programming languages make are suitable for writing parallel programs.
+Additionally, working in Agda allows us to write an algorithm and prove its correctness simultaneously. %In particular, Agda has helped us choose the right definitions in a couple of cases when they have been they have turned out to be the only ones with the right type.
+
+The choice of Valiant's algorithm is due to the fact that, although initially discovered to prove that parsing can be done in the time needed to perform a matrix multiplication, happens to be highly parallel. Additionally, it is a simple enough algorithm to make it feasible to write a formal proof of its correctness.
+
+%because it is being actively developed at Chalmers, and because its 
 
 
-The thesis is meant to be usable as an introduction to proving things in Agda for people not familiar with the programming language, but it is helpful to have some previous experience with either functional programming or abstract algebra.
+We begin the report with Section \ref{Agda}, which a short introduction to Agda, where we use it to define and prove the correctness of a maximum function on lists. Next, in Section \ref{Algebra}, we introduce the algebra relevant for parsing (some parts of which are fairly non-standard, in particular, we need to consider structures with non-associative multiplication). We give definitions of algebraic structures both as ``mathematical'' definitions (as seen in an algebra textbook) and as Agda definitions, to display the similarity between Agda syntax and ordinary mathematics, and to provide the base for later chapters. The main algebraic structures we discuss are commutative monoids and nonassociative semirings. We also define matrices over the nonassociative semirings. In Section \ref{Parsing}, we then give a short introduction to Parsing, mainly to relate it to the algebra we have just presented, and show that Parsing is equivalent to computing the transitive closure of an upper triangular matrix. In the final part of our thesis, Section \ref{Valiant}, we first present Valiant's algorithm for computing the transitive closure and implement it in Agda. Then we combine the algebra with the ideas in the parsing section to prove the correctness of the algorithm.
+%%%%%%%%%%
+
+This report is meant to be usable as an introduction to proving things in Agda for people not familiar with the programming language, but it is helpful to have some previous experience with either functional programming or abstract algebra.

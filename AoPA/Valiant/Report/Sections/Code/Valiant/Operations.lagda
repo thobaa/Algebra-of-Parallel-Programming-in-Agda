@@ -8,7 +8,7 @@ open import Data.Unit
 module Valiant.Operations (NANR : NonAssociativeNonRing) where
 import Valiant.MatAndTri
 open Valiant.MatAndTri NANR
-open NonAssociativeNonRing NANR renaming (_+_ to _R+_; _*_ to _R*_; 0# to R0; _≈_ to _R≈_)
+--open NonAssociativeNonRing NANR renaming (_+_ to _R+_; _*_ to _R*_; 0# to R0; _≈_ to _R≈_)
 
 infix 7 _m*_ 
 infix 7 _vm*_
@@ -102,31 +102,31 @@ and column vector--row vector multiplication (the outer product) is given by
 
 We now begin defining these multiplications in Agda. There is some dependency between them, for example, to define outer product, we need both kinds of scalar--vector multiplication (although we don't need anything to define the dot product). We hence begin with the simplest kinds of multiplication, first scalar--vector mutliplication:
 \begin{code}
-_sv*_ : {s : Splitting} → Carrier → Vec s → Vec s
+_sv*_ : {s : Splitting} → R → Vec s → Vec s
 x sv* one x' = one (x R* x')
 x sv* two u v = two (x sv* u) (x sv* v) 
 \end{code}
 and then vector--scalar multiplication:
 \begin{code}
-_vs*_ : {s : Splitting} → Vec s → Carrier → Vec s
+_vs*_ : {s : Splitting} → Vec s → R → Vec s
 one x vs* x' = one (x R* x')
 two u v vs* x = two (u vs* x) (v vs* x)
 \end{code}
 Then we move on to the dot product:
 \begin{code}
-_∙_ : {s : Splitting} → Vec s → Vec s → Carrier
+_∙_ : {s : Splitting} → Vec s → Vec s → R
 one x ∙ one x' = x R* x'
 two u v ∙ two u' v' = u ∙ u' R+ v ∙ v'
 \end{code}
 next, we move on to scalar--matrix and matrix--scalar multiplication (the definition of which we leave out since it is essentially the same as scalar--matrix multiplication):
 \begin{code}
-_sm*_ : {s₁ s₂ : Splitting} → Carrier → Mat s₁ s₂ → Mat s₁ s₂
+_sm*_ : {s₁ s₂ : Splitting} → R → Mat s₁ s₂ → Mat s₁ s₂
 x sm* sing x' = sing (x R* x')
 x sm* rVec v = rVec (x sv* v)
 x sm* cVec v = cVec (x sv* v)
 x sm* quad A B C D = quad (x sm* A) (x sm* B) (x sm* C) (x sm* D)
 
-_ms*_ : {s₁ s₂ : Splitting} → Mat s₁ s₂ → Carrier → Mat s₁ s₂
+_ms*_ : {s₁ s₂ : Splitting} → Mat s₁ s₂ → R → Mat s₁ s₂
 \end{code}
 %if False
 \begin{code}

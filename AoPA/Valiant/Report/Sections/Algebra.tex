@@ -6,7 +6,7 @@ We are going to introduce a bunch of algebraic things that will be useful either
 The first two sections are about algebraic structures that are probably already known. Both for reference, and as examples. Then we go on to more general algebraic structures, more common in Computer Science, since they satisfy fewer axioms (more axioms mean more interesting structure---probably---but at the same time, it's harder to satisfy all the axioms.
 \subsection{Introductory defintions}
 Before covering some algebraic structures, we would like to define the things needed to talk about them in Agda. These are mainly propositions regarding functions and relations.
-\subsubsection{Relation properties}
+\subsubsection{Properties of a relation}
 The first thing to discuss is the equivalence relation. It is a relation that acts like an equality.
 \begin{Definition}
   A relation $R \subset X \times X$ is called an \emph{equivalence relation} if it is\todo{write sqiggly line instead of $R$}
@@ -31,7 +31,7 @@ If we replace the equality of elements with an equivalence relation, i.e., that 
 \todo{Done (PJ): is it possible to make underscores less ugly?}
 \todo{Chase down the last few underscores.}
 
-\subsubsection{Operation Properties}\todo{THOMAS: Should we give these things names, or use them anyway? (i.e., |OP2| vs |A \to A \to A|}
+\subsubsection{Properties of an operation}\todo{THOMAS: Should we give these things names, or use them anyway? (i.e., |OP2| vs |A \to A \to A|}
 Next, we define some properties that binary operation (i.e., functions $X \to X \to X$) can have. These are functions that are similar to ordinary addition and multiplication of numbers (if they have all the properties we define below---but it can be useful to think of them that way even if they don't).
 \begin{Definition} %%% Associative
 A binary operation $\cdot$ on a set $X$ is associative if $x \cdot (y \cdot z) = (x \cdot y) \cdot z$ for all $x$, $y$, $z \in X$.
@@ -54,7 +54,7 @@ In Agda, this proposition becomes the type
 %include Code/Algebra/Short/Commutative.lagda
 Again, many familiar basic mathematical operations are commutative, like addition and multiplication of numbers, are commutative, but matrix multiplication for matrices of size $n \times n$, $n \ge 2$ is an example of an operation that is not commutative.
 
-\subsubsection{Properties of pairs of operations}
+\subsubsection{Properties of a pair of operations}
 When we have two different binary operations on the same set, we often want them to interact with each other sensibly, where sensibly means as much as multiplication and addition of numbers interact as possible. 
 
 %%%%%%%%%%%%%%%%%%
@@ -90,57 +90,26 @@ If we don't have inverses, we can't perform the final step (for example, if $+$ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% GROUPS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Groups}
-The first algebraic structure we will discuss is that of a group. We give first the mathematical definition, and then define it in Agda:
+\subsection{Sets with one binary operation} % alternate title: genralizations
+In this section, we are going to discuss algebraic structures made up of a set and a binary operation on the set.
+\subsubsection{Groups}
+In mathematics, the most common such structure is the group. Many mathematical objects form groups, including the integers $\Z$, the rational numbers $\Q$, the real numbers $\R$ and the complex numbers $\C$, with the binary opertaion addition, and the non-zero rational numbers $\Q\setminus{0}$, non-zero real numbers $\R\setminus{0}$, and non-zero complex numbers $\C\setminus{0}$, with the binary operation multiplication form groups. Although, groups satisfy too to be useful to us, we give the definition below, to make clarify the difference between them and the less familiar monoids we present next.
 \begin{Definition}
-A group is a set $G$ together with a binary operation $\cdot$ on $G$, satisfying the following:
+A \emph{group} is a set $G$ together with a binary operation $\cdot$ on $G$, satisfying the following:
 \begin{itemize}
 \item $\cdot$ is associative, that is, for all $x$, $y$, $z \in G$, $(x \cdot y) \cdot z = x \cdot (y \cdot z)$. 
 \item There is an element $e \in G$ such that $e \cdot g = g \cdot e = g$ for every $g \in G$. This element is the \emph{neutral element} of $G$.
 \item For every $g \in G$, there is an element $g^{-1}$ such that $g \cdot g^{-1} = g^{-1} \cdot g = e$. This element $g^{-1}$ is the \emph{inverse} of $g$.
 \end{itemize}
 \end{Definition}
-\begin{Remark}
-The set $G$ is sometimes called the \emph{carrier set} of the group. This is the name used in the Agda Standard Library for all algebraic structures.
-\end{Remark}
-\begin{Remark}
-One usually refers to a group $(G, \cdot, e)$ simply by the name of the set $G$, in particular when the operation considered is fairly obvious.
-\end{Remark}
-\begin{Definition}
-An group $(G, \cdot, e)$ is \emph{Abelian} if the binary operation $\cdot$ is commutative.
-\end{Definition}
-%\begin{Remark}
-%$G$ doesn't actually need to be a set. \todo{should this be noted}
-%\end{Remark}
-An important reason to study groups that many common mathematical objects are groups. First there are groups where the set is a set of numbers:
-\begin{Example}
-  The integers $\Z$, the rational numbers $\Q$, the real numbers $\R$ and the complex numbers $\C$, all form groups when $\cdot$ is addition and $e$ is $0$.
-\end{Example}
-\begin{Example}
-  The non-zero rational numbers $\Q\setminus{0}$, non-zero real numbers $\R\setminus{0}$, and non-zero complex numbers $\C\setminus{0}$, all form groups when $\cdot$ is multiplication and $e$ is $1$.
-\end{Example}
-Second, the symmetries of a 
-% In Agda code, this is defined using a record:
-%include /Code/Algebra/GroupDef.lagda
-
-
-\subsubsection{Cayley Table / Examples / Finite groups}
-We are mostly concerned with finite structures (although not groups) in this thesis, and these can be generated by a multiplication table (also known as a cayley table. We here give two examples of finite groups, to examplify the equational reasoning for algebraic structures.
-% include z2xz2
-
-
-
-
-
+A group where the binary operation $\cdot$ is commutative is said to be \emph{Abelian}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% MONOIDS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Monoids and related structures} % alternate title: genralizations
-Here, we are going to discuss algebraic structures that are slightly more general than groups. These are important for programming, because it is rare that a datatype satisfies all the axioms of a group. First, we define monoids, which are a generalization of groups, and then we define magmas, which are an even further generalization.
-\subsubsection{Definition}
-Like a group, a monoid is a set with a binary operation, that satisfies some axioms. The difference is that now, we don't require that there is an inverse for each element.
+\subsubsection{Monoids}
+Now, we discuss monoids, which are slightly more general than groups. In particular, they do not require the existence of inverses. Monoids are important for programming because it is rare that a datatype satisfies all the axioms of a group.
 \begin{Definition}
   A monoid is a set $M$, together with a binary operation $\cdot$ on $M$, that satisfies the following:
   \begin{itemize}
@@ -148,6 +117,7 @@ Like a group, a monoid is a set with a binary operation, that satisfies some axi
   \item There is an element $e \in M$ such that $e \cdot x = x \cdot e = x$ for every $x \in M$. This element is the \emph{neutral element} of $M$.
   \end{itemize}
 \end{Definition}
+A \emph{commutative} monoid is one where $\cdot$ is commutative.
 %include Code/Algebra/Monoid.lagda
 
 %\subsubsection{Cayley Table} remove this here, and instead refer back to definition of group.

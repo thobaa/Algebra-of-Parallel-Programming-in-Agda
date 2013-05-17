@@ -3,24 +3,25 @@
 open import Algebra.NANRing
 open import Valiant.Splitting
 open import Data.Nat
-module Valiant.MatAndTri (NANR : NonAssociativeNonRing) where
-open NonAssociativeNonRing NANR renaming (_+_ to _R+_; _*_ to _R*_; 0# to R0)
+module Valiant.MatAndTri (NASR : NonAssociativeNonRing) where
+open NonAssociativeNonRing NASR public renaming (_+_ to _R+_; _*_ to _R*_; _≈_ to _R≈_; +-identity to R+-identity)
 \end{code}
 %endif
 Mimicking the above, but using |Splitting|s as indices (the code is essentially the same, with every instance of ``|ℕ|'' replaced by ``|Splitting|''), we first define |Vec| as:
 \begin{code}
 data Vec : Splitting → Set where
-  one : (x : Carrier) → Vec one
-  two : {s₁ s₂ : Splitting} → (u : Vec s₁) → (v : Vec s₂) → Vec (bin s₁ s₂)
+  one : (x : R) → Vec one
+  two : {s₁ s₂ : Splitting} → Vec s₁ → Vec s₂ → Vec (bin s₁ s₂)
 \end{code}
 We can note that where |Splitting| is a binary tree of elements of the unit type, |Vec| is instead a binary tree of |Carrier| (with elements in the leaves). We move on to defining |Mat| as:
 \begin{code}
 data Mat : Splitting → Splitting → Set where
-  sing : (x : Carrier) → Mat one one
+  sing : (x : R) → Mat one one
   rVec : {s₁ s₂ : Splitting} → (v : Vec (bin s₁ s₂)) → Mat one (bin s₁ s₂)
   cVec : {s₁ s₂ : Splitting} → (v : Vec (bin s₁ s₂)) → Mat (bin s₁ s₂) one
-  quad : {r₁ r₂ c₁ c₂ : Splitting} → (A : Mat r₁ c₁) → (B : Mat r₁ c₂) → 
-                                     (C : Mat r₂ c₁) → (D : Mat r₂ c₂) → Mat (bin r₁ r₂) (bin c₁ c₂)
+  quad : {r₁ r₂ c₁ c₂ : Splitting} →  Mat r₁ c₁ → Mat r₁ c₂ → 
+                                      Mat r₂ c₁ → Mat r₂ c₂ → 
+                                      Mat (bin r₁ r₂) (bin c₁ c₂)
 \end{code}
 \todo{THOMAS: Check for number of constructors in JP's |Tri| definition}
 The definition of the last datatype involved, |Tri| is straightforward from the subdivision made above in Section \ref{Section:Subdivision-in-Specification}. There is only one base case, that of the $1 \times 1$ zero triangle (equal to the $1 \times 1$ zero matrix when viewed as an upper triangular marix), and putting together |Tri|s is straightforward since the upper triangular matrices need to be square, now that our matrices can have any shape, and the definition guarantees that the two step splitting in Section \ref{Section:Two-Step-Splitting} can be done:

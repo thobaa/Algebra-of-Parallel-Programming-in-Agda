@@ -6,7 +6,7 @@ open import Data.Fin using (Fin)
 open import Algebra.Monoid
 open import Algebra.NANRing
 module Algebra.MatrixProof (NAR : NonAssociativeNonRing) where
---open NonAssociativeNonRing NAR renaming (_+_ to _R+_; _*_ to _R*_; _≈_ to _R≈_)
+
 
 open Algebra.Matrix NAR
 open Algebra.MatrixOperations NAR

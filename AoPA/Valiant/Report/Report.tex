@@ -18,7 +18,7 @@
 %format _≡_   = "\unopun{≡}"
 %format _<_   = "\unopun{<}"
 %format _∧_   = "\unopun{∧}"
-%format _,_   = "\unopun{,}"
+%format _¸_   = "\unopun{,}"
 %format _∨_   = "\unopun{∨}"
 %format _+_   = "\unopun{+}"
 %format _v+_  = "\unopun{v+}"
@@ -38,7 +38,14 @@
 %format _≤?′_ = "\unopun{≤?′}"
 %format _∼_   = "\unopun{∼}"
 
+% format [_]   = "AA"
+%format "[]"    = "AA"
 
+% by thomas
+%format _≤_ = "\unopun{≤}"
+% format [          = "[\mskip5.5mu "
+% format ]          = "\mskip5.5mu]"
+% /by thomas
 
 %subst dummy = "\un"
 %**It is also possible to adjust the spacing for space (function appl.)
@@ -53,13 +60,12 @@
 
 \begin{document}
 
-\title{Report}
+\title{An Agda proof of Valiant's algorithm for context free parsing}
 \author{Thomas Bååth Sjöblom}
 \date{\today}
 \maketitle
 \newpage
 \tableofcontents
-\todo{THOMAS: Go through TODOList :)}
 %include ./Sections/Introduction.tex
 %include ./Sections/Agda.tex
 %include ./Sections/Algebra.tex

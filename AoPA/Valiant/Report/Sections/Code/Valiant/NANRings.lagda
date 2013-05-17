@@ -9,7 +9,7 @@ open import Data.Product
 --open import Algebra hiding (Monoid)
 
 open import Algebra.NANRing
-open import Algebra.Reasoning
+--open import Algebra.Reasoning
 open import Algebra.Monoid
 
 module Valiant.NANRings (NANR : NonAssociativeNonRing) where
@@ -17,7 +17,7 @@ import Valiant.MatAndTri
 open Valiant.MatAndTri NANR
 import Valiant.Operations
 open Valiant.Operations NANR
-open NonAssociativeNonRing NANR renaming (_+_ to _R+_; _*_ to _R*_; 0# to R0; +-identity to R+-identity; _≈_ to _R≈_; Carrier to R)
+--open NonAssociativeNonRing NANR renaming (_+_ to _R+_; _*_ to _R*_; +-identity to R+-identity; _≈_ to _R≈_; Carrier to R)
 \end{code}
 %endif
 \subsubsection{Proof that they are NANRings}
@@ -62,11 +62,7 @@ Tri-NonAssociativeNonRing {s} = record { isNonAssociativeNonRing = Tri-isNonAsso
 \end{code}
 
 To partly motivate proving that they are (and further, using algebraic structures) algebraic structures, we prove two simple lemmas about |CommutativeMonoid|s. The first is used repeatedly when proving that |zeroTri| is an annihilating element:\todo{fix the all a b below}
-\begin{code}
-0′+0″≈0 : (cm : CommutativeMonoid) → let open CommutativeMonoid cm renaming (_∙_ to _+_) in {0′ 0″ : Carrier} → 0′ ≈ ε → 0″ ≈ ε → 0′ + 0″ ≈ ε
-0′+0″≈0 cm = {!!}
-  where open CM-Reasoning cm
-\end{code}
+% HAS BEEN MOVED
 The second is used very frequently when proving that |_t*_| distributes over |_t+_|:
 \begin{code}
 rearr : {!!}

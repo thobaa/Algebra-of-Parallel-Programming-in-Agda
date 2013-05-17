@@ -1,8 +1,9 @@
 %if False
 \begin{code}
 open import Algebra.Equivalence
-open import Agda.CH 
+open import Data.Nat using ()
 open import Algebra.Monoid
+open import Data.Product renaming (_×_ to _∧_)
 module Algebra.NANRing where
 \end{code}
 %endif

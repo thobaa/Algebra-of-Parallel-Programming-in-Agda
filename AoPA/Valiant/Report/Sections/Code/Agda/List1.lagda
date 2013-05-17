@@ -17,14 +17,13 @@ one = suc zero
 five : ℕ
 five = suc (suc (suc (suc (suc zero))))
 \end{code}
-This is a fairly cumbersome way of writing numbers, and it is possible to make Agda supports more standard notation for |ℕ|, so that we may write:
-%if False
+This is a fairly cumbersome way of writing numbers, and it is possible to make Agda support a more standard notation for |ℕ| using the pragmas
 \begin{code}
-{-# BUILTIN NATURAL ℕ    #-}
-{-# BUILTIN ZERO    zero #-}
-{-# BUILTIN SUC     suc  #-}
+{-# BUILTIN NATURAL   ℕ      #-}
+{-# BUILTIN ZERO      zero   #-}
+{-# BUILTIN SUC       suc    #-}
 \end{code}
-%endif
+so that we may write:
 \begin{code}
 two  : ℕ
 two  = 2
@@ -37,9 +36,9 @@ data [_] (a : Set) : Set where
   []   : [ a ]
   _∷_  : a → [ a ] → [ a ]
 \end{code}
-We have chosen the notation to be similar to the Haskell notation for lists. The |(a : Set)| before the colon means the type of lists depends on (is indexed by) an arbitrary (small) type |a|. The underscore denotes where the argument is placed, so |[ a ]| is a list of elements from |a|, |[ ℕ ]| a list of natural numbers, et cetera. In the same way, |_∷_| is a function of two arguments, the first of type |a| (written in the place of the first underscore), the second of type |[ a ]| (written in place of the second underscore). The line |infixr 8 _∷_| explains that the infix operator |_∷_| associates to the right (the |r|) and the |8| defines how tightly it binds (to determine whether an expression including other operators needs parentheses or not). In the remainder we omit the |infix| declarations from this text, and use them only to give operations their expected bindings (for example, multiplication binds tighter than addition). 
+We have chosen the notation to be similar to the Haskell notation for lists. The |(a : Set)| before the colon means the type of lists depends on a parameter, which is an arbitrary (small) type |a|. The underscore denotes where the argument is placed, so |[ a ]| is a list of elements from |a|, |[ ℕ ]| a list of natural numbers, etc. In the same way, |_∷_| is a function of two arguments, the first of type |a| (written in the place of the first underscore), the second of type |[ a ]| (written in place of the second underscore). The line |infixr 8 _∷_| explains that the infix operator |_∷_| associates to the right (the |r|) and the |8| defines how tightly it binds (to determine whether an expression including other operators needs parentheses or not). In the remainder we omit the |infix| declarations from this text, but use them to give operations the bindings we expect (so that, for example, multiplication binds tighter than addition). 
 
-We give an example of a list of natural numbers:\todo{ALL: lhs2tex spacing in lists}
+We give an example of a list of natural numbers:
 \begin{code}
 exampleList  : [ ℕ ]
 exampleList  = 5 ∷ 2 ∷ 12 ∷ 0 ∷ 23 ∷ []
