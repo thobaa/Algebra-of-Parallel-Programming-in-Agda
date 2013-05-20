@@ -5,10 +5,10 @@ open import Valiant.Splitting
 open import Data.Nat
 open import Data.Product renaming (_×_ to _∧_)
 open import Data.Unit
-module Valiant.Operations (NANR : NonAssociativeNonRing) where
+module Valiant.Operations (NaSr : NonassociativeSemiring) where
 import Valiant.MatAndTri
-open Valiant.MatAndTri NANR
---open NonAssociativeNonRing NANR renaming (_+_ to _R+_; _*_ to _R*_; 0# to R0; _≈_ to _R≈_)
+open Valiant.MatAndTri NaSr
+--open NonassociativeSemiring NaSr renaming (_+_ to _R+_; _*_ to _R*_; 0# to R0; _≈_ to _R≈_)
 
 infix 7 _m*_ 
 infix 7 _vm*_
@@ -211,7 +211,7 @@ one t* one = one
 two U R L t* two U' R' L' = two (U t* U') (U tm* R' m+ R mt* L') (L t* L')
 \end{code}
 
-The final part needed to express the transitive closure specification in Agda is a concept of equality among triangles (and for this, we need equality for matrices and vectors, as before). In all cases, we want to lift the \nanring equality to the datatype in question. As before (see section \ref{Algebra-Equality}), equality takes two objects of a datatype to a proposition (a member of |Set|). We begin with equality among |Vec|, where two one element vectors are equal if their only elements are equal, and vectors that are made up of two parts are equal if both parts are equal (as vectors):
+The final part needed to express the transitive closure specification in Agda is a concept of equality among triangles (and for this, we need equality for matrices and vectors, as before). In all cases, we want to lift the nonassociative semiring-equality to the datatype in question. As before (see section \ref{Algebra-Equality}), equality takes two objects of a datatype to a proposition (a member of |Set|). We begin with equality among |Vec|, where two one element vectors are equal if their only elements are equal, and vectors that are made up of two parts are equal if both parts are equal (as vectors):
 \begin{code}
 _v≈_ : {s : Splitting} → Vec s → Vec s → Set
 one x v≈ one x' = x R≈ x'

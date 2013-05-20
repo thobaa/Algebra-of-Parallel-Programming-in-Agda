@@ -5,16 +5,16 @@ open import Valiant.Splitting
 open import Data.Nat
 open import Data.Unit
 open import Data.Product
-module Valiant.Specification (NANR : NonAssociativeNonRing) where
+module Valiant.Specification (NaSr : NonassociativeSemiring) where
 import Valiant.MatAndTri
-open Valiant.MatAndTri NANR
+open Valiant.MatAndTri NaSr
 import Valiant.Operations
-open Valiant.Operations NANR
-open NonAssociativeNonRing NANR renaming (_+_ to _R+_; _*_ to _R*_; 0# to R0; _≈_ to _R≈_; refl to R-refl)
+open Valiant.Operations NaSr
+--open NonassociativeSemiring NaSr renaming (_+_ to _R+_; _*_ to _R*_; _≈_ to _R≈_)
 \end{code}
 %endif
 \subsubsection{Specification and Proof in Agda}\todo{ALL: the specification part is very small -- either move up to previous, or keep with proof here.}
-With the above operations, and the fact that they form \nanring s, we are now ready to express the transitive closure problem in Agda. It is a relation between two |Tri|s, that is, a function that takes two |Tri|s, |C⁺| and |C|, and returns the propostion that |C⁺| is the transitive closure of |C|, which is true if |C⁺| and |C| satisfy the specification \eqref{Equation:JPTSpec}, with multiplication, addition and equality replaced by their triangle versions:
+With the above operations, and the fact that they form nonassociative semiring s, we are now ready to express the transitive closure problem in Agda. It is a relation between two |Tri|s, that is, a function that takes two |Tri|s, |C⁺| and |C|, and returns the propostion that |C⁺| is the transitive closure of |C|, which is true if |C⁺| and |C| satisfy the specification \eqref{Equation:JPTSpec}, with multiplication, addition and equality replaced by their triangle versions:
 \begin{code}
 _is-tc-of_ : {s : Splitting} → Tri s → Tri s → Set
 C⁺ is-tc-of C = C⁺ t≈ C⁺ t* C⁺ t+ C
@@ -107,7 +107,7 @@ valiant-mat-correctness one (rVec v) L = {!valiant-row-correctness v L!}
 valiant-mat-correctness (Valiant.MatAndTri.two U R L) (Valiant.MatAndTri.cVec v) Valiant.MatAndTri.one = {!!}
 valiant-mat-correctness U (Valiant.MatAndTri.quad A B C D) L = {!!}
 
-valiant-row-correctness (Valiant.MatAndTri.one x) Valiant.MatAndTri.one = R-refl
+valiant-row-correctness (Valiant.MatAndTri.one x) Valiant.MatAndTri.one = ? --R-refl
 valiant-row-correctness (Valiant.MatAndTri.two u v) (Valiant.MatAndTri.two U R L) = ({!valiant-row-correctness u U!}) , {!valiant-row-correctness (u vm* R v+ v) L!}
 valiant-col-correctness U v = {!!}
 \end{code}

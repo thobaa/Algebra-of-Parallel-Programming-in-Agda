@@ -2,20 +2,22 @@
 \begin{code}
 open import Data.Nat
 open import Algebra.NANRing
-module Valiant.NaiveCode (NANR : NonAssociativeNonRing) where -- also known as first attempt, perhaps a better name
-open NonAssociativeNonRing NANR renaming (_+_ to _R+_)
+module Valiant.NaiveCode (NaSr : NonassociativeSemiring) where -- also known as first attempt, perhaps a better name
+open NonassociativeSemiring NaSr renaming (_+_ to _R+_)
 \end{code}
 %endif
 The naive (and not the way we finally decide on, for reasons that become clear later, hence we add a |′| to the datatypes) way, which stays close to the |Vector| and |Matrix| datatypes would be to define |Vec′| as something like
 \begin{code}
 data Vec′ : ℕ → Set where
-  one : (x : Carrier) → Vec′ 1 
+  one : (x : R) → Vec′ 1 
   two : {m n : ℕ} → Vec′ m → Vec′ n → Vec′ (m + n)
+data ℤ : Set where
+  _-_ : ℕ → ℕ → ℤ
 \end{code}
 and then defining |Mat′| as \todo{THOMAS: should we call |Vec′| |Vec| or |Vec′| in text, and code?}
 \begin{code}
 data Mat′ : ℕ → ℕ → Set where
-  sing : (x : Carrier) → Mat′ 1 1
+  sing : (x : R) → Mat′ 1 1
   rVec : {n : ℕ} → Vec′ (suc (suc n)) → Mat′ 1 (suc (suc n)) 
   cVec : {n : ℕ} → Vec′ (suc (suc n)) → Mat′ (suc (suc n)) 1
   quad : {r₁ r₂ c₁ c₂ : ℕ} → Mat′ r₁ c₁ → Mat′ r₁ c₂ → 

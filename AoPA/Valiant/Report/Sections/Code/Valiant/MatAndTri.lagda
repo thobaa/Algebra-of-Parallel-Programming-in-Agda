@@ -3,8 +3,8 @@
 open import Algebra.NANRing
 open import Valiant.Splitting
 open import Data.Nat
-module Valiant.MatAndTri (NASR : NonAssociativeNonRing) where
-open NonAssociativeNonRing NASR public renaming (_+_ to _R+_; _*_ to _R*_; _≈_ to _R≈_; +-identity to R+-identity)
+module Valiant.MatAndTri (NaSr : NonassociativeSemiring) where
+open NonassociativeSemiring NaSr public renaming (_+_ to _R+_; _*_ to _R*_; _≈_ to _R≈_; +-identity to R+-identity)
 \end{code}
 %endif
 Mimicking the above, but using |Splitting|s as indices (the code is essentially the same, with every instance of ``|ℕ|'' replaced by ``|Splitting|''), we first define |Vec| as:
@@ -34,7 +34,7 @@ Where again, the ordering of the arguments to |two| (it takes \emph{two} |Tri|s)
 
 Here, we note that if we had chosen the approach with empty matrices (see \ref{Section:Empty-Matrices} \todo{THOMAS: check if there should be a reference back here}), and correspondingly, empty |Splitting|s, we might have needed an extra constructor for triangles also \todo{THOMAS: think, is this true???}.
 
-Later, we are going to prove that |Tri s| is a \nanring for any |s|, and that |Vec s| and |Mat s₁ s₂| are commutative monoids (under addition). For this, we need to define their zero elements, that is a zero |Vec|, a zero |Mat| and a zero |Tri|. Even if we decided against doing this, we would need to define the zero elements somewhere, since we need multiplication to define our specification of the transitive closure, and multiplying a |Tri one| by a |Mat one s| should result in a |Mat one s| that is zero everywhere. 
+Later, we are going to prove that |Tri s| is a nonassociative semiring for any |s|, and that |Vec s| and |Mat s₁ s₂| are commutative monoids (under addition). For this, we need to define their zero elements, that is a zero |Vec|, a zero |Mat| and a zero |Tri|. Even if we decided against doing this, we would need to define the zero elements somewhere, since we need multiplication to define our specification of the transitive closure, and multiplying a |Tri one| by a |Mat one s| should result in a |Mat one s| that is zero everywhere. 
 
 We define them by pattern matching on the implicit splittings:
 \begin{code}

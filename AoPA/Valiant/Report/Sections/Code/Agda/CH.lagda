@@ -6,6 +6,7 @@ infix 4 _≤_
 \end{code}
 %endif
 \subsection{The Curry--Howard Correspondence}
+\label{CH}
 To consider proofs and propositions in Agda, and to allow functions to depend on them and their existence, we make use of the Curry--Howard correspondence (for a longer, more detailed introduction to the Curry--Howard correspondence with Agda, see for example \cite{Dep-types-at-work}). It states that a proposition $P$ can be seen as the type containing all proofs of $P$. To prove $P$, then means to give an element of the type corresponding to $P$ (i.e., a proof of $P$).
 
 %We identify the type of all small types |Set| with the set of all propositions.
@@ -87,3 +88,36 @@ We also note that if $P$ is a sentence containing $x$, the sentence $\exists x. 
 ∃ λ x → P x
 \end{spec}
 in Agda (we introduce an anonymous function |λ x → P x|, taking |x| to |P x| using lambda notation).
+
+Finally, mention decidable propositions. Constructively, the law of excluded middle---saying that for any proposition $P$, either $P$ or $\lnot P$ is true---is not valid. There is no algorithm that takes a proposition and returns either a proof of it, or a proof that it implies $\bot$. However, there are propositions for which it is valid. These propositions are said to be \emph{decidable}. In Agda, if |P| is a proposition, we define the proposition that |P| is decidable with the |Dec P|:
+\begin{code}
+data Dec (P : Set) : Set where
+  yes  :    P  → Dec P
+  no   : ¬  P  → Dec P
+\end{code}
+So an element of |Dec P| is a proof that |P| is decidable, since it contains either a proof of |P| or a proof of |¬  P|.
+
+An example of a proposition that is decidable is the proposition that |m ≤ n|, where |m| and |n| are natural numbers. To prove that this is decidable for any |m| and |n|, we give a function that takes |m| and |n| and returns an element of |Dec (m ≤ n)|:
+\begin{code}
+_≤?_ : (m n : ℕ) → Dec (m ≤ n)
+\end{code}
+if |m| is |0|, we can construct a proof that |m ≤ n| with |z≤n|: 
+\savecolumns
+\begin{code}
+0        ≤?  n  = yes z≤n
+\end{code}
+if |m| is |suc m'|, we pattern match on |n|. If |n| is |0|, there is no proof of |m ≤ n|, since no constructor of |_≤_| constructs an element of type |suc m' ≤ 0|. The fact that there are no such proofs is denoted by |λ ()|.
+\restorecolumns
+\begin{code}
+suc m'   ≤?  0  = no (λ ())
+\end{code}
+If |n| is |suc n'|, we use a |with| statement to add an extra argument to the function, to pattern match on |Dec (m' ≤ n')|, which is decidable by induction:
+\restorecolumns
+\begin{code}
+suc m'   ≤?  suc n' with m' ≤? n' 
+suc m'   ≤?  suc n' | yes m'≤n'  = yes (s≤s m'≤n')
+suc m'   ≤?  suc n' | no ¬m'≤n'  = no (λ sm≤sn → ¬m'≤n' (p≤p sm≤sn))
+  where  p≤p : {m n : ℕ} → suc m ≤ suc n → m ≤ n 
+         p≤p (s≤s m≤n) = m≤n
+\end{code}
+

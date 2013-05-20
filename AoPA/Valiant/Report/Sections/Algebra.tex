@@ -1,22 +1,33 @@
-\newcommand{\nanring}{nonassociative semiring}
-\newcommand{\Nanring}{Nonassociative semiring}
 \section{Algebra}
-We are going to introduce a bunch of algebraic things that will be useful either later or as point of reference. They will also be useful as an example of using agda as a proof assistant!
+In this section, we are going to introduce a number of algebraic definitions. Some (like commutative monoid and nonassociative semiring) will be useful later in the report, while other (like group and ring) are mentioned as possibly familiar examples and for comparison.
 
-The first two sections are about algebraic structures that are probably already known. Both for reference, and as examples. Then we go on to more general algebraic structures, more common in Computer Science, since they satisfy fewer axioms (more axioms mean more interesting structure---probably---but at the same time, it's harder to satisfy all the axioms.
-\subsection{Introductory defintions}
-Before covering some algebraic structures, we would like to define the things needed to talk about them in Agda. These are mainly propositions regarding functions and relations.
-\subsubsection{Properties of a relation}
-The first thing to discuss is the equivalence relation. It is a relation that acts like an equality.
+In Section \ref{Intro-defs} we introduce a number of well known propositions that show up in the definitions of algebraic structures as axioms and comment on differences between defining an algebraic structure in mathematics and in Agda. Then, in Sections \ref{Monoid} and \ref{Ring}, we use these properties to define algebraic structures consisting of sets with one and two binary operations, respectively. It might be useful to look at for example Definition \ref{Group} of a group before proceeding.
+\subsection{Introductory definitions}
+\ref{Intro-defs}
+When defining an algebraic structure (consisting of just one set), one gives the set of objects, a number of binary operations on the objects and a number of axioms that the set and the operations are required to satisfy. In this section, we are going to introduce common such axioms. 
+\subsubsection{Equivalence relations}
+The axioms usually refer to equalities between different sequences of operation applications, like the axiom in a group that $x \cdot (y \cdot z) = (x \cdot y) \cdot z$ for all $x$, $y$ and $z$. However, to define these things in Agda, we note that we do not have a concept of equality for terms of an arbitrary datatype. Further, the most ``basic'' equality definition (called propositional equality), stating just that $x = x$ for all $x$ and defined by
+\begin{code}
+data _≡_ {A : Set} : A → A → Set where
+  refl : {x : A} → x ≡ x
+\end{code}
+is often not what we want. For the datatype |ℕ|, it coincides with the ``mathematical'' equality of natural numbers, because |ℕ| is inductively defined (in particular, if two things are built in different ways by |zero| and |suc|, they cannot be equal). But if we were to define the integers |ℤ| as differences between natural numbers:
+\begin{code}
+data ℤ : Set where
+  _-_ : ℕ → ℕ → ℤ
+\end{code}
+we want a concept of equality that conciders |5 - 3| as equal to |0 - 2|, for example. Also, if we define a datatype of sets, we want sets where the elements have been added in different orders to be equal. Hence, we need to generalize the propositional equality to some kind of relation that behaves well. We cannot choose an arbitrary relation, for example, $<$ does not behave as we expect equality to. 
+
+It turns out that there are three properties we want a concept of equality to have. First, it should be reflexive: every element should be equal to itself. Second, it should be symmetric: if $a$ is equal to $b$, $b$ should be equal to $a$. Third, it should be transitive: if $a$ is equal to $b$ and $b$ is equal to $c$, then $a$ should be equal to $c$. A relation that satisfies this is called an equivalence relation:
 \begin{Definition}
-  A relation $R \subset X \times X$ is called an \emph{equivalence relation} if it is\todo{write sqiggly line instead of $R$}
+  A relation $\sim \subset X \times X$ is called an \emph{equivalence relation} if it is
   \begin{itemize}
-  \item Reflexive: for $x \in X$, $x R x$.
-  \item Symmetric: for $x$, $y \in X$, if $x R y$, then $y R x$.
+  \item Reflexive: for $x \in X$, $x \sim x$.
+  \item Symmetric: for $x$, $y \in X$, if $x \sim y$, then $y \sim x$.
   \item Transitive: for $x$, $y$, $z \in X$, if $x R y$ and $y R z$, then $x R z$.
   \end{itemize}
 \end{Definition}
-We formalize the way it behaves like an equality in the following proposition:
+The following proposition formalizes the way it behaves like an equality (for a proof, see for example \cite{Equivalence-proof}):
 \begin{Proposition}
 An equivalence relation $R$ partitions the elements of a set $X$ into disjoint nonempty equivalence classes (subsets $[x] = \{y \in X \st y R x\}$) satisfying: 
 \begin{itemize}
@@ -24,112 +35,132 @@ An equivalence relation $R$ partitions the elements of a set $X$ into disjoint n
 \item If $x \in [y]$, then $[x] = [y]$.
 \end{itemize}
 \end{Proposition}
-If we replace the equality of elements with an equivalence relation, i.e., that two elements are ``equal'' if they belong to the same equivalence class, we get a coarser sense of equality. To see that it acts as the regular equality, we note that the equivalence relation is equality on equivalence classes.\todo{Expand/clean up on induced equality from equivalence classes.}
+This means that if we use an equivalence relation as ``equality'' on a set, we are saying that two elements are equal if they generate the same equivalence class, so we let actual equality on the equivalence classes give us an ``equality'' on the members of the set.
 
 %include /Code/Algebra/Equivalence.lagda
 
-\todo{Done (PJ): is it possible to make underscores less ugly?}
 \todo{Chase down the last few underscores.}
 
-\subsubsection{Properties of an operation}\todo{THOMAS: Should we give these things names, or use them anyway? (i.e., |OP2| vs |A \to A \to A|}
-Next, we define some properties that binary operation (i.e., functions $X \to X \to X$) can have. These are functions that are similar to ordinary addition and multiplication of numbers (if they have all the properties we define below---but it can be useful to think of them that way even if they don't).
+
+
+\subsubsection{Propositions about one operation}
+Next, we define three propositions that binary operations (i.e., functions $X \to X \to X$) can satisfy. These are operations that are similar to ordinary addition and multiplication of numbers.
 \begin{Definition} %%% Associative
-A binary operation $\cdot$ on a set $X$ is associative if $x \cdot (y \cdot z) = (x \cdot y) \cdot z$ for all $x$, $y$, $z \in X$.
+A binary operation $\cdot$ on a set $X$ is \emph{associative} if $x \cdot (y \cdot z) = (x \cdot y) \cdot z$ for all $x$, $y$, $z \in X$.
 \end{Definition}
-In Agda code, the proposition that |_∙_| is associative, with respect to a given equivalence relation |_≈_| is given by the type:
+In Agda, the proposition that |_∙_| is associative, with respect to a given equivalence relation |_≈_| is given by the type:
 %include Code/Algebra/Short/Associative.lagda
 
-Most familiar basic mathematical operations, like addition and multiplication of numbers, are associative. On the other hand, operations like subtraction and division are not, since $x - (y - z) = x - y + z \ne (x - y) - z$, but this is because they are in some sense the combination of addition and inversion: $x - y = x + (-y)$. %One reason that many mathematical operations are associative is that they are in some sense transformations of something, and transformations are related 
+Many familiar basic mathematical operations, like addition and multiplication of numbers, are associative. On the other hand, operations like subtraction and division are not, since $x - (y - z) = x - y + z \ne (x - y) - z$ (but this is because they are in some sense the combination of addition and inversion: $x - y = x + (-y)$). In functional programming, a very important example of an associative operation is list concatenation.
+In this thesis, we are very interested in a non-associative operation related to parsing. %remove sentence?
 
-In this thesis, we are very interested in a non-associative operation related to parsing.
-\begin{Example}
-Informally, we can define a multiplication on sequences of words, where ? \todo{THOMAS: write, maybe}
-% Non-example of parsing
-% Non-example of genetics ?
-\end{Example}
+
+
 \begin{Definition} %%% Commutative
-A binary operation $\cdot$ on a set $X$ is commutative if $x \cdot y = y \cdot x$ for all $x$, $y \in X$.
+A binary operation $\cdot$ on a set $X$ is \emph{commutative} if $x \cdot y = y \cdot x$ for all $x$, $y \in X$.
 \end{Definition}
-In Agda, this proposition becomes the type
+In Agda, this proposition is given by the type
 %include Code/Algebra/Short/Commutative.lagda
-Again, many familiar basic mathematical operations are commutative, like addition and multiplication of numbers, are commutative, but matrix multiplication for matrices of size $n \times n$, $n \ge 2$ is an example of an operation that is not commutative.
+Again, many familiar basic mathematical operations are commutative, like addition and multiplication of numbers, but matrix multiplication (for matrices of size $n \times n$, $n \ge 2$) is an example of an operation that is not commutative.
+In this thesis, we are interested in the commutative operation set union, $\cup$.
 
-\subsubsection{Properties of a pair of operations}
-When we have two different binary operations on the same set, we often want them to interact with each other sensibly, where sensibly means as much as multiplication and addition of numbers interact as possible. 
+Now, we present two properties that relate elements to the operations:
+\begin{Definition} %%% NEUTRAL ELEMENT!
+  An element $e \in X$ is an \emph{identity element} of a binary operation $\cdot$ if $x \cdot e = e \cdot x = x$ for all $x \in X$.
+\end{Definition}
+In Agda, the type of this proposition is
+%include Code/Algebra/Short/Identity.lagda
+
+
+\begin{Definition}
+An element $x^{-1} \in X$ is the \emph{inverse} of $x$ with respect to a binary operation $\cdot$ if $x^{-1} \cdot x = x \cdot x^{-1} = e$.
+\end{Definition}
+When discussing inverses, it is usually required that every (or nearly every) element has an inverse.
+In Agda, since the proposition that every element has an inverse is a universal quantification, it is proved by a function |_⁻¹| that takes an element to its inverse. Given such a function, the statement that |x ⁻¹| is the inverse of |x| is given by the type
+%include Code/Algebra/Short/Inverse.lagda
+
+If the operation is addition of numbers, the inverse of $x$ is given by $-x$, and if the operation is multiplication of numbers, the inverse is given by $1/x$. In computer science, inverses occur more rarely.
+Indeed, none of the algebraic structures we have used in to prove the correctness of Valiant's algorithm include inverses.
+
+\subsubsection{Propositions about two operations}
+\label{two-operations}
+When we have two different binary operations on the same set, we often want them to interact with each other sensibly. Here we define two such ways of interaction.
 
 %%%%%%%%%%%%%%%%%%
 %% Distributivity
 %%%%%%%%%%%%%%%%%%
-We recall the distributive law $x\cdot(y + z) = x\cdot y + x\cdot z$, where $x$, $y$, and $z$ are numbers and $\cdot$ and $+$ are multiplication and addition and generalize it to arbitrary operations: 
+We recall the distributive law $x\cdot(y + z) = x\cdot y + x\cdot z$, where $x$, $y$, and $z$ are numbers and $\cdot$ and $+$ are multiplication and addition, respectively and generalize it to an arbitrary pair operations:
 \begin{Definition}
   A binary operation $\cdot$ on $X$ \emph{distributes over} a binary operation $+$ if, for all $x$, $y$, $z \in X$,
   \begin{itemize}
   \item $x \cdot (y + z) = x \cdot y + x \cdot z$,
   \item $(y + z) \cdot x = y \cdot x + z \cdot x$,
   \end{itemize}
-  where we assume that $\cdot$ binds its arguments harder than $+$.
+  where we assume that $\cdot$ binds its arguments tighter than $+$.
 \end{Definition}
 %include /Code/Algebra/Short/Distributive.lagda
 
 %%%%%%%%%%%%%%%%%%
 %% Zero
 %%%%%%%%%%%%%%%%%%
-\todo{THOMAS: Should zero be here, it only considers one operation}
-The second such interaction axiom we will consider comes from the fact that $0$ absorbs when involved in a multiplication of numbers: $0 \cdot x = x \cdot 0 = 0$. In particular, if we have an operation $+$ to which we have an inverse and a neutral element $0$, we automatically get $0 \cdot x = 0$:
+\label{zero-element}
+The second such interaction we will consider comes from the fact that $0$ absorbs when involved in a multiplication of numbers: $0 \cdot x = x \cdot 0 = 0$. The reason we consider this a property of a pair of operations is that if we have an operation $+$ to which we have an identity element $0$ and every element has an inverse, and an operation $\cdot$ which distributes over $+$, we automatically get $0 \cdot x = 0$:
 \begin{equation*}
   0 \cdot x = (0 + 0) \cdot x = 0 \cdot x + 0 \cdot x,
 \end{equation*}
-where the first equality follows from the fact that $0$ is a neutral element for $+$, and the second from that $\cdot$ distributes over $+$. We can then cancel $0 \cdot x$ on both sides to get $0 = 0 \cdot x$.% In Agda, we can formalize the above proof (and make sure we didn't use any other properties).
+where the first equality follows from the fact that $0$ is an identity element for $+$, and the second from that $\cdot$ distributes over $+$. We can then cancel $0 \cdot x$ on both sides to get $0 = 0 \cdot x$.
 
-If we don't have inverses, we can't perform the final step (for example, if $+$ would happen to be idempotent: $x + x = x$ for all $x \in X$, like set union $\cup$, we could not conclude that $0 = 0 \cdot x$), and then, it makes sense to have the following as an axiom:
+If we do not have inverses, we cannot perform the final step (for example, if $+$ would happen to be idempotent: $x + x = x$ for all $x \in X$, like set union $\cup$ is, we could not conclude that $0 = 0 \cdot x$), and then, it makes sense to have the following as an axiom:
 \begin{Definition}
-  An element $0 \in X$ is a \emph{zero element} (also known as an \emph{absorbing element}) of a binary operation $\cdot$ if $0 \cdot x = x \cdot 0 = 0$ for every $x \in X$.
+  An element $z \in X$ is a \emph{zero element} (also known as an \emph{absorbing element}) of a binary operation $\cdot$ if $z \cdot x = x \cdot z = z$ for every $x \in X$.
 \end{Definition}
 %include Code/Algebra/Short/Zero.lagda
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% GROUPS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Sets with one binary operation} % alternate title: genralizations
+\subsection{Sets with one operation} % alternate title: genralizations
 In this section, we are going to discuss algebraic structures made up of a set and a binary operation on the set.
 \subsubsection{Groups}
-In mathematics, the most common such structure is the group. Many mathematical objects form groups, including the integers $\Z$, the rational numbers $\Q$, the real numbers $\R$ and the complex numbers $\C$, with the binary opertaion addition, and the non-zero rational numbers $\Q\setminus{0}$, non-zero real numbers $\R\setminus{0}$, and non-zero complex numbers $\C\setminus{0}$, with the binary operation multiplication form groups. Although, groups satisfy too to be useful to us, we give the definition below, to make clarify the difference between them and the less familiar monoids we present next.
+In mathematics, the most common such structure is the group. Many mathematical objects form groups, including the integers $\Z$, the rational numbers $\Q$, the real numbers $\R$ and the complex numbers $\C$, with addition as the binary opertaion, and the non-zero rational numbers $\Q\setminus{0}$, non-zero real numbers $\R\setminus{0}$, and non-zero complex numbers $\C\setminus{0}$, with multiplication as the binary operation. Although, groups satisfy too many axioms to be useful to us, we give the definition below, to clarify the difference between them and the perhaps less familiar structure, the monoid, that we present next.
 \begin{Definition}
 A \emph{group} is a set $G$ together with a binary operation $\cdot$ on $G$, satisfying the following:
 \begin{itemize}
-\item $\cdot$ is associative, that is, for all $x$, $y$, $z \in G$, $(x \cdot y) \cdot z = x \cdot (y \cdot z)$. 
-\item There is an element $e \in G$ such that $e \cdot g = g \cdot e = g$ for every $g \in G$. This element is the \emph{neutral element} of $G$.
-\item For every $g \in G$, there is an element $g^{-1}$ such that $g \cdot g^{-1} = g^{-1} \cdot g = e$. This element $g^{-1}$ is the \emph{inverse} of $g$.
+\item The operation $\cdot$ is associative: for all $x$, $y$, $z \in G$, $(x \cdot y) \cdot z = x \cdot (y \cdot z)$. 
+\item There is an identity element $e \in G$: for all $x \in G$, $e \cdot x = x \cdot e = x$.
+\item For every $x \in G$, there is an inverse element element $x^{-1}$: $x \cdot x^{-1} = x^{-1} \cdot x = e$.
 \end{itemize}
+A group where the binary operation is commutative is said to be \emph{Abelian}.
 \end{Definition}
-A group where the binary operation $\cdot$ is commutative is said to be \emph{Abelian}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% MONOIDS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Monoids}
-Now, we discuss monoids, which are slightly more general than groups. In particular, they do not require the existence of inverses. Monoids are important for programming because it is rare that a datatype satisfies all the axioms of a group.
+In this section, we discuss monoids, which are slightly more general than groups in that they do not require the existence of inverses. Monoids are important for programming because it is rare that a datatype satisfies all the axioms of a group.
+
+Example of a monoids (that are not also groups) include the natural numbers, with $\cdot$ as either multiplication or addition, sets ($M$ is a collection of sets, $\cdot$ is union and the identity element is the empty set), lists ($M$ is a collection of lists, $\cdot$ is list concatenation and the identity element is the empty list).
+
 \begin{Definition}
   A monoid is a set $M$, together with a binary operation $\cdot$ on $M$, that satisfies the following:
   \begin{itemize}
-  \item $\cdot$ is associative, that is, for all $x$, $y$, $z \in M$, $(x \cdot y) \cdot z = x \cdot (y \cdot z)$. 
-  \item There is an element $e \in M$ such that $e \cdot x = x \cdot e = x$ for every $x \in M$. This element is the \emph{neutral element} of $M$.
+  \item The operation $\cdot$ is associative: $x$, $y$, $z \in M$, $(x \cdot y) \cdot z = x \cdot (y \cdot z)$. 
+  \item There is an identity element $e \in M$: for all $x \in M$, $e \cdot x = x \cdot e = x$.
   \end{itemize}
+A monoid where the binary operation is commutative is a \emph{commutative monoid}.
 \end{Definition}
-A \emph{commutative} monoid is one where $\cdot$ is commutative.
 %include Code/Algebra/Monoid.lagda
-
-%\subsubsection{Cayley Table} remove this here, and instead refer back to definition of group.
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% RING LIKE STRUCTURES (two operations on a set)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Ring-like structures}
-\subsubsection{Definitions}
-As we discussed above, in Section \ref{two-operators}, when one has two operations on a set, one often wants them to interact sensibly. The basic example from algebra is a ring:
+\subsection{Sets with two operations}
+In this section, we discuss algebraic structures that consist of a set together with two binary operations. As we discussed in Section \ref{two-operations}, we want them to interact sensibly.
+\subsubsection{Rings}
+The basic example of this kind of structure is a ring:
 \begin{Definition}
 A set $R$ together with two binary operations $+$ and $*$ (called addition and multiplication) forms a \emph{ring} if:
 \begin{itemize}
@@ -138,9 +169,11 @@ A set $R$ together with two binary operations $+$ and $*$ (called addition and m
 \item $*$ distributes over $+$.
 \end{itemize}
 \end{Definition}
-However, for the applications we have in mind, Parsing, the algebraic structure in question (see Section \ref{Parsing-as-algebraic structure}) does not even have associative multiplication (see section \ref{magma-monoid-like}), and does not have inverses for addition. We still have an additive $0$ (the empty set---representing no parse), and want it to be an absorbing element with regard to multiplication (if the left, say, substring has no parse, then the whole string has no parse). We also do not have a unit element for multiplication (there is no guarantee that there is a string $A$ such that $A$ followed by $X$ has the same parse as $X$ for every string $X$). But the proof that $0$ is an absorbing element depends crucially on the existence of the ability to cancel (implied by the existence of additive inverses in a group), as seen above. For this reason, we include as an axiom that zero absorbs.
+Examples of rings include the integers, real and complex numbers with the usual addition and multiplication.
 
-There are a number of (fairly standard) \todo{THOMAS: Cite something} generalizations of the ring definition, but none matches our requirements. One generalization is the semiring, which has the same axioms, except that addition need not have inverses, and so we add the requirement that zero absorbs:
+However, for the applications we have in mind, Parsing, the algebraic structure in question (see Section \ref{Parsing-as-algebraic structure}) does not even have associative multiplication, and does not have inverses for addition. We still have an additive $0$ (the empty set---representing no parse), which is a zero element with regard to multiplication (if the left, say, substring has no parse, then the whole string has no parse). We also do not have a unit element for multiplication (there is no guarantee that there is a string $A$ such that $A$ followed by $X$ has the same parse as $X$ for every string $X$). The usual proof that $0$ is an absorbing element depends on the existence of the ability to cancel (which is implied by the existence of additive inverses in a group), as seen in section \ref{zero-element}. So if we are to define an algebraic structure modelling this, we need to include as an axiom that zero absorbs.
+
+There are a number of fairly standard \todo{THOMAS: Cite something} generalizations of a ring, but none of these matches our requirements. One generalization is the semiring, which has the same axioms as a ring, except that addition need not have inverses:
 \begin{Definition}
 A set $R$ together with two binary operations $+$ and $*$ forms a \emph{semiring} if:
 \begin{itemize}
@@ -150,7 +183,7 @@ A set $R$ together with two binary operations $+$ and $*$ forms a \emph{semiring
 \item $0 * x = x * 0 = 0$ for all $x \in R$.
 \end{itemize}
 \end{Definition}
-Another generalization is the nonassociative ring, which does away with the requirement that multiplication is associative and that there is an identity element for multiplication.
+Another generalization is the nonassociative ring, which instead does away with the requirement that multiplication is associative and that there is an identity element for multiplication.
 \begin{Definition}
 A set $R$ together with two binary operations $+$ and $*$ forms a \emph{non-associative ring} if:
 \begin{itemize}
@@ -159,9 +192,9 @@ A set $R$ together with two binary operations $+$ and $*$ forms a \emph{non-asso
 \item $*$ distributes over $+$.
 \end{itemize}
 \end{Definition}
-We take this to mean that the modifier \emph{nonassociative} removes the requirement that the set together with $*$ is a monoid\todo{too horrible joke?} from the axioms of the structure. Hence, we make the following definition:
+We take this to mean that the modifier \emph{nonassociative} removes the requirement that the set together with $*$ is a monoid from the axioms of the structure. Hence, we make the following (nonstandard) definition:
 \begin{Definition}
-A set $R$ together with two binary operations $+$ and $*$ forms a \emph{\nanring} if:
+A set $R$ together with two binary operations $+$ and $*$ forms a \emph{nonassociative semiring} if:
 \begin{itemize}
 \item It is a commutative monoid with respect to $+$.
 \item $*$ distributes over $+$.
@@ -174,48 +207,32 @@ A set $R$ together with two binary operations $+$ and $*$ forms a \emph{\nanring
 %% MATRICES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Matrices}
-We recall that a matrix is in some sense really just a set of numbers formed in a rectangle, so there is nothing stopping us from defining one over an arbitrary ring, or even over a \nanring, as opposed to over $\R$ or $\C$. To be similar to the definition we will make in Agda of an abstract matrix (one without a specific implementation in mind), we consider a matrices of size $m \times n$ as a functions from a pair of natural numbers $(i,j)$, with $0 \le i < m$, $0 \le j < n$ (or more specifically, $i \in \Fin{m}$, $j \in \Fin{n}$, and hence, after currying define: 
+A matrix is in some sense really just a set of numbers arranged in a rectangle, so there is nothing stopping us from defining such a matrix with entries from an arbitrary set, as opposed to from $\R$ or $\C$. To be similar to the definition we will make in Agda of an abstract matrix (one without a specific implementation in mind), we consider a matrix of size $m \times n$ as a function from a pair of natural numbers $(i,j)$, with $0 \le i < m$, $0 \le j < n$ (or, $i \in \Fin{m}$, $j \in \Fin{n}$, and hence, after currying define: 
 \begin{Definition}
-A \emph{matrix} $A$ over a set $R$ is a function $A : \Fin{m} \to \Fin{n} \to R$. 
+A \emph{matrix} $A$ over a set $R$ is a function $A : \Fin{m} \to \Fin{n} \to R$.
 \end{Definition}
 When talking about matrices from a mathematical point of view, we will write $A_{i j}$ for $A\, i\, j$
 
 %include Code/Algebra/Matrix.lagda
 
-If $R$ is a ring or a \nanring, we can define addition and multiplication of matrices with the usual formulas:
+If $R$ is a nonassociative semiring, we can define addition and multiplication of matrices with the usual formulas:
 \begin{align*}
   (A + B)_{i j} &= A_{i j} + B_{i j} 
   \intertext{and}
-  (A B)_{i j} &= \sum_{k = 1}^n A_{i k} B_{k j} 
+  (A B)_{i j} &= \sum_{k = 1}^n A_{i k} B_{k j} .
 \end{align*}
-
 %include /Code/Algebra/MatrixOperations.lagda
 
 The most interesting fact about matrices (to our application) is the following two propositions:
 \begin{Proposition}
-If $R$ is a a ring (\nanring), then the matrices of size $n \times n$ over $R$ also form a ring (\nanring). Actually, matrices over $R$ of arbitrary size form an Abelian group (commutative monoid) under matrix addition. In both cases, the zero matrix plays the role of the neutral element.
+If $R$ is a a ring (nonassociative semiring), then the matrices of size $n \times n$ over $R$ also form a ring (nonassociative semiring). Additionally, the matrices over $R$ of arbitrary size form an Abelian group (commutative monoid) under matrix addition. In both cases, the zero matrix plays the role of the zero element.
 \end{Proposition}
-The proof is fairly easy but boring. We provide part of the proof when $R$, is particualar, we prove that addition is commutative, and that multiplication is ?\todo{THOMAS: WHAT}. is a \nanring in Agda (because it is the case we will make use of later).
+The proof is fairly easy but boring. We provide part of the proof when $R$ is a nonassociative semiring in Agda, is particualar, we prove that addition is commutative, and that the zero matrix is a zero element with multiplication. The whole proof for a nonassociative semiring is available in our library.
 %include /Code/Algebra/MatrixProof.lagda
-\subsection{Triangular Matrices}
+\subsubsection{Upper triangular matrices}
 For our applications, we will be interested in matrices that have no non-zero elements on or below the diagonal.
 \begin{Definition}
   A matrix is \emph{upper triangular} if all elements on or below its diagonal are equal to zero.
 \end{Definition}
-Since we are only interested in upper triangular matrices, we will sometimes refer to them as just \emph{triangular} matrices.% We generalize the defintion to matrices that have zeros on their super diagonals too.
-
-
-
-
-%\begin{Definition}         TRIANGULARITY???
-%  An upper triangular matrix has \emph{triangularity} $d$ if all elements on or below its $d$th super diagonal are zero. \todo{are they called super diagonals?}
-%\end{Definition}
-%That is, if $i \le j + d$ implies that $A_{i j} = 0$. An upper triangular matrix thus has triangularity $0$, an upper triangular matrix where the line above the diagonal also contains \todo{line is not a good word} zeros has triangularity $1$ and so on. See Figure \ref{Figure:TriangularityExample}
-%\begin{figure}
-%  \centering
-%  \missingfigure{matrix with positive triangularity \label{Figure:TriangularityExample}}
-%\end{figure}
-
+Since we are only interested in upper triangular matrices, we will usually refer to them as just \emph{triangular} matrices.
 %include /Code/Algebra/Triangle.lagda
-
-%continues until it is proven in Triangle.lagda, since there isn't really anthing mathematical to say

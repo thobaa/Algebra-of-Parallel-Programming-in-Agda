@@ -13,7 +13,9 @@
 %include agda.fmt
 
 \newcommand{\un}{\mbox{\texttt{\_}}}   % short underscore
+\newcommand{\unopunt}[1]{\un\Varid{#1}\un}
 \newcommand{\unopun}[1]{\ensuremath{\un{#1}\un}}
+\newcommand{\unop}[1]{\ensuremath{\un{#1}}}
 %format _∷_   = "\unopun{∷}"
 %format _≡_   = "\unopun{≡}"
 %format _<_   = "\unopun{<}"
@@ -21,19 +23,19 @@
 %format _¸_   = "\unopun{,}"
 %format _∨_   = "\unopun{∨}"
 %format _+_   = "\unopun{+}"
-%format _v+_  = "\unopun{v+}"
-%format _m+_  = "\unopun{m+}"
-%format _t+_  = "\unopun{t+}"
-%format _v≈_  = "\unopun{v≈}"
-%format _m≈_  = "\unopun{m≈}"
-%format _t≈_  = "\unopun{t≈}"
-%format _tm*_ = "\unopun{tm*}"
+%format _v+_  = "\unopunt{v+}"
+%format _m+_  = "\unopunt{m+}"
+%format _t+_  = "\unopunt{t+}"
+%format _v≈_  = "\unopunt{v≈}"
+%format _m≈_  = "\unopunt{m≈}"
+%format _t≈_  = "\unopunt{t≈}"
+%format _tm*_ = "\unopunt{tm*}"
 %format _∙_   = "\unopun{∙}"
-%format _M+_  = "\unopun{M+}"
-%format _M≈_  = "\unopun{M≈}"
-%format _M*_  = "\unopun{M*}"
-%format _T≈_  = "\unopun{T≈}"
-%format _T+_  = "\unopun{T+}"
+%format _M+_  = "\unopunt{M+}"
+%format _M≈_  = "\unopunt{M≈}"
+%format _M*_  = "\unopunt{M*}"
+%format _T≈_  = "\unopunt{T≈}"
+%format _T+_  = "\unopunt{T+}"
 %format _≤?_  = "\unopun{≤?}"
 %format _≤?′_ = "\unopun{≤?′}"
 %format _∼_   = "\unopun{∼}"
@@ -43,6 +45,14 @@
 
 % by thomas
 %format _≤_ = "\unopun{≤}"
+%format _⁻¹ = "\unop{⁻¹}"
+%format _≈_   = "\unopun{≈}"
+%format _*_   = "\unopun{*}"
+%format _R*_   = "\unopunt{R*}"
+%format _R+_   = "\unopunt{R+}"
+%format _R≈_   = "\unopunt{R≈}"
+%format NonassociativeSemiring._+_ = NonassociativeSemiring."\unopun{+}"
+%format NonassociativeSemiring._≈_ = NonassociativeSemiring."\unopun{≈}"
 % format [          = "[\mskip5.5mu "
 % format ]          = "\mskip5.5mu]"
 % /by thomas
