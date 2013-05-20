@@ -1,6 +1,13 @@
-all: 
+all: C.pdf
+
+C.pdf: C.tex
+#	pdflatex C.tex
+	latexmk -pdf C.tex
+
+C.tex: Report.tex
 	lhs2TeX --agda -o C.tex Report.tex
-	pdflatex C.tex
+
+
 #52 repetitions...
 #dvipdf C.dvi
 #	bibtex C
@@ -10,3 +17,5 @@ all:
 
 clean:
 	rm -f C.*
+	rm -f `cat .gitignore`
+
