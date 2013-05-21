@@ -1,45 +1,18 @@
 \section{Valiant's Algorithm}
-In his paper \cite{Valiant}, Leslie G. Valiant gave a divide and conquer algorithm for chart parsing that has the same time complexity as matrix multiplication. The algorithm divides a string into two parts, and parses them recursively, and then puts them together through a fairly complicated procedure that requires a constant number of matrix multiplications.
+In the paper \cite{Valiant}, Leslie G. Valiant gave a divide and conquer algorithm for computing the transitive closure of an upper triangular matrix to prove that context free parsing that has the same time complexity as matrix multiplication. The algorithm divides a string into two parts, parses them recursively, and then puts them together through a fairly complicated procedure that requires a constant number of matrix multiplications.
 
-Since the algorithm is a divide and conquer algorithm (and the combining step is also fairly paralellizable), it could potentially be used for parsing in parallel, as suggested by Jean-Philippe Bernardy and Koen Claessen \todo{THOMAS: - or --}\cite{JP-PP}. 
+Since the algorithm is a divide and conquer algorithm (where the combine step is also fairly parallelizable), it could potentially be used for parsing in parallel, as suggested in \cite{JP-PP}.
 
 \subsection{The Algorithm} \todo{THOMAS: note that we want to compute the transitive closure here, not \emph{parse}.}
-We want to compute the transitive closure of the parse chart. The main idea of the algorithm is to split the chart along the diagonal, into two subcharts and a rectangular overlap region, see Figure \ref{Figure:ParseChart}. Next, compute the transitive closures of the subcharts, and combine them (somehow) to fill in the rectangular part. We note that charts of size $1 \times 1$ are the zero matrix, where the transitive closure is also the zero matrix. We also note that it is easy to compute the transitive closure of subcharts that have size $2 \times 2$, since all charts are nonzero on the diagonal, they have only one nonzero element: \todo{THOMAS: remove the $2 \times 2$ stuff!}
-\begin{equation*}
-  \begin{pmatrix}
-    0 & x \\
-    0 & 0
-  \end{pmatrix},
-\end{equation*}
-and hence the specification \eqref{Equation:SpecificationTC} is: 
-\begin{equation*}
-  \begin{pmatrix}
-    0 & c \\
-    0 & 0
-  \end{pmatrix}
-  = 
-  \begin{pmatrix}
-    0 & c\\
-    0 & 0 
-  \end{pmatrix}
-  \begin{pmatrix}
-    0 & c \\
-    0 & 0
-  \end{pmatrix}
-  + 
-  \begin{pmatrix}
-    0 & x \\
-    0 & 0
-  \end{pmatrix}
-\end{equation*}
-which turns into $c = x$, since $CC = \zeromat$.
+We want to compute the transitive closure of a parse chart. The main idea of the algorithm is to split the chart along the diagonal, into two subcharts and a rectangular overlap region, see Figure \ref{Figure:ParseChart}. Next, compute the transitive closures of the subcharts, and combine them (somehow) to fill in the overlap part. A chart of size $1 \times 1$ contains just one element, which is zero because it is upper triangular, and the transitive closure of this is again the zero matrix.
+
 \label{Section:Subdivision-in-Specification}
 When the chart $X$ is $n \times n$, with $n > 1$, we can write it down as a block matrix 
 \begin{equation*}
   C = 
   \begin{pmatrix}
     U & R \\
-    0 & L
+    \zeromatrix & L
   \end{pmatrix}
 \end{equation*}
 where $U$ is upper triangular and is the chart corresponding to the first part of the string (the \emph{upper} part of the chart), $L$ is upper triangular and is the chart corresponding to the second part of the string (the \emph{lower} part of the chart, and $R$ corresponds to the parses that start in the first string and end in the second string (the \emph{rectangular} part of the chart).
@@ -48,110 +21,104 @@ If we put this into the specification, we get:
 \begin{equation*}
   \begin{pmatrix}
     \tc{U} & \rc{R} \\
-    0   & L^+
+    \zeromatrix   & \tc{L}
   \end{pmatrix}
   =  
   \begin{pmatrix}
     \tc{U} & \rc{R} \\
-    0   & L^+
+    \zeromatrix   & \tc{L}
   \end{pmatrix}
   \begin{pmatrix}
     \tc{U} & \rc{R} \\
-    0   & L^+
+    \zeromatrix   & \tc{L}
   \end{pmatrix}
   +
   \begin{pmatrix}
     U & R \\
-    0 & L
+    \zeromatrix & L
   \end{pmatrix}
 \end{equation*}
-where $\tc{U}$, $\rc{R}$, $L^+$ are the corresponding parts of (a priori, we don't know if $\tc{U}$ and $L^+$ are the transitive closures of $U$, $L$). Multiplying together $\tc{C}\tc{C}$, and adding $C$, we get:
+where $\tc{U}$, $\rc{R}$, $\tc{L}$ are the part of $\tc{C}$s corresponding to $U$, $R$ and $L$ (a priori, we do not know if $\tc{U}$ and $\tc{L}$ are the transitive closures of $U$, $L$). Performing the multiplication and addition, we get:
 \begin{equation*}
     \begin{pmatrix}
     \tc{U} & \rc{R} \\
-    0   & \tc{L}
+    \zeromatrix   & \tc{L}
   \end{pmatrix} 
     =
   \begin{pmatrix}
-    \tc{U}\tc{U} + \rc{R}\zeromat + U   &   \tc{U}\rc{R}     + \rc{R}L^+ + R \\
-    0                          &   \zeromat R + L^+L^+ + L
-  \end{pmatrix}
-  %= 
-  %\begin{pmatrix}
-  %  \tc{U}\tc{U} + U                 &   \tc{U}\rc{R} + \rc{R}L^+ + R \\
-  %  0                          &   L^+L^+ + L
-  %\end{pmatrix}
-  ,
+    \tc{U}\tc{U} + \rc{R}\zeromat + U   &   \tc{U}\rc{R}     + \rc{R}\tc{L} + R \\
+    \zeromatrix                          &   \zeromat R + \tc{L}\tc{L} + L
+  \end{pmatrix}.
 \end{equation*}
-since $\zeromat$ is an absorbing element. Since all elements of two matrices need to be equal for the matrices to be equal, we get the set of equations:
+Since $\zeromat$ is a zero element and since all elements of two matrices need to be equal for the matrices to be equal, we get the set of equations:
 \begin{align}
   \tc{U} &= \tc{U}\tc{U} + U \\
-  \rc{R} &= \tc{U}\rc{R} + \rc{R}L^+ + R \label{Equation:R-Specification}\\
-  L^+ &= L^+L^+ + L,
+  \rc{R} &= \tc{U}\rc{R} + \rc{R}\tc{L} + R \label{Equation:R-Specification}\\
+  \tc{L} &= \tc{L}\tc{L} + L,
 \end{align}
-so we see that it the condition that $C^+$ is the transitive closure of $C$ is equivalent to the conditions that the upper and lower parts of $C^+$ are the transitive closures of the upper and lower parts of $C$, respectively (intuitively, this makes sense, since the transitive closure of the first part describes the ways to get between nodes in the first part, and these don't depend on the second part, and vice versa, since the matrix is upper triangular---i.e., while parsing a subset of the of the first part of a string, it doesn't matter what the second part of the string is, because the grammar is context free) and the rectangular part of $C^+$ satisfies the equation \eqref{Equation:R-Specification}.
-
-Hence, if we compute the transitive closures of the upper and lower part of the matrix recursively, we only need to put them together and compute the rectangular part of the matrix.
-\subsubsection{The overlap case}
+so we see that it the condition that $C^+$ is the transitive closure of $C$ is equivalent to the conditions that the upper and lower parts of $C^+$ are the transitive closures of the upper and lower parts of $C$, respectively (intuitively, this makes sense, since the transitive closure of the first part describes the ways to get between nodes in the first part, and these don't depend on the second part, and vice versa, since the matrix is upper triangular---while parsing a subset of the of the first part of a string, it doesn't matter what the second part of the string is, because the grammar is context free) and the rectangular part of $C^+$ satisfies the equation \eqref{Equation:R-Specification}, which we will refer to as the overlap specification.
+%Hence, if we compute the transitive closures of the upper and lower part of the matrix recursively, we only need to put them together and compute the rectangular part of the matrix.
+\subsubsection{The overlap part}
 \label{Section:Two-Step-Splitting}
-To do this, we need to separate four cases, depending on the dimensions of $R$. We will give a recursive function, for computing $\rc{R}$ from $R$, $\tc{U}$ and $\tc{L}$, that we will call $\overlap(\tc{U}, R, \tc{L})$ , because when used for parsing, \todo{THOMAS: come up with good reason for name (overlap). Also, it should be $\tc{U}$ everywhere!}. 
+To compute the overlap part, we need to consider four separate cases, depending on the dimensions of $R$. We will outline a recursive algorithm for computing $\rc{R}$ from $R$, $\tc{U}$ and $\tc{L}$. %function for computing $\rc{R}$ from $R$, $\tc{U}$ and $\tc{L}$, that we will call $\overlap(\tc{U}, R, \tc{L})$ , because when used for parsing, 
+\todo{THOMAS: come up with good reason for name (overlap).}. 
 
-First, if $R$ is a $1 \times 1$ matrix, in which case, we must have that $\tc{U}$ and $\tc{L}$ are also $1 \times 1$ matrices, and since they are upper triangular, they are both equal to the zero matrix. Hence, by \eqref{Equation:R-Specification}, $\rc{R} = R$, so we define 
-\begin{equation}
-  \label{overlap1}
-  \overlap((0), (r), (0)) = r.
-\end{equation}
+First, if $R$ is a $1 \times 1$ matrix, in which case we must have that $\tc{U}$ and $\tc{L}$ are also $1 \times 1$ matrices, and since they are upper triangular, they both equal the zero matrix. Hence, by \eqref{Equation:R-Specification}, $\rc{R} = R$.%, so we define 
+%\begin{equation}
+%  \label{overlap1}
+%  \overlap((0), (r), (0)) = r.
+%\end{equation}
 
-Second, if $R$ is a $1 \times n$ matrix, with $n > 1$, we must have that $\tc{U}$ is a $1 \times 1$ matrix (the zero matrix), and $\tc{L}$ is a $n \times n$ upper triangular matrix. Then, the rectangular specification  \eqref{Equation:R-Specification} gives us the rectangular specification for a row vector:
+Second, if $R$ is a $1 \times n$ matrix (that is, a row vector) with $n > 1$, we must have that $\tc{U}$ is a $1 \times 1$ matrix (the zero matrix), and $\tc{L}$ is a $n \times n$ upper triangular matrix. Then, the overlap specification  \eqref{Equation:R-Specification} gives us the overlap specification for a row vector:
 \begin{equation}
   \label{R-Spec-Row}
   \rc{R} = \rc{R}\tc{L} + R
 \end{equation}
-. We can subdivide $R$ along the middle into two nonempty matrices: $R = (u , v)$, where $u$ is an $1 \times i$ vector, $v$ and $1 \times j$ vector, $i + j = n$, and in the same way, split $\tc{L}$ into four blocks 
+We can subdivide $R$ along the middle into two nonempty matrices: $R = (u , v)$, where $u$ is a $1 \times i$ matrix, $v$ and $1 \times j$ matrix, $i + j = n$, and in the same way, split $\tc{L}$ into four blocks 
 \begin{equation*}
   \tc{L} = 
   \begin{pmatrix}
     \tc{L_U} & \rc{L_R} \\
-    0   & \tc{L_L}
+    \zm   & \tc{L_L}
   \end{pmatrix},
 \end{equation*}
-where $\tc{L}_U$ is an $i \times i$ upper triangular matrix and $\tc{L}_L$ is a $j \times j$ upper triangular matrix. Inserting this in the specification for $\rc{R}$, we get
+where $\tc{L_U}$ is an $i \times i$ upper triangular matrix and $\tc{L_L}$ is a $j \times j$ upper triangular matrix. Inserting this into \eqref{R-Spec-Row}, we get
 \begin{equation*}
   \rc{R} = (\rc{u} , \rc{v}) 
   \begin{pmatrix}
     \tc{L_U} & \rc{L_R} \\
-    0   & \tc{L_L}
+    \zeromatrix   & \tc{L_L}
   \end{pmatrix}
   + (u , v) 
   = 
-  (\rc{u}\tc{L_U} + u , rc{v}\tc{L_L} + \rc{u}\rc{L_U} + v ),
+  (\rc{u}\tc{L_U} + u , \rc{u}\rc{L_R} + \rc{v}\tc{L_L} + v ),
 \end{equation*}
-so that 
+so that, after rearranging
 \begin{align*}
   \rc{u} &= \rc{u}\tc{L_U} + u\\
-  \rc{v} &= \rc{u}\rc{L_U}  + \rc{v}\tc{L_L} + v,
+  \rc{v} &= \rc{v}\tc{L_L} + \rc{u}\rc{L_R} + v.
 \end{align*}
-that is, $\rc{u}$ satisfies the rectangular specification for a row vector, \eqref{R-Spec-Row}, with $R = u$, $\tc{L} = \tc{L_U}$, and $\rc{v}$ satisifes the specification with $R = \rc{u}\rc{L_U} + v  $, $\tc{L_U} = \tc{L_L}$
-\begin{equation}
-  \label{overlap2}
-  \overlap\left((0), (u , v) ,
-  \begin{pmatrix}
-    \tc{L_U} & \rc{L_R} \\
-    0   & \tc{L_L}
-  \end{pmatrix} \right) 
-  = (\overlap((0) , u ,\tc{L_U} ) , \overlap((0) , \rc{u}\rc{L_U} + v , \tc{L_L} ) ),
-\end{equation}
-and we can compute $\rc{u}$ first, to use in the second computation, to avoid repeating anything.
+That is, $\rc{u}$ satisfies the overlap specification for a row vector, \eqref{R-Spec-Row}, with $R = u$, $\tc{L} = \tc{L_U}$, and $\rc{v}$ satisifes the same specification with $R = \rc{u}\rc{L_R} + v$, $\tc{L_U} = \tc{L_L}$, and hence we can compute them recursively (starting with $\rc{u}$. %So to compute the overlap part when $R$ is a row vector $(u,v)$., we recursively compute the overlap part of 
+%\begin{equation}
+%  \label{overlap2}
+%  \overlap\left((0), (u , v) ,
+%  \begin{pmatrix}
+%    \tc{L_U} & \rc{L_R} \\
+%    0   & \tc{L_L}
+%  \end{pmatrix} \right) 
+%  = (\overlap((0) , u ,\tc{L_U} ) , \overlap((0) , \rc{u}\rc{L_U} + v , \tc{L_L} ) ),
+%\end{equation}
+%and we can compute $\rc{u}$ first, to use in the second computation, to avoid repeating anything.
 
-Next, if $R$ is a $n \times 1$ matrix, as in the case above, we can subdivide $R$ into $(u , v)^T$ and $\tc{U}$ into 
+Next, if $R$ is a $n \times 1$ matrix (a column vector), as in the case above, we can subdivide $R$ into $(u , v)^T$ and $\tc{U}$ into 
 \begin{equation*}
   \tc{U} = 
   \begin{pmatrix}
     \tc{U_U} & \rc{U_R} \\
-    0   & \tc{U_L}
+    \zeromatrix   & \tc{U_L}
   \end{pmatrix},
 \end{equation*}
-and since $L = 0$, the rectangular specification turns into 
+and since $L = \zeromatrix$, the overlap specification \eqref{Equation:R-Specification} turns into the overlap specification for a column vector:
 \begin{equation}
 \label{R-Spec-Col}
 \rc{R} = \tc{U}\rc{R} + R,
@@ -164,7 +131,7 @@ which gives us
   \end{pmatrix}
   = \begin{pmatrix}
     \tc{U_U} & \rc{U_R} \\
-    0        & \tc{U_L}
+    \zeromatrix        & \tc{U_L}
   \end{pmatrix}
   \begin{pmatrix}
     \rc{u} \\
@@ -181,32 +148,9 @@ which gives us
     \tc{U_L}\rc{v} + v
   \end{pmatrix},
 \end{equation*}
-so $\rc{u}$ and $\rc{v}$ satisfy the rectangular specification for a column vector \eqref{R-Spec-Col} with $R = \rc{U_R}\rc{v} + u$, $U = \tc{U_U}$ and $R = v$, $U = \tc{U_L}$, respectively. Hence, we have 
-\begin{equation}
-\label{overlap3}
-\overlap\left(
-\begin{pmatrix}
-  \tc{U_U} & \rc{U_R} \\
-    0      & \tc{U_L}
-\end{pmatrix}
-, 
-\begin{pmatrix}
-  u \\ 
-  v
-\end{pmatrix}
-, 
-\begin{pmatrix}
-0
-\end{pmatrix}
-\right) = 
-\begin{pmatrix}
-  \overlap(\tc{U_U} , \rc{U_R}\rc{v} + u , (0) ) \\ 
-  \overlap(\tc{U_L} , v, (0) ) 
-\end{pmatrix},
-\end{equation}
-where, we can compute $\rc{v}$ first, so as not to repeat anything.
+so $\rc{u}$ and $\rc{v}$ satisfy the overlap specification for a column vector \eqref{R-Spec-Col} with $R = \rc{U_R}\rc{v} + u$, $U = \tc{U_U}$ and $R = v$, $U = \tc{U_L}$, respectively, and we can compute them recursively (starting with $\rc{v}$).
 
-Finally, if $R$ is an $m \times n$ matrix, with $m > 1$, $n > 1$, we can subdivide $R$ along both rows and colums, into four (nonempty) blocks:
+Finally, if $R$ is an $m \times n$ matrix, with $m > 1$, $n > 1$, we can subdivide $R$ along both rows and colums, into four blocks:
 \begin{equation*}
   R =
   \begin{pmatrix}
@@ -214,159 +158,156 @@ Finally, if $R$ is an $m \times n$ matrix, with $m > 1$, $n > 1$, we can subdivi
     C & D
   \end{pmatrix},
 \end{equation*}
-and subdivide $\tc{U}$ and $\tc{L}$ along the same rows and columns into three parts:
+where $A$ is an $i \times k$ matrix, $B$ is an $i \times l$ matrix, $C$ is a $j \times k$ matrix and $D$ is a $j \times l$ matrix, where $i + j = m$, $k + l = n$.
+We subdivide $\tc{U}$ and $\tc{L}$ along the same rows and columns into three parts:
 \begin{equation*}
   \tc{U} = 
   \begin{pmatrix}
     \tc{U_U} & \rc{U_R} \\
-    0   & \tc{U_L}
-  \end{pmatrix},
-\end{equation*}
-\begin{equation*}
-  L = 
+    \zeromatrix   & \tc{U_L}
+  \end{pmatrix} \quad \text {and} \quad
+  \tc{L} = 
   \begin{pmatrix}
     \tc{L_U} & \rc{L_R} \\
-    0   & \tc{L_L}
-  \end{pmatrix}
+    \zeromatrix   & \tc{L_L}
+  \end{pmatrix},
 \end{equation*}
-where the numbering of the parts are selected so as to make the final specifications symmetric.
+where $\tc{U_U}$ is a $i \times i$ matrix, $\rc{U_R}$ is a $i \times j$ matrix, $\tc{U_L}$ is a $j \times j$ matrix, $\tc{L_U}$ is a $k \times k$ matrix, $\rc{L_R}$ is a $k \times l$ matrix, and $\tc{L_L}$ is a $l \times l$ matrix. 
 
-Inserting this in the specification for $R$, \eqref{Equation:R-Specification}, gives us,
+Inserting this in the overlap specification, \eqref{Equation:R-Specification}, and performing the multiplications gives us,
 \begin{align*}
   \begin{pmatrix}
     \rc{A} & \rc{B} \\
     \rc{C} & \rc{D}
   \end{pmatrix} &= 
   \begin{pmatrix}
-    \tc{U_U}\rc{A} + \tc{U_L}\tc{C}  &  \tc{U_U}\rc{B} + \rc{U_R}\tc{D} \\
+    \tc{U_U}\rc{A} + \rc{U_R}\rc{C}  &  \tc{U_U}\rc{B} + \rc{U_R}\rc{D} \\
     \tc{U_L}\rc{C}                   &  \tc{U_L}\rc{D}
   \end{pmatrix}
-  +
+  +\\&+
   \begin{pmatrix}
     \rc{A}\tc{L_U}        &   \rc{A}\rc{L_R} + \rc{B}\tc{L_L}\\
     \rc{C}\tc{L_U}        &   \rc{C}\rc{L_R} + \rc{D}\tc{L_L}
   \end{pmatrix}
-  \\&+
+  +
   \begin{pmatrix}
     A & B \\
     C & D
   \end{pmatrix}
 \end{align*}
-where we have again written $\tc{A}$, $\tc{B}$, $\tc{C}$ and $\tc{D}$, for the parts of $\rc{R}$ corresponding to $A$, $B$, $C$ and $D$, which a priori are not the transitive closures of anything, while $\tc{U_U}$, $\tc{U_L}$, $\tc{L_U}$ and $\tc{L_L}$ \emph{are} the transitive closures of $U_U$¸ $U_L$, $L_U$ and $L_L$, respectively, and $\rc{U_R}$ and $\rc{L_R}$ satisfy the rectangular specification for $U_R$ and $L_R$, respectively, since we assume that we have computed the transitive closures of $U$ and $L$ recursively.
-\todo{THOMAS: maybe give better names to parts}
+where we have again written $\rc{A}$, $\rc{B}$, $\rc{C}$ and $\rc{D}$, for the parts of $\rc{R}$ corresponding to $A$, $B$, $C$ and $D$ (which a priori do not satisfy the overlap specification for anything).
 Hence, after rearranging, we get the equations
 \begin{align*}
-  \rc{A} &= \tc{U_U}\rc{A} + \rc{A}\tc{L_U} + \tc{U_L}\rc{C} + A \\
+  \rc{A} &= \tc{U_U}\rc{A} + \rc{A}\tc{L_U} + \rc{U_R}\rc{C} + A \\
   \rc{B} &= \tc{U_U}\rc{B} + \rc{B}\tc{L_L} + \rc{U_R}\rc{D} + \rc{A}\rc{L_R} + B \\
   \rc{C} &= \tc{U_L}\rc{C} + \rc{C}\tc{L_U} + C\\
-  \rc{D} &= \tc{U_L}\rc{D} + \rc{D}\tc{L_L} + \rc{C}\rc{L_R} +  D.
-\end{align*}\todo{THOMAS: update to use tc and rc commands}
-When looking at them carefully and comparing them to the rectangular specification \eqref{Equation:R-Specification}, $\rc{R} = \tc{U}\rc{R} + \rc{R}\tc{L} + R$, we see that, for example, $\rc{A}$ satisfies the rectangular specification with $U = U_U$, $L = L_U$, $R = \tc{U_L}\rc{C}$.
-
-Hence, we can finish the definition of $\overlap$.
-\begin{equation}
-  \overlap
-  \left( 
-  \begin{pmatrix}
-    \tc{U_U} & \rc{U_R} \\
-    0        & \tc{U_L}
-  \end{pmatrix} 
-  ,
-   \begin{pmatrix}
-    A & B \\ 
-    C & D
-  \end{pmatrix}
-  ,
-  \begin{pmatrix}
-    \tc{L_U} & \rc{L_R} \\
-    0        & \tc{L_L}
-  \end{pmatrix}
-  \right)
-  = 
-  \begin{pmatrix}
-    \overlap( \tc{U_U} , \tc{U_L}\rc{C} + A                  , \tc{L_U} ) & 
-    \overlap( \tc{U_U} , \rc{U_R}\rc{D} + \rc{A}\rc{L_R} + B , \tc{L_L} ) \\
-    \overlap( \tc{U_L} , C                                   , \tc{L_U} ) & 
-    \overlap( \tc{U_L} , \rc{C}\rc{L_R} +  D                 , \tc{L_L} )
-  \end{pmatrix},
-\end{equation}
-where again, we note that there is an order to compute the parts that avoids repeating work (and there are no mutual dependencies), namely first compute $\rc{C}$, then compute $\rc{A}$ and $\rc{D}$, and finally, compute $\rc{B}$.
-
+  \rc{D} &= \tc{U_L}\rc{D} + \rc{D}\tc{L_L} + \rc{C}\rc{L_R} +  D,
+\end{align*}
+and see that they all satisfy the overlap specification \eqref{Equation:R-Specification} for some choice of $R$, $\tc{U}$ and $\tc{L}$. For example, $\rc{A}$ satisfies it with $\tc{U} = \tc{U_U}$, $\tc{L} = \tc{L_U}$, $R = \rc{U_R}\rc{C} + A$. We see also that the equation satisfied by $\rc{B}$ contains $\rc{A}$ and $\rc{D}$, which in turn both contain $\rc{C}$, and $\rc{C}$ does not contain any of the other parts. So we can compute them recursively, starting with $\rc{C}$, and then computing $\rc{A}$ and $\rc{D}$, finishing with $\rc{B}$.
 \missingfigure{Overlap step, 4-case}
 \subsubsection{The Algorithm (or Valiant's Algorithm, if we rename the subsection)}
-Summing up, and going back to the original matrix for the parse chart, $C$, and dividing it into parts in two steps, we get
-\begin{equation}
-  C =
-  \begin{pmatrix}
-    U_U & U_R & A   & B \\
-    0   & U_L & C   & D \\
-    0   &   0 & L_U & L_R \\
-    0   &   0 & 0   & L_L 
-  \end{pmatrix}.
-\end{equation}
-We can then compute the transitive closure of $C$ by the following algorithm, which is (roughly) the algorithm introduced by Valiant \cite{Valiant}:
-\begin{enumerate}
-\item Recursively compute the transitive closures $\tc{U}$ of $U$ and $\tc{L}$ of $L$.
-\item Compute $\rc{U} = \overlap(U,R,L)$ by recursively computing $\rc{C} = \overlap(U_L, C, L_U)$, then $\rc{A} = \overlap( \tc{U_U} , \tc{U_L}\rc{C} + A , \tc{L_U} )$ and $\rc{D} = \overlap( \tc{U_L} , \rc{C}\rc{L_R} +  D , \tc{L_L} )$, and finally $\rc{B} = \overlap( \tc{U_U} , \rc{U_R}\rc{D} + \rc{A}\rc{L_R} + B , \tc{L_L})$ and putting them together into 
+Summing up, we give the algorithm for computing the transitive closure $\tc{\chart}$ of an upper triangular matrix $\chart$ here:
+\begin{itemize}
+\item If $\chart$ has size $1 \times 1$, return $\chart$.
+\item Otherwise $\chart$ has size $n \times n$, with $n > 1$. Split $\chart$ into
   \begin{equation*}
-    \rc{U} = 
+    \chart = 
     \begin{pmatrix}
-      \rc{A} & \rc{B} \\
-      \rc{C} & \rc{D} 
-    \end{pmatrix}.
+      U           &  R \\
+      \zeromatrix &  L
+    \end{pmatrix},
   \end{equation*}
-\end{enumerate}
+  and then: 
+  \begin{enumerate}
+  \item Recursively compute $\tc{U}$, $\tc{L}$.
+  \item Compute $\rc{R}$ from $\tc{U}$, $R$, and $\tc{L}$ by:
+    \begin{itemize}
+    \item If $R$ has size $1 \times 1$, return $R$.
+    \item If $R$ has size $n \times 1$, $n > 1$, then $\tc{L}$ is the $1\times 1$ zeromatrix, split $\tc{U}$ and $R$ into
+      \begin{equation*}
+        \tc{U} = 
+        \begin{pmatrix}
+          \tc{U_U} & \tc{U_R} \\
+          \zm      & \tc{U_L} 
+        \end{pmatrix} \quad \text{and}\quad
+        R = 
+        \begin{pmatrix}
+          u \\
+          v
+        \end{pmatrix}
+      \end{equation*}
+        and recursively compute $ $ from $ $ and $ $ from $ $. Return
+        \begin{equation*}
+          \begin{pmatrix}
+            \rc{u}\\
+            \rc{v}
+          \end{pmatrix}
+        \end{equation*}
+    \end{itemize}
+    \item Return 
+      \begin{equation*}
+        \begin{pmatrix}
+          \tc{U} & \rc{R} \\
+          \zm    & \tc{L}
+        \end{pmatrix}
+      \end{equation*}
+  \end{enumerate}
+\end{itemize}
+
+$\overlaprow()$
+\todo{THOMAS: clear this up}
 \subsection{Implementation}
-In this section, we are going to implement Valiant's Algorithm.
+In this section, we are going to implement Valiant's Algorithm in Agda.
 \subsubsection{Data types}
-To implement this in Agda using the |Matrix| and |Triangle| datatype from Section \ref{Section:Triangle} would be very complicated since we would have to handle the splitting manually. Instead, we define concrete representations for the matrices and triangle that have the way we split them built in% (at least two levels down, for use with the rectangular part). 
+To implement this in Agda using the |Matrix| and |Triangle| datatypes from Section \ref{Section:Triangle} would be very complicated since we would have to handle the splitting manually. Instead, we define concrete representations for the matrices and triangle that have the way we split them built in.
 We will call the datatypes we use |Mat| and |Tri| for general matrices and upper triangular matrices, respectively.
-To build the split into the data types, we give them constructors for building a large |Mat| or |Tri| from four smaller |Mat|s or two |Tri| and one |Mat| respectively. Since we need |Mat| to define |Tri|, it should appear earlier on in the Agda code, and we begin by reasoning about it. By the above, we have one constructor ready, which we will call |quad|, and which takes four smaller matrices and puts them together into a big one. \todo{THOMAS: make note about us using matrix for |Mat| here.} Written mathematically, we want the meaning to be:
-\begin{equation}
+To build the split into the data types, we give them constructors for building a large |Mat| or |Tri| from four smaller |Mat|s or two |Tri| and one |Mat| respectively. We begin with |Mat| since it is needed to define |Tri|. 
+
+By the above reasoning, we have one constructor, which we will call |quad| that takes four smaller matrices and puts them together into a big one. Written mathematically, we want the meaning to be:
+\begin{equation*}
 \operatorname{quad}(A,B,C,D) = 
 \begin{pmatrix} 
   A & B \\
   C & D
 \end{pmatrix},
-\end{equation}
+\end{equation*}
 where $A$ has the same number of rows as $B$, $C$ has the same number of rows as $D$, $A$ has the same number of columns as $C$ and $B$ has the same number of columns as $D$.
-Thinking about what ``small'' structures should have constructors, we we realize that it is not enough to simply allow $1 \times 1$ matrices, since then, any matrix would be a $2^n \times 2^n$ matrix, where $n$ is the number of times we use |quad|. 
+Thinking about what ``small'' structures should have constructors, we should definitely have a constructor |sing| for single element matrices. We realize that it is not enough to simply allow these $1 \times 1$ matrices, as it would imply that any matrix is a $2^n \times 2^n$ matrix, where $n$ is the number of times we use |quad|. 
 
 \label{Section:Empty-Matrices}
-One way to to solve this problem is to have a constructor for ``empty'' matrices of any dimension, that play two different roles. First, empty $0 \times n$ matrices are used to allow |quad| to put two matrices with the same number of rows next to each others:
+One way to allow arbitrary dimensions for the matrices is to have a constructor |empty| for ``empty'' matrices of any dimension, that play two different roles. First, empty $0 \times n$ matrices are used to allow |quad| to put two matrices with the same number of rows next to each others:
 \begin{equation}
 \operatorname{quad}(A, B, e_{0\,m}, e_{0\,n}) =
 \begin{pmatrix}
   A & B \\
   e_{0\,m} & e_{0\,n}
-\end{pmatrix} = 
-\begin{pmatrix}
-  A & B
-\end{pmatrix},
+\end{pmatrix} = (A,  B),
 \end{equation}
-where $e_m$ and $e_n$ are empty $m \times 0$ and $n\times 0$ matrices respectively. Similarily, empty $n \times 0$ matrices are used to put two matrice with the same number of columns on top of each others. Second, an empty $m \times n$ matrix, $m \ne 0$, $n \ne 0$, represents a $m \times n$ matrix whose entries are all zero. This approach is taken in \cite{JP-PP}. One advantages of this method is that one can probably get some speedup when adding and multiplying with ``empty'' matrices:
-\begin{equation*}
-  e_{m\, n} + A = A + e_{m\,n} = A
-  e_{m\, n} * A = e_{m\,p}
-  A * e_{n\,p}  = e_{m\,p},
-\end{equation*}
+where $e_m$ and $e_n$ are empty $m \times 0$ and $n\times 0$ matrices respectively. Similarily, empty $n \times 0$ matrices are used to put two matrice with the same number of columns on top of each others. Second, an empty $m \times n$ matrix, $m > 0$, $n > 0$, represents a $m \times n$ matrix whose entries are all zero. One advantages of this method is that we could give fast implementations of  addition and multiplication of ``empty'' matrices:
+\begin{align*}
+  e_{m\, n} + A &= A \\ 
+  A + e_{m\,n}  &= A \\
+  e_{m\, n}   A &= e_{m\,p} \\
+  A e_{n\,p}    &= e_{m\,p},
+\end{align*}
 where $A$ is an arbitrary $m \times n$, $n \times p$ and $m \times n$ matrix, respectively.
-Another is that it keeps the number of constructors down (three constructors for the matrix type), and this is desirable when proving things with Agda, since one often has to deal separately with each constructor, to establish the base cases in an induction.
+Another is that it keeps the number of constructors down (three constructors for the matrix type), and this is desirable when proving things with Agda, since we generally pattern match on the structures, and this gives us a case for each constructor.
 
-One (potential) downside with this approach is that while it allows easy construction of zero-matrices of arbitrary size, non-zero matrices still require many constructor application. For example, to make a $2^k \times 1$ vector, we'd have to build a tree of ``n'' \todo{THOMAS: count} applications of |quad|.
+%One (potential) downside with this approach is that while it allows easy construction of zero-matrices of arbitrary size, non-zero matrices still require many constructor application. For example, to make a $2^k \times 1$ vector, we would have to build a tree of $k$ \todo{THOMAS: count} applications of |quad|.
+One Another downside is that there are multiple constructors for matrices of the same size (there is always |empty| and a nonempty way when $m > 0$, $n > 0$), removign some of the advantage we get from having few constructors.
 
-Another approach, which we take in this report, is to allow row and column vectors, that is $1 \times n$ and $n \times 1$ matrices for arbitrary $n > 1$, along with the single element matrices. That is, we define |rVec| and |cVec| to take a vector of length $n > 1$ and turn it into a $1 \times n$ or $n \times 1$ matrix respectively.
-This approach has the advantage that we can define all matrices in a simple way, and that we could potentially specialize algorithms when the input is a vector, but introduces one extra constructor (one for rows, one for columns and one for single elements and |quad|, as opposed to one for empty matrices, one for single element matrices and |quad|).
+Another approach, which is the one we take in this report, is to have constructors for row and column vectors, $1 \times n$ and $n \times 1$ matrices for arbitrary $n > 1$, along with the single element matrices. We define |rVec| and |cVec| to take a vector of length $n > 1$ and turn it into a $1 \times n$ or $n \times 1$ matrix respectively.
+This approach has the advantage that we can define all matrices in a simple way, and that we could potentially specialize algorithms when the input is a vector, but introduces one extra constructor (|sing|, |rVec|, |cVec| and |quad| compared to |empy|, |sing| and |quad|).
 
-Similarily to the matrices, we then want a concrete representation |Vec| of vectors. Since we (probably) want to be able to split vectors too along the middle, we give them a constructor |two| that takes a vector of length $m$ and one of length $n$ and appends them. For our base cases, we need to be able to build single element vectors, and this turns out to be enough, since we can then build any vector. 
+We then need a concrete representation |Vec| of vectors. Since we want to be able to split vectors along the middle (to implement Valiant's algorithm in the case where $R$ is a vector), we give them a constructor |two| that takes a vector of length $m$ and one of length $n$ and concatenates them. For our base cases, we need to be able to build single element vectors, this is enough to build any vector.
 To implement this approach, we need to define the datatypes |Vec| of vectors and |Mat| of matrices (that shoud be concrete representations of |Vector| and |Matrix|).
 
 %include Code/Valiant/NaiveCode.lagda
 
-Instead we want to use a different approach for indexing our matrices, by building the splitting further into the data structures. Looking at the first attempt to define |quad|, we can perhaps guess that the indexing should have a constructor that puts two sub-indices together to form a new index (as in |a + b|), because then, |quad| would result in a |Mat| whose indices are clearly distinguishable from the single index (that is |1| above). Hence, we want something like |ℕ|, but, instead of having |suc| as a constructor, it should have |+|. \todo{THOMAS: look for paper maybe -- mentioned by JP at some point in time}
+Instead we want to use an approach for indexing our matrices where we build the splitting further into the data structures. Looking at the first attempt to define |quad|, we see that we only use constant |ℕ|s and |_+_| (we never use |suc| to increase the size of a matrix). So we could use a datatype like |ℕ|, but, instead of having |suc| as a constructor, it has |_+_|.
 %include Code/Valiant/Splitting.lagda
 
-Using this data type we can finally define our data types \todo{THOMAS: data type or datatype?} |Mat| and |Tri|.
+Using this data type we can finally define our datatypes |Mat| and |Tri|.
 %include Code/Valiant/MatAndTri.lagda
 %include Code/Valiant/Operations.lagda
 %include Code/Valiant/NANRings.lagda

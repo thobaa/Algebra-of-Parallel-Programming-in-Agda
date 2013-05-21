@@ -1,10 +1,13 @@
-all: C.pdf
+all: 
+	lhs2TeX --agda -o C.tex Report.tex
+#	#C.pdf
+	pdflatex C.tex
 
 C.pdf: C.tex
 #	pdflatex C.tex
 	latexmk -pdf C.tex
 
-C.tex: Report.tex
+C.tex: 
 	lhs2TeX --agda -o C.tex Report.tex
 
 

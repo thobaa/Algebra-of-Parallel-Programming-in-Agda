@@ -10,25 +10,27 @@ open NonassociativeSemiring NaSr public renaming (_+_ to _R+_; _*_ to _R*_; _≈
 Mimicking the above, but using |Splitting|s as indices (the code is essentially the same, with every instance of ``|ℕ|'' replaced by ``|Splitting|''), we first define |Vec| as:
 \begin{code}
 data Vec : Splitting → Set where
-  one : (x : R) → Vec one
-  two : {s₁ s₂ : Splitting} → Vec s₁ → Vec s₂ → Vec (bin s₁ s₂)
+  one  : R → Vec one
+  two  : {s₁ s₂ : Splitting} → Vec s₁ → Vec s₂ → Vec (bin s₁ s₂)
 \end{code}
 We can note that where |Splitting| is a binary tree of elements of the unit type, |Vec| is instead a binary tree of |Carrier| (with elements in the leaves). We move on to defining |Mat| as:
 \begin{code}
 data Mat : Splitting → Splitting → Set where
   sing : (x : R) → Mat one one
-  rVec : {s₁ s₂ : Splitting} → (v : Vec (bin s₁ s₂)) → Mat one (bin s₁ s₂)
-  cVec : {s₁ s₂ : Splitting} → (v : Vec (bin s₁ s₂)) → Mat (bin s₁ s₂) one
+  rVec : {s₁ s₂ : Splitting} → Vec (bin s₁ s₂) → Mat one (bin s₁ s₂)
+  cVec : {s₁ s₂ : Splitting} → Vec (bin s₁ s₂) → Mat (bin s₁ s₂) one
   quad : {r₁ r₂ c₁ c₂ : Splitting} →  Mat r₁ c₁ → Mat r₁ c₂ → 
                                       Mat r₂ c₁ → Mat r₂ c₂ → 
                                       Mat (bin r₁ r₂) (bin c₁ c₂)
 \end{code}
-\todo{THOMAS: Check for number of constructors in JP's |Tri| definition}
-The definition of the last datatype involved, |Tri| is straightforward from the subdivision made above in Section \ref{Section:Subdivision-in-Specification}. There is only one base case, that of the $1 \times 1$ zero triangle (equal to the $1 \times 1$ zero matrix when viewed as an upper triangular marix), and putting together |Tri|s is straightforward since the upper triangular matrices need to be square, now that our matrices can have any shape, and the definition guarantees that the two step splitting in Section \ref{Section:Two-Step-Splitting} can be done:
+Finally, |Tri|:
+The definition of the last datatype involved, 
 \begin{code}
 data Tri : Splitting → Set where
-  one : Tri one
-  two : {s₁ s₂ : Splitting} → (U : Tri s₁) → (R : Mat s₁ s₂) → (L : Tri s₂) → Tri (bin s₁ s₂)
+  zer   : Tri one
+  tri   : {s₁ s₂ : Splitting} → Tri s₁  →  Mat s₁ s₂ → 
+                                           Tri s₂ 
+                                        → Tri (bin s₁ s₂)
 \end{code}
 Where again, the ordering of the arguments to |two| (it takes \emph{two} |Tri|s) is such that if we introduce a line break after |Mat s₁ s₂|, and indent |Tri s₂| so it is below |Mat s₁ s₂|, they have the shape of an upper triangular matrix.
 
@@ -49,6 +51,6 @@ zeroMat {bin s₁ s₂} {one} = cVec zeroVec
 zeroMat {bin s₁ s₂} {bin s₁' s₂'} = quad zeroMat zeroMat zeroMat zeroMat
 
 zeroTri : {s : Splitting} → Tri s
-zeroTri {one} = one
-zeroTri {bin s₁ s₂} = two zeroTri zeroMat zeroTri
+zeroTri {one} = zer
+zeroTri {bin s₁ s₂} = tri zeroTri zeroMat zeroTri
 \end{code}

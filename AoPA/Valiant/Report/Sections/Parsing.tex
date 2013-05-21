@@ -62,13 +62,13 @@ The solution to these two problems is to consider \emph{sets} of nonterminals, w
   \{A_1, \ldots, A_n \} \cdot \{B_1 \ldots B_m\} = \{A_1B_1, \ldots, A_nB_m, A_2B_1 \ldots, A_2B_m, \ldots, A_nB_n\}
 \end{equation*}
 \subsubsection{Parsing as Transitive Closure}
-\todo{was it valiant who came up with this idea? -- include reference to whoever}
+\todo{was it valiant who came up with this idea? -- include reference to whoever, it seems like that}
 
 % here should be a ``proof'' that parsing can be seen as computing the transitive closure of a matrix
 When we consider the 
 
 \subsection{Specification of non-associative transitive closure}
-In Section \ref{Parsing as transitive closure}, we showed that parsing can be considered as computing the (non-associative) transitive closure of a matrix. To get an algorithm from this, we want to create a specification for the problem of finding the (non-associative) transitive closure of a matrix. As before, we let $C^+$ denote the transitive closure of $C$. In \cite{Valiant}, the specification is given as \todo{THOMAS: check if valiant has a word for this, also if he uses $\infty$, or not}
+In Section \ref{Parsing as transitive closure}, we showed that parsing can be considered as computing the (non-associative) transitive closure of a matrix. To get an algorithm from this, we want to create a specification for the problem of finding the (non-associative) transitive closure of a matrix. As before, we let $C^+$ denote the transitive closure of $C$. In \cite{Valiant}, the specification is given as
 \begin{equation}
   \label{VSpec}
   C^+ = \sum_{i = 1}^{\infty}\nap{C}{i}
