@@ -1,0 +1,882 @@
+% -*- latex -*-
+\documentclass[14pt, notes=hide]{beamer}
+
+\usepackage{lmodern}
+
+
+\usepackage{ucs}
+\include{unicodedefs}
+
+\newcommand{\trc}[1]{#1^{\times}}
+\DeclareMathOperator{\overlap}{Overlap}
+\DeclareMathOperator{\tc}{TC}
+% format ->         = "\to "
+% format <-         = "\leftarrow "
+% format =>         = "\Rightarrow "
+% format \          = "\lambda "
+% format !!         = "\mathbin{!!}"
+% format `quot`     = "\mathbin{\Varid{`quot`}}"
+% format `rem`      = "\mathbin{\Varid{`rem`}}"
+% format `div`      = "\mathbin{\Varid{`div`}}"
+% format `mod`      = "\mathbin{\Varid{`mod`}}"
+% format ==         = "\equiv "
+%% ODER: format ==         = "\mathrel{==}"
+% format /=         = "\not\equiv "
+%% ODER: format /=         = "\neq "
+% format <=         = "\leq "
+% format >=         = "\geq "
+% format `elem`     = "\in "
+% format `notElem`  = "\notin "
+% format &&         = "\mathrel{\wedge}"
+% format ||         = "\mathrel{\vee}"
+% format >>         = "\sequ "
+% format >>=        = "\bind "
+% format =<<        = "\rbind "
+% format undefined  = "\bot "
+% format not	   = "\neg "
+%
+%
+\makeatletter
+\@ifundefined{lhs2tex.lhs2tex.sty.read}%
+  {\@namedef{lhs2tex.lhs2tex.sty.read}{}%
+   \newcommand\SkipToFmtEnd{}%
+   \newcommand\EndFmtInput{}%
+   \long\def\SkipToFmtEnd#1\EndFmtInput{}%
+  }\SkipToFmtEnd
+
+\newcommand\ReadOnlyOnce[1]{\@ifundefined{#1}{\@namedef{#1}{}}\SkipToFmtEnd}
+\usepackage{amstext}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\DeclareFontFamily{OT1}{cmtex}{}
+\DeclareFontShape{OT1}{cmtex}{m}{n}
+  {<5><6><7><8>cmtex8
+   <9>cmtex9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmtex10}{}
+\DeclareFontShape{OT1}{cmtex}{m}{it}
+  {<-> ssub * cmtt/m/it}{}
+\newcommand{\texfamily}{\fontfamily{cmtex}\selectfont}
+\DeclareFontShape{OT1}{cmtt}{bx}{n}
+  {<5><6><7><8>cmtt8
+   <9>cmbtt9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmbtt10}{}
+\DeclareFontShape{OT1}{cmtex}{bx}{n}
+  {<-> ssub * cmtt/bx/n}{}
+\newcommand{\tex}[1]{\text{\texfamily#1}}	% NEU
+
+\newcommand{\Sp}{\hskip.33334em\relax}
+
+
+\newcommand{\Conid}[1]{\mathit{#1}}
+\newcommand{\Varid}[1]{\mathit{#1}}
+\newcommand{\anonymous}{\kern0.06em \vbox{\hrule\@width.5em}}
+\newcommand{\plus}{\mathbin{+\!\!\!+}}
+\newcommand{\bind}{\mathbin{>\!\!\!>\mkern-6.7mu=}}
+\newcommand{\rbind}{\mathbin{=\mkern-6.7mu<\!\!\!<}}% suggested by Neil Mitchell
+\newcommand{\sequ}{\mathbin{>\!\!\!>}}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+\usepackage{polytable}
+
+%mathindent has to be defined
+\@ifundefined{mathindent}%
+  {\newdimen\mathindent\mathindent\leftmargini}%
+  {}%
+
+\def\resethooks{%
+  \global\let\SaveRestoreHook\empty
+  \global\let\ColumnHook\empty}
+\newcommand*{\savecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\savecolumns[#1]}}
+\newcommand*{\restorecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\restorecolumns[#1]}}
+\newcommand*{\aligncolumn}[2]%
+  {\g@addto@macro\ColumnHook{\column{#1}{#2}}}
+
+\resethooks
+
+\newcommand{\onelinecommentchars}{\quad-{}- }
+\newcommand{\commentbeginchars}{\enskip\{-}
+\newcommand{\commentendchars}{-\}\enskip}
+
+\newcommand{\visiblecomments}{%
+  \let\onelinecomment=\onelinecommentchars
+  \let\commentbegin=\commentbeginchars
+  \let\commentend=\commentendchars}
+
+\newcommand{\invisiblecomments}{%
+  \let\onelinecomment=\empty
+  \let\commentbegin=\empty
+  \let\commentend=\empty}
+
+\visiblecomments
+
+\newlength{\blanklineskip}
+\setlength{\blanklineskip}{0.66084ex}
+
+\newcommand{\hsindent}[1]{\quad}% default is fixed indentation
+\let\hspre\empty
+\let\hspost\empty
+\newcommand{\NB}{\textbf{NB}}
+\newcommand{\Todo}[1]{$\langle$\textbf{To do:}~#1$\rangle$}
+
+\EndFmtInput
+\makeatother
+%
+%
+%
+%
+%
+%
+% This package provides two environments suitable to take the place
+% of hscode, called "plainhscode" and "arrayhscode". 
+%
+% The plain environment surrounds each code block by vertical space,
+% and it uses \abovedisplayskip and \belowdisplayskip to get spacing
+% similar to formulas. Note that if these dimensions are changed,
+% the spacing around displayed math formulas changes as well.
+% All code is indented using \leftskip.
+%
+% Changed 19.08.2004 to reflect changes in colorcode. Should work with
+% CodeGroup.sty.
+%
+\ReadOnlyOnce{polycode.fmt}%
+\makeatletter
+
+\newcommand{\hsnewpar}[1]%
+  {{\parskip=0pt\parindent=0pt\par\vskip #1\noindent}}
+
+% can be used, for instance, to redefine the code size, by setting the
+% command to \small or something alike
+\newcommand{\hscodestyle}{}
+
+% The command \sethscode can be used to switch the code formatting
+% behaviour by mapping the hscode environment in the subst directive
+% to a new LaTeX environment.
+
+\newcommand{\sethscode}[1]%
+  {\expandafter\let\expandafter\hscode\csname #1\endcsname
+   \expandafter\let\expandafter\endhscode\csname end#1\endcsname}
+
+% "compatibility" mode restores the non-polycode.fmt layout.
+
+\newenvironment{compathscode}%
+  {\par\noindent
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \let\hspre\(\let\hspost\)%
+   \pboxed}%
+  {\endpboxed\)%
+   \par\noindent
+   \ignorespacesafterend}
+
+\newcommand{\compaths}{\sethscode{compathscode}}
+
+% "plain" mode is the proposed default.
+% It should now work with \centering.
+% This required some changes. The old version
+% is still available for reference as oldplainhscode.
+
+\newenvironment{plainhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\hspre\(\let\hspost\)%
+   \pboxed}%
+  {\endpboxed%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+\newenvironment{oldplainhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \(\pboxed}%
+  {\endpboxed\)%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+% Here, we make plainhscode the default environment.
+
+\newcommand{\plainhs}{\sethscode{plainhscode}}
+\newcommand{\oldplainhs}{\sethscode{oldplainhscode}}
+\plainhs
+
+% The arrayhscode is like plain, but makes use of polytable's
+% parray environment which disallows page breaks in code blocks.
+
+\newenvironment{arrayhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \(\parray}%
+  {\endparray\)%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+\newcommand{\arrayhs}{\sethscode{arrayhscode}}
+
+% The mathhscode environment also makes use of polytable's parray 
+% environment. It is supposed to be used only inside math mode 
+% (I used it to typeset the type rules in my thesis).
+
+\newenvironment{mathhscode}%
+  {\parray}{\endparray}
+
+\newcommand{\mathhs}{\sethscode{mathhscode}}
+
+% texths is similar to mathhs, but works in text mode.
+
+\newenvironment{texthscode}%
+  {\(\parray}{\endparray\)}
+
+\newcommand{\texths}{\sethscode{texthscode}}
+
+% The framed environment places code in a framed box.
+
+\def\codeframewidth{\arrayrulewidth}
+\RequirePackage{calc}
+
+\newenvironment{framedhscode}%
+  {\parskip=\abovedisplayskip\par\noindent
+   \hscodestyle
+   \arrayrulewidth=\codeframewidth
+   \tabular{@{}|p{\linewidth-2\arraycolsep-2\arrayrulewidth-2pt}|@{}}%
+   \hline\framedhslinecorrect\\{-1.5ex}%
+   \let\endoflinesave=\\
+   \let\\=\@normalcr
+   \(\pboxed}%
+  {\endpboxed\)%
+   \framedhslinecorrect\endoflinesave{.5ex}\hline
+   \endtabular
+   \parskip=\belowdisplayskip\par\noindent
+   \ignorespacesafterend}
+
+\newcommand{\framedhslinecorrect}[2]%
+  {#1[#2]}
+
+\newcommand{\framedhs}{\sethscode{framedhscode}}
+
+% The inlinehscode environment is an experimental environment
+% that can be used to typeset displayed code inline.
+
+\newenvironment{inlinehscode}%
+  {\(\def\column##1##2{}%
+   \let\>\undefined\let\<\undefined\let\\\undefined
+   \newcommand\>[1][]{}\newcommand\<[1][]{}\newcommand\\[1][]{}%
+   \def\fromto##1##2##3{##3}%
+   \def\nextline{}}{\) }%
+
+\newcommand{\inlinehs}{\sethscode{inlinehscode}}
+
+% The joincode environment is a separate environment that
+% can be used to surround and thereby connect multiple code
+% blocks.
+
+\newenvironment{joincode}%
+  {\let\orighscode=\hscode
+   \let\origendhscode=\endhscode
+   \def\endhscode{\def\hscode{\endgroup\def\@currenvir{hscode}\\}\begingroup}
+   %\let\SaveRestoreHook=\empty
+   %\let\ColumnHook=\empty
+   %\let\resethooks=\empty
+   \orighscode\def\hscode{\endgroup\def\@currenvir{hscode}}}%
+  {\origendhscode
+   \global\let\hscode=\orighscode
+   \global\let\endhscode=\origendhscode}%
+
+\makeatother
+\EndFmtInput
+%
+%
+\ReadOnlyOnce{agda.fmt}%
+
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8x]{inputenc}
+\RequirePackage{ucs}
+\RequirePackage{amsfonts}
+
+\providecommand\mathbbm{\mathbb}
+
+% TODO: Define more of these ...
+\DeclareUnicodeCharacter{737}{\textsuperscript{l}}
+\DeclareUnicodeCharacter{8718}{\ensuremath{\blacksquare}}
+\DeclareUnicodeCharacter{8759}{::}
+\DeclareUnicodeCharacter{9669}{\ensuremath{\triangleleft}}
+\DeclareUnicodeCharacter{8799}{\ensuremath{\stackrel{\scriptscriptstyle ?}{=}}}
+\DeclareUnicodeCharacter{10214}{\ensuremath{\llbracket}}
+\DeclareUnicodeCharacter{10215}{\ensuremath{\rrbracket}}
+
+% TODO: This is in general not a good idea.
+\providecommand\textepsilon{$\epsilon$}
+\providecommand\textmu{$\mu$}
+
+
+%Actually, varsyms should not occur in Agda output.
+
+% TODO: Make this configurable. IMHO, italics doesn't work well
+% for Agda code.
+
+\renewcommand\Varid[1]{\mathord{\textsf{#1}}}
+\let\Conid\Varid
+\newcommand\Keyword[1]{\textsf{\textbf{#1}}}
+\EndFmtInput
+
+
+\usepackage{pgfpages}
+
+\usepackage{mathptmx}
+\usepackage{ dsfont }
+
+\usepackage{tikz}
+\usepackage{amsmath,amssymb}
+\usepackage{intcalc}
+
+\usepackage{alltt}
+\usepackage{xcolor}
+
+\usetikzlibrary{arrows,shapes,calc,positioning,fit,matrix}
+\usenavigationsymbolstemplate{}
+% \setbeameroption{show notes on second screen=left} 
+\setbeamertemplate{note page}[plain]
+\setbeamerfont{note page}{size=\Large}
+
+\setbeamersize{text margin left=.3cm, text margin right=.3cm}
+\setbeamercolor{alerted text}{fg=red}
+
+
+\usetheme{Warsaw}
+\setbeamertemplate{footline}{}
+
+\title{An Agda proof of the correctness of Valiant's algorithm for CF parsing}
+\author{Thomas B{\aa}{\aa}th Sj{\"o}blom}
+\institute{Chalmers University of Technology}
+\date{}
+
+\definecolor{darkgreen}{rgb}{0,0.4,0}
+
+\begin{document}
+\begin{frame}               % 1
+\titlepage
+
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Overview}     % 2
+\begin{itemize}
+\item Parsing
+  \begin{itemize}
+  \item What is Parsing?
+  \item Grammars
+  \item Chart parsing % tie in to algebra
+  \item Relation to transitive closure
+  \end{itemize}
+\item Valiant's Algorithm
+  \begin{itemize}
+  \item Motivation, then and now
+  \item The algorithm
+  \end{itemize}
+\item Agda
+  \begin{itemize}
+  \item Introduction to Agda
+  \item Implementation of Valiant's algorithm
+  \item Sketch of Agda proof of Valiant's algorithm
+  \end{itemize}  
+\end{itemize}
+% introduction
+% example
+
+% chart parsing
+% transitive closure
+% specification of transitive closure
+\end{frame}
+
+
+%\begin{frame}{Parsing}{Introduction}  % 3
+% adding structure
+%Parsing is adding structural information to a sequence of tokens.
+% applications in compiler design, bioinformatics and computational linguistics
+%\pause
+% example
+%\begin{equation*}
+%  5 + 3 \times 2 + 7 \times (1 + 9) + 6
+%\end{equation*}
+% relevant to evaluating 
+% numbers are factors
+% 
+
+% is the string generated by the grammar?
+% introduction
+% example
+% uses
+% why algebra? unified names
+
+% chart parsing
+% transitive closure
+% specification of transitive closure
+%\end{frame}
+
+
+\begin{frame}{Parsing}{Introduction} % 4
+\begin{itemize}
+\item A grammar is a tuple $(N, \Sigma, P, S)$, where
+  \begin{itemize}
+  \item $N$ is the set of nonterminals.
+  \item $\Sigma$ is the set of terminals, with $\Sigma \cap N = \emptyset$.
+  \item $P$ is the set of production rules, each of the form $(\Sigma \cup N)^*N(\Sigma \cup N)^* \to (\Sigma \cup N)^*$
+  \item $S \in N$ is the start symbol.
+  \end{itemize}
+\pause
+\item We only consider grammars where the production rules are of the form (Chomsky normal form)
+  \begin{itemize}
+  \item $A \to BC$, where $A$, $B$, $C \in N$.
+  \item $A \to \alpha$, where $A \in N$, $\alpha \in \Sigma$.
+  \end{itemize}
+\end{itemize}
+\pause
+Given a string, we want to see whether it can be generated from the start symbol, that is, whether there is a sequence of 
+\end{frame}
+
+\begin{frame}{Parsing}{Parse charts}
+  Given a string of length $n$, we can make a matrix of all intermediate results into a matrix:
+  \begin{equation*}
+    \trc{C} = \begin{pmatrix}
+      0 & a_{1 2} & a_{1 3} & \hdots & a_{1 n} \\
+      0 & 0      & a_{2 3}  & \ldots & a_{2 n} \\
+      \vdots & \vdots &\ddots & \ldots & \vdots\\
+      0      & 0      & 0      & \ldots &a_{n-1 n}\\
+      0      & 0      & 0      & \ldots &0
+    \end{pmatrix}
+  \end{equation*}
+  where $a_{i j}$ is a set containing $A \in N$ iff $A$ generates the substring starting at the $i$th symbol, and ending at the $j$th.
+\end{frame}
+
+\begin{frame}{Parsing}{Parsing as transitive closure}
+  \begin{itemize}
+  \item We can multiply the sets by $x \cdot y = \{A : B \in x, C \in y, A \to BC \in P \}$.
+    \pause
+  \item Defining matrix multiplication as $(X \cdot Y)_{i j} = \bigcup_k X_{i k} Y_{k j}$ means that $(X \cdot Y)_{i j}$ contains $A$ if and only if $A$ is the product of a parse of the string from $i$ to $k$ in $X$ and from $k$ to $j$ in $Y$.
+    \pause
+    \item Hence, if $C$ is the matrix formed by placing the input just above the diagonal, the parse chart is the transitive closure of the input:
+      \begin{equation*}
+        \trc{C} = \trc{C}\trc{C} + C
+      \end{equation*}
+      \note{HUH, this is not very rigorous}
+      A symbol is either an input symbol, or a combination of two parses.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Valiant's Algorithm}{Motivation} % 5
+\begin{itemize}
+  \item Then
+    \begin{itemize}
+    \item A theoretical algorithm for proving that parsing is as fast as matrix multiplication.
+    \end{itemize}
+  \item Now
+    \begin{itemize}
+    \item A practical (?) algorithm for parsing in parallel.
+    \end{itemize}
+  \item Idea
+    \begin{itemize}
+    \item Split string along the middle, recursively pars. Put together.
+    \end{itemize}
+\end{itemize}
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}{Valiant's Algorithm}{The Algorithm} % 6
+To compute the transitive closure $\tc(C)$ of
+\begin{equation*}
+  C = 
+  \begin{pmatrix}
+    U_1 & R_1 & A   & B \\
+        & L_1 & C   & D \\
+        &     & U_2 & R_2 \\
+        &     &     & L_2
+  \end{pmatrix}
+\end{equation*}
+\pause
+Recursively, compute the transitive closures
+\begin{equation*}
+  \begin{pmatrix}
+    \trc{U_1} & \trc{R_1} \\
+          & \trc{L_1}
+  \end{pmatrix}
+  = \tc
+  \begin{pmatrix}
+    U_1 & R_1 \\
+        & L_1
+  \end{pmatrix}, 
+   \begin{pmatrix}
+    \trc{U_2} & \trc{R_2} \\
+          & \trc{L_2}
+  \end{pmatrix}
+   = \tc
+  \begin{pmatrix}
+    U_2 & R_2 \\
+        & L_2
+  \end{pmatrix}.
+\end{equation*}
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Valiant's Algorithm}{The Algorithm} % 6
+
+%% PERHAPS MAKE COOL ``ANIMATION''
+Define $\overlap(X)$ to be the rectangular part of $\tc(X)$ and compute
+\begin{align*}
+  \trc{C} &= \overlap
+  \begin{pmatrix}
+    \trc{L_1} & C \\
+        & \trc{U_2}
+  \end{pmatrix}
+  \\
+  \trc{A} &= \overlap
+  \begin{pmatrix}
+    \trc{U_1} & A + \trc{R_1} \trc{C} \\
+        & \trc{U_2}
+  \end{pmatrix}
+  \\
+  \trc{D} &= \overlap
+  \begin{pmatrix}
+    \trc{L_1} & D + \trc{C} \trc{R_2} \\
+        & \trc{L_2}
+  \end{pmatrix}
+  \\
+  \trc{B} &= \overlap
+  \begin{pmatrix}
+    \trc{U_1} & B + \trc{R_1} \trc{D} + \trc{A} \trc{R_2} \\
+        & \trc{L_2}
+  \end{pmatrix}
+\end{align*}
+\pause
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\begin{frame}{Valiant's Algorithm}{The Algorithm}  % 7
+Putting things together, the transitive closure of $C$ is 
+\begin{equation*}
+  C = 
+  \begin{pmatrix}
+    \trc{U_1} & \trc{R_1} & \trc{A}   & \trc{B} \\
+        & \trc{L_1} & \trc{C}   & \trc{D} \\
+        &     & \trc{U_2} & \trc{R_2} \\
+        &     &     & \trc{L_2}
+  \end{pmatrix}
+\end{equation*}
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\begin{frame}{Agda} % 8
+Agda is a dependently typed functional language.
+\pause
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{ℕ}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{zero}\;{}\<[9]%
+\>[9]{}\mathbin{:}\;\Conid{ℕ}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{suc}\;{}\<[9]%
+\>[9]{}\mathbin{:}\;\Conid{ℕ}\;\Varid{→}\;\Conid{ℕ}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\note{Syntax--unicode}
+\pause
+\vspace{-1cm}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 +\char95 }\;\mathbin{:}\;\Conid{ℕ}\;\Varid{→}\;\Conid{ℕ}\;\Varid{→}\;\Conid{ℕ}{}\<[E]%
+\\
+\>[B]{}\Varid{zero}\;{}\<[8]%
+\>[8]{}\Varid{+}\;\Varid{n}\;\mathrel{=}\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\Varid{suc}\;\Varid{m}\;{}\<[8]%
+\>[8]{}\Varid{+}\;\Varid{n}\;\mathrel{=}\;\Varid{suc}\;(\Varid{m}\;\Varid{+}\;\Varid{n}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\note{recursion, underscores}
+%Agda is total. All Agda programs terminate.
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% intro:
+% simple def of say nat
+% function definition on nat
+
+% define our matrices and triangles
+% 
+\begin{frame}{Agda}{Implementing Valiant's Algorithm} % 9
+Datatype for matrices:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{Split}\;\mathbin{:}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{one}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;\Conid{Split}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{bin}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;\Conid{Split}\;\Varid{→}\;\Conid{Split}\;\Varid{→}\;\Conid{Split}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{28}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{Mat}\;\mathbin{:}\;\Conid{Split}\;\Varid{→}\;\Conid{Split}\;\Varid{→}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{sing}\;{}\<[9]%
+\>[9]{}\mathbin{:}\;\Conid{R}\;\Varid{→}\;\Conid{Mat}\;\Varid{one}\;\Varid{one}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{quad}\;{}\<[9]%
+\>[9]{}\mathbin{:}\;\Varid{∀}\;\{\mskip1.5mu \Varid{r₁}\;\Varid{r₂}\;\Varid{c₁}\;\Varid{c₂}\mskip1.5mu\}\;{}\<[28]%
+\>[28]{}\Varid{→}\;\Conid{Mat}\;\Varid{r₁}\;\Varid{c₁}\;\Varid{→}\;\Conid{Mat}\;\Varid{r₁}\;\Varid{c₂}\;{}\<[E]%
+\\
+\>[28]{}\Varid{→}\;\Conid{Mat}\;\Varid{r₂}\;\Varid{c₁}\;\Varid{→}\;\Conid{Mat}\;\Varid{r₂}\;\Varid{c₂}\;{}\<[E]%
+\\
+\>[28]{}\Varid{→}\;\Conid{Mat}\;(\Varid{bin}\;\Varid{r₁}\;\Varid{r₂})\;(\Varid{bin}\;\Varid{c₁}\;\Varid{c₂}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Agda}{Implementing Valiant's Algorithm} % 10
+Datatype for triangles:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Conid{Tri}\;\mathbin{:}\;\Conid{Split}\;\Varid{→}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{one}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;\Conid{Tri}\;\Varid{one}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{tri}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;\Varid{∀}\;\{\mskip1.5mu \Varid{a}\;\Varid{b}\mskip1.5mu\}\;\Varid{→}\;\Conid{Tri}\;\Varid{a}\;{}\<[27]%
+\>[27]{}\Varid{→}\;\Conid{Mat}\;\Varid{a}\;\Varid{b}\;{}\<[E]%
+\\
+\>[27]{}\Varid{→}\;\Conid{Tri}\;\Varid{b}\;{}\<[E]%
+\\
+\>[27]{}\Varid{→}\;\Conid{Tri}\;(\Varid{bin}\;\Varid{a}\;\Varid{b}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}{Agda}{Implementing Valiant's Algorithm} % 11
+Operations:
+\vspace{-0.5cm}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{35}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 +\char95 }\;\mathbin{:}\;\Varid{∀}\;\{\mskip1.5mu \Varid{a}\;\Varid{b}\mskip1.5mu\}\;\Varid{→}\;\Conid{Mat}\;\Varid{a}\;\Varid{b}\;\Varid{→}\;\Conid{Mat}\;\Varid{a}\;\Varid{b}\;\Varid{→}\;\Conid{Mat}\;\Varid{a}\;\Varid{b}{}\<[E]%
+\\
+\>[B]{}\Varid{sing}\;\Varid{x}\;{}\<[15]%
+\>[15]{}\Varid{+}\;\Varid{sing}\;\Varid{x'}\;{}\<[35]%
+\>[35]{}\mathrel{=}\;\Varid{sing}\;(\Varid{x}\;\Conid{R+}\;\Varid{x'}){}\<[E]%
+\\
+\>[B]{}\Varid{quad}\;\Conid{A}\;\Conid{B}\;\Conid{C}\;\Conid{D}\;{}\<[15]%
+\>[15]{}\Varid{+}\;\Varid{quad}\;\Conid{A'}\;\Conid{B'}\;\Conid{C'}\;\Conid{D'}\;{}\<[35]%
+\>[35]{}\mathrel{=}\;\Varid{quad}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{8}{}\<[8]%
+\>[8]{}(\Conid{A}\;\Varid{+}\;\Conid{A'})\;(\Conid{B}\;\Varid{+}\;\Conid{B'})\;{}\<[E]%
+\\
+\>[B]{}\hsindent{8}{}\<[8]%
+\>[8]{}(\Conid{C}\;\Varid{+}\;\Conid{C'})\;(\Conid{D}\;\Varid{+}\;\Conid{D'}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{35}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 *\char95 }\;\mathbin{:}\;\Varid{∀}\;\{\mskip1.5mu \Varid{a}\;\Varid{b}\;\Varid{c}\mskip1.5mu\}\;\Varid{→}\;\Conid{Mat}\;\Varid{a}\;\Varid{b}\;\Varid{→}\;\Conid{Mat}\;\Varid{b}\;\Varid{c}\;\Varid{→}\;\Conid{Mat}\;\Varid{a}\;\Varid{c}{}\<[E]%
+\\
+\>[B]{}\Varid{sing}\;\Varid{x}\;{}\<[15]%
+\>[15]{}\Varid{*}\;\Varid{sing}\;\Varid{x'}\;{}\<[35]%
+\>[35]{}\mathrel{=}\;\Varid{sing}\;(\Varid{x}\;\Conid{R*}\;\Varid{x'}){}\<[E]%
+\\
+\>[B]{}\Varid{quad}\;\Conid{A}\;\Conid{B}\;\Conid{C}\;\Conid{D}\;{}\<[15]%
+\>[15]{}\Varid{*}\;\Varid{quad}\;\Conid{A'}\;\Conid{B'}\;\Conid{C'}\;\Conid{D'}\;{}\<[35]%
+\>[35]{}\mathrel{=}\;\Varid{quad}\;{}\<[E]%
+\\
+\>[B]{}\hsindent{8}{}\<[8]%
+\>[8]{}(\Conid{A}\;\Varid{*}\;\Conid{A'}\;\Varid{+}\;\Conid{B}\;\Varid{*}\;\Conid{C'})\;(\Conid{A}\;\Varid{*}\;\Conid{B'}\;\Varid{+}\;\Conid{B}\;\Varid{*}\;\Conid{D'})\;{}\<[E]%
+\\
+\>[B]{}\hsindent{8}{}\<[8]%
+\>[8]{}(\Conid{C}\;\Varid{*}\;\Conid{A'}\;\Varid{+}\;\Conid{D}\;\Varid{*}\;\Conid{C'})\;(\Conid{C}\;\Varid{*}\;\Conid{B'}\;\Varid{+}\;\Conid{D}\;\Varid{*}\;\Conid{D'}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}{Agda}{Implementing Valiant's Algorithm} % 11
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{42}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{60}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{overlap}\;\mathbin{:}\;\Varid{∀}\;\{\mskip1.5mu \Varid{a}\;\Varid{b}\mskip1.5mu\}\;\Varid{→}\;\Conid{Tri}\;\Varid{a}\;\Varid{→}\;\Conid{Mat}\;\Varid{a}\;\Varid{b}\;\Varid{→}\;\Conid{Tri}\;\Varid{b}\;\Varid{→}\;\Conid{Mat}\;\Varid{a}\;\Varid{b}{}\<[E]%
+\\
+\>[B]{}\Varid{overlap}\;\Varid{one}\;{}\<[27]%
+\>[27]{}(\Varid{sing}\;\Varid{x})\;{}\<[42]%
+\>[42]{}\Varid{one}\;{}\<[60]%
+\>[60]{}\mathrel{=}\;\Varid{sing}\;\Varid{x}{}\<[E]%
+\\
+\>[B]{}\Varid{overlap}\;(\Varid{tri}\;\Conid{U₁ˣ}\;\Conid{R₁ˣ}\;\Conid{L₁ˣ})\;(\Varid{quad}\;\Conid{A}\;\Conid{B}\;\Conid{C}\;\Conid{D})\;(\Varid{tri}\;\Conid{U₂ˣ}\;\Conid{R₂ˣ}\;\Conid{L₂ˣ})\;\mathrel{=}\;\Varid{quad}\;\Conid{Aˣ}\;\Conid{Bˣ}\;\Conid{Cˣ}\;\Conid{Dˣ}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{where}\;{}\<[10]%
+\>[10]{}\Conid{Cˣ}\;{}\<[14]%
+\>[14]{}\mathrel{=}\;\Varid{overlap}\;\Conid{L₁ˣ}\;\Conid{C}\;\Conid{U₂ˣ}{}\<[E]%
+\\
+\>[10]{}\Conid{Aˣ}\;{}\<[14]%
+\>[14]{}\mathrel{=}\;\Varid{overlap}\;\Conid{U₁ˣ}\;(\Conid{A}\;\Varid{+}\;\Conid{R₁ˣ}\;\Varid{*}\;\Conid{Cˣ})\;\Conid{U₂ˣ}{}\<[E]%
+\\
+\>[10]{}\Conid{Dˣ}\;{}\<[14]%
+\>[14]{}\mathrel{=}\;\Varid{overlap}\;\Conid{L₁ˣ}\;(\Conid{D}\;\Varid{+}\;\Conid{Cˣ}\;\Varid{*}\;\Conid{R₂ˣ})\;\Conid{L₂ˣ}{}\<[E]%
+\\
+\>[10]{}\Conid{Bˣ}\;{}\<[14]%
+\>[14]{}\mathrel{=}\;\Varid{overlap}\;\Conid{U₁ˣ}\;(\Conid{B}\;\Varid{+}\;\Conid{R₁ˣ}\;\Varid{*}\;\Conid{Dˣ}\;\Varid{+}\;\Conid{Aˣ}\;\Varid{*}\;\Conid{R₂ˣ})\;\Conid{L₂ˣ}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Agda}{Implementing Valiant's Algorithm} % 11
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{16}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{v}\;\mathbin{:}\;\Varid{∀}\;\{\mskip1.5mu \Varid{s}\mskip1.5mu\}\;\Varid{→}\;\Conid{Tri}\;\Varid{s}\;\Varid{→}\;\Conid{Tri}\;\Varid{s}{}\<[E]%
+\\
+\>[B]{}\Varid{v}\;\Varid{one}\;{}\<[16]%
+\>[16]{}\mathrel{=}\;\Varid{one}{}\<[E]%
+\\
+\>[B]{}\Varid{v}\;(\Varid{tri}\;\Conid{U}\;\Conid{R}\;\Conid{L})\;{}\<[16]%
+\>[16]{}\mathrel{=}\;\Varid{tri}\;\Conid{U⁺}\;(\Varid{overlap}\;\Conid{U⁺}\;\Conid{R}\;\Conid{L⁺})\;\Conid{L⁺}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Keyword{where}\;{}\<[10]%
+\>[10]{}\Conid{U⁺}\;{}\<[14]%
+\>[14]{}\mathrel{=}\;\Varid{v}\;\Conid{U}{}\<[E]%
+\\
+\>[10]{}\Conid{L⁺}\;{}\<[14]%
+\>[14]{}\mathrel{=}\;\Varid{v}\;\Conid{L}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}{Agda}{Proving things in Agda} % 12
+The Curry--Howard correspondence:
+
+A propositions can be seen as the type containing all proofs of the proposition.
+\pause
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{8}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Keyword{data}\;\Varid{\char95 ≤\char95 }\;\mathbin{:}\;\Conid{ℕ}\;\Varid{→}\;\Conid{ℕ}\;\Varid{→}\;\Conid{Set}\;\Keyword{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{z≤n}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;\Varid{∀}\;\{\mskip1.5mu \Varid{n}\mskip1.5mu\}\;{}\<[27]%
+\>[27]{}\Varid{→}\;\Varid{zero}\;\Varid{≤}\;\Varid{n}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{s≤s}\;{}\<[8]%
+\>[8]{}\mathbin{:}\;\Varid{∀}\;\{\mskip1.5mu \Varid{m}\;\Varid{n}\mskip1.5mu\}\;\Varid{→}\;\Varid{m}\;\Varid{≤}\;\Varid{n}\;{}\<[27]%
+\>[27]{}\Varid{→}\;\Varid{suc}\;\Varid{m}\;\Varid{≤}\;\Varid{suc}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\note{what is indexed? type?, two different canonical proofs}
+\pause
+To prove something a proposition is to give an inhabitant of the type.
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Agda}{Specification of Valiant's algorithm} % 13
+\begin{itemize}
+\item A relation from triangles to triangles:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{\char95 is-tc-of\char95 }\;\mathbin{:}\;\Varid{∀}\;\{\mskip1.5mu \Varid{s}\mskip1.5mu\}\;\Varid{→}\;\Conid{Tri}\;\Varid{s}\;\Varid{→}\;\Conid{Tri}\;\Varid{s}\;\Varid{→}\;\Conid{Set}{}\<[E]%
+\\
+\>[B]{}\Conid{Cˣ}\;\Varid{is-tc-of}\;\Conid{C}\;\mathrel{=}\;\Conid{Cˣ}\;\Varid{≈}\;\Conid{Cˣ}\;\Varid{*}\;\Conid{Cˣ}\;\Varid{+}\;\Conid{C}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\pause
+\item To prove the correctness, find an element of type
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{∀}\;\{\mskip1.5mu \Varid{s}\mskip1.5mu\}\;\{\mskip1.5mu \Conid{C}\;\mathbin{:}\;\Conid{Tri}\;\Varid{s}\mskip1.5mu\}\;\Varid{→}\;\Varid{v}\;\Conid{C}\;\Varid{is-tc-of}\;\Conid{C}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{itemize}
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Agda}{Sketch of proof} % 14
+\begin{itemize}
+  \item We pattern match on the \ensuremath{\Conid{Tri}}.
+    \begin{itemize}
+    \item \ensuremath{\Varid{one}}, should have type
+      \begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[9]{}\Varid{one}\;\Varid{≈}\;\Varid{one}\;\Varid{*}\;\Varid{one}\;\Varid{+}\;\Varid{one}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+    \item \ensuremath{\Varid{tri}}, we get that the overlap function should satisfy
+      \begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{24}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{24E}{@{}l@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[9]{}\Conid{Rˣ}\;\Varid{≈}\;\Conid{U}\;\Varid{*}\;\Conid{Rˣ}\;\Varid{+}\;{}\<[24]%
+\>[24]{}\Conid{R},{}\<[24E]%
+\ColumnHook
+\end{hscode}\resethooks
+      which when we expand it gives us exactly the definition of it.
+    \end{itemize}
+\end{itemize}
+\end{frame} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

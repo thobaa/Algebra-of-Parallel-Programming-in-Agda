@@ -6,6 +6,7 @@ In Section \ref{Intro-defs} we introduce a number of well known propositions tha
 \ref{Intro-defs}
 When defining an algebraic structure (consisting of just one set), one gives the set of objects, a number of binary operations on the objects and a number of axioms that the set and the operations are required to satisfy. In this section, we are going to introduce common such axioms. 
 \subsubsection{Equivalence relations}
+\label{Algebra-equality}
 The axioms usually refer to equalities between different sequences of operation applications, like the axiom in a group that $x \cdot (y \cdot z) = (x \cdot y) \cdot z$ for all $x$, $y$ and $z$. However, to define these things in Agda, we note that we do not have a concept of equality for terms of an arbitrary datatype. Further, the most ``basic'' equality definition (called propositional equality), stating just that $x = x$ for all $x$ and defined by
 \begin{code}
 data _≡_ {A : Set} : A → A → Set where
@@ -39,7 +40,7 @@ This means that if we use an equivalence relation as ``equality'' on a set, we a
 
 %include /Code/Algebra/Equivalence.lagda
 
-\todo{Chase down the last few underscores.}
+\todo{Chase down the last few underscores-- there are many in valiant!.}
 
 
 
@@ -230,9 +231,10 @@ If $R$ is a a ring (nonassociative semiring), then the matrices of size $n \time
 The proof is fairly easy but boring. We provide part of the proof when $R$ is a nonassociative semiring in Agda, is particualar, we prove that addition is commutative, and that the zero matrix is a zero element with multiplication. The whole proof for a nonassociative semiring is available in our library.
 %include /Code/Algebra/MatrixProof.lagda
 \subsubsection{Upper triangular matrices}
-For our applications, we will be interested in matrices that have no non-zero elements on or below the diagonal.
+For our applications, we will be interested in matrices that have no nonzero elements on or below the diagonal.
 \begin{Definition}
   A matrix is \emph{upper triangular} if all elements on or below its diagonal are equal to zero.
 \end{Definition}
+The standard definition of upper triangular matrix allows nonzero elements on the diagonal (for example, the identity matrix is both upper and lower triangular), but we only consider matrices with zeros on the diagonal, so the above definition simplifies our language considerably.
 Since we are only interested in upper triangular matrices, we will usually refer to them as just \emph{triangular} matrices.
 %include /Code/Algebra/Triangle.lagda

@@ -206,6 +206,7 @@ Hence, after rearranging, we get the equations
 and see that they all satisfy the overlap specification \eqref{Equation:R-Specification} for some choice of $R$, $\tc{U}$ and $\tc{L}$. For example, $\rc{A}$ satisfies it with $\tc{U} = \tc{U_U}$, $\tc{L} = \tc{L_U}$, $R = \rc{U_R}\rc{C} + A$. We see also that the equation satisfied by $\rc{B}$ contains $\rc{A}$ and $\rc{D}$, which in turn both contain $\rc{C}$, and $\rc{C}$ does not contain any of the other parts. So we can compute them recursively, starting with $\rc{C}$, and then computing $\rc{A}$ and $\rc{D}$, finishing with $\rc{B}$.
 \missingfigure{Overlap step, 4-case}
 \subsubsection{The Algorithm (or Valiant's Algorithm, if we rename the subsection)}
+\label{Valiant-summing-up}
 Summing up, we give the algorithm for computing the transitive closure $\tc{\chart}$ of an upper triangular matrix $\chart$ here:
 \begin{itemize}
 \item If $\chart$ has size $1 \times 1$, return $\chart$.
@@ -314,12 +315,5 @@ Using this data type we can finally define our datatypes |Mat| and |Tri|.
 %include Code/Valiant/Specification.lagda
 
 
-
-That is, we want 
-The way to do this in a way that works well with Agda is by using 
-\todo{THOMAS: smart Constructors}
-
-
-
-\subsection{Correctness Proof}
-Here we prove the correctness of Valiant's Algorithm.
+%\subsection{Correctness Proof}
+%Here we prove the correctness of Valiant's Algorithm.
