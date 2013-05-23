@@ -47,7 +47,7 @@
   \item Valiant's algorithm 
     \begin{itemize}
       \pause
-    \item 1974: Prove that parsing can be done as fast as matrix multiplication.
+    \item 1974: Prove that parsing can be done as quickly as matrix multiplication.
       \pause
     \item 2013: Provide a practical (?) algorithm for parsing in parallel.
       \pause
@@ -105,7 +105,7 @@ Grammar:
   \begin{columns}
     \column{0.5\textwidth}
     \begin{itemize}
-        \uncover<6->{\item Superdiagonals:\begin{itemize}
+        \uncover<6->{\item Superdiagonal:\begin{itemize}
         \item Fill with $N_p \to \She$, $V \to \eats$, $V_p \to \eats$, $D \to \an$, etc. Defines $C$.
           \end{itemize}
 
@@ -242,7 +242,7 @@ data Mat : ℕ → Set where
 \pause
 \begin{code}
 data Tri : ℕ → Set where
-  zer  : Tri 1
+  zer  : Tri 0
   tri  : ∀ {n} → Tri n  → Mat n
                         → Tri n 
                         → Tri (suc n)
