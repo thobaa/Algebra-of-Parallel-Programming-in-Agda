@@ -1,4 +1,5 @@
 \section{Valiant's Algorithm}
+\ref{Section:Valiant}
 In the paper \cite{Valiant}, Leslie G. Valiant gave a divide and conquer algorithm for computing the transitive closure of an upper triangular matrix to prove that context free parsing that has the same time complexity as matrix multiplication. The algorithm divides a string into two parts, parses them recursively, and then puts them together through a fairly complicated procedure that requires a constant number of matrix multiplications.
 
 Since the algorithm is a divide and conquer algorithm (where the combine step is also fairly parallelizable), it could potentially be used for parsing in parallel, as suggested in \cite{JP-PP}.

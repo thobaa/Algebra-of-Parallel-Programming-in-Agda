@@ -48,7 +48,6 @@ _‼_ : ∀ {a} → (xs : [ a ]) → Σ ℕ (λ n → n < length xs) → a
 (x ∷ xs)   ‼  (0       , _)         = x
 (x ∷ xs)   ‼  (suc n   , s≤s m≤n)   = xs ‼ (n , m≤n)
 \end{spec}
-\todo{THOMAS: note about standard library, maybe}
 We note, however, that we do not really use the proof for anything important. This, along with the fact that |ℕ| is inductively defined (and the structure of the definition of |_≤_|) lets us use an even nicer formulation, where the proof is further embedded into the datatype we use.
 
 We choose to define type family |Fin|, where |Fin n| containing the numbers less than |n|, using the simple fact that if $n = 1 + n'$, then $0 \le n$, and if $n = 1 + n'$ and $i \le n'$, then $1 + i \le n$:
