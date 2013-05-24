@@ -233,6 +233,7 @@ If $R$ is a a ring (nonassociative semiring), then the matrices of size $n \time
 The proof is fairly easy but boring. We provide part of the proof when $R$ is a nonassociative semiring in Agda, is particualar, we prove that addition is commutative, and that the zero matrix is a zero element with multiplication. The whole proof for a nonassociative semiring is available in our library.
 %include /Code/Algebra/MatrixProof.lagda
 \subsubsection{Upper triangular matrices}
+\label{Triangular-matrices}
 For our applications, we will be interested in matrices that have no nonzero elements on or below the diagonal.
 \begin{Definition}
   A matrix is \emph{upper triangular} if all elements on or below its diagonal are equal to zero.
@@ -240,3 +241,5 @@ For our applications, we will be interested in matrices that have no nonzero ele
 The standard definition of upper triangular matrix allows nonzero elements on the diagonal (for example, the identity matrix is both upper and lower triangular), but we only consider matrices with zeros on the diagonal, so the above definition simplifies our language considerably.
 Since we are only interested in upper triangular matrices, we will usually refer to them as just \emph{triangular} matrices.
 %include /Code/Algebra/Triangle.lagda
+
+In our library, we use a more general definition of triangularity: a matrix is triangular of degree $d$ if it is zero whenever $j - i \le d$, that is, it is zero on the main diagonal and on $d - 1$ diagonals above it (an upper triangular matrix is triangular of degree $1$). We prove there that if $A$ is triangular of degree $d_A$ and $B$ is triangular of degree $d_B$, then $AB$ is triangular of degree $d_A + d_B$. In particular, any product of at least $n-1$ upper triangular matrices is equal to the zero matrix (there are $n-1$ diagonals above the main diagonal, and the product has to be zero on them all).

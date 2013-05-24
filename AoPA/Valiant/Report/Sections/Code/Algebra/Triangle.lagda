@@ -151,5 +151,3 @@ A T* B = record
 \end{code}
 %endif
 To prove that upper triangular matrices form a ring, all we need to do is apply the matrix results to |Triangle.mat|.
-
-In our library, we use a more general definition of triangularity: a matrix is triangular of degree $d$ if it is zero whenever $j - i \le d$, that is, it is zero on the main diagonal and on $d - 1$ diagonals above it (an upper triangular matrix is triangular of degree $1$). We prove there that if $A$ is triangular of degree $d_A$ and $B$ is triangular of degree $d_B$, then $AB$ is triangular of degree $d_A + d_B$. In particular, any product of at least $n$ upper triangular matrices is equal to the zero matrix.

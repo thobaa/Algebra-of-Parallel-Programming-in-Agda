@@ -52,8 +52,8 @@ We are not going to consider arbitrary grammars in this report, so we give two r
 \begin{Definition}
   A grammar is in (reduced) Chomsky Normal Form \cite{Chomsky} if the every production rule is of one of the following two forms:
   \begin{align*}
-  A &\to BC \\
-  A &\to a
+  A &\to a\\
+  A &\to BC 
   \end{align*}
 \end{Definition}
 It is well known that any Context Free Grammar can be converted into a grammar in CNF (which generates the same language), with a size increase that is at most quadratic (the size of a grammar is the number of symbols contained \cite{Lange-Leiss}.
@@ -63,24 +63,78 @@ In the remainder of the report, we only consider grammars in Chomsky Normal Form
   We give a grammar in Chomsky Normal Form generating the same language as the one in Example \ref{Arithmetic}:
 \end{Example}
 \subsection{Grammar as a nonassociative semiring}
-The set of production rules for a grammar in Chomsky Normal Form which have the form $A \to BC$ could almost be used as a definition of multiplication among the nonterminals by replacing the arrows by equals signs:
+The set of production rules for a grammar in Chomsky Normal Form which have the form $A \to BC$ could almost be used directly as a definition of multiplication among the nonterminals by replacing the arrows by equals signs:
 \begin{equation*}
   BC = A
 \end{equation*}
-However, there are two problems with this definition. First, as we see in Example \ref{CNF-Ex}, there can be nonterminals $B$ and $C$ with no production $A \to BC$ (...). Second, there can be many different nonterminals that expand to the same thing: there can be $A_1$ and $A_2$ such that $A_1 \to BC$ and $A_2 \to BC$ are both productions.
+However, there are two problems with this. First, as we see in Example \ref{CNF-Ex}, there can be nonterminals $B$ and $C$ with no production $A \to BC$ (...). Second, there can be many different nonterminals that expand to the same thing: there can be $A_1$ and $A_2$ such that $A_1 \to BC$ and $A_2 \to BC$ are both productions.
 
 The solution to these two problems is to instead consider \emph{sets} of nonterminals, with the following multiplication:
 \begin{equation*}
-  x \cdot y = \{A \st \exists B \in x,\, C \in y,\, A \to BC \in P\}.
+  x \cdot y = \{A \st B \in x,\, C \in y,\, A \to BC \in P\}.
 \end{equation*}
 
-In general, this multiplication does not satisfy any algebraic axioms, it is not... \todo{THOMAS: refer back to example above -- once finished}
-\subsubsection{Parsing as Transitive Closure}
-In this section, reformulate the parsing problem for a grammar in CNF form as the problem of finding the transitive closure of an upper triangle matrix.
+In general, this multiplication does not satisfy any algebraic axioms, it is not... \todo{THOMAS: refer back to example above -- once finished}.
 
-Valiant showed this when defining his algorithm in \cite{Valiant}, but he uses a different specification of the transitive closure, which is  less suitable for use in Agda.
-% here should be a ``proof'' that parsing can be seen as computing the transitive closure of a matrix
-When we consider the 
+Since we are considering sets, it is natural to choose set union as addition and hence $\emptyset$ as $0$.
+\subsubsection{Parsing as Transitive Closure}
+In this section, we reformulate the parsing problem for a grammar in CNF form as the problem of finding the transitive closure of an upper triangle matrix.
+Valiant showed this when defining his algorithm in \cite{Valiant}, but he uses a different specification of the transitive closure, which is  less suitable for proofs in Agda.
+
+One approach to parsing a string $w$ of length $n$ is to form a matrix $X$ containing the sets of all non-terminals that generate a substring: if we define $w[i,j)$ to be the substring starting at the $i$th symbol in $w$ and ending at the $j-1$st,we let: $X_{i j}$ be the set of all nonterminals generating of $w[i,j)$. The matrix formed this way is upper triangular since if $j \le i$, $X_{i j}$ is the set of all parses of an empty string.
+
+Now, if we consider what nonterminals should be in the set $X_{i j}$, we note that:
+\begin{itemize}
+\item If $j = i + 1$, then $w[i,j)$ is a single token $a$. The only ways to generate $w[i,j)$ are using a production rules of the form $A \to a$, so $X_{i j}$ is the set of all $A$ such that $A \to a \in P$.
+\item If $j > i + 1$, then $w[i,j)$ contains more than one token. The only ways to generate $w[i,j)$ are thus using a production rule $A \to BC$, where $B$ generates $w[i,k)$ and $C$ generates $w[k,j)$, for some $k$. For a fixed $k$, we find all nonterminals $A$ such that $A \to BC \in P$, where $B$ generates $w[i,k)$ and $C$ generates $w[k,j)$ by computing $X_{i k} \cdot X_{k j}$. Hence, 
+            \begin{equation}
+              X_{i j} = \bigcup_k X_{i k}\cdot X_{k j} = \sum_kX_{i k}X_{k j} = (XX)_{i j}
+            \end{equation}
+\end{itemize}
+Combining the two points, we get:
+\begin{equation}
+  \label{TC}
+  X = XX + C,
+\end{equation}
+where $C$ is the matrix whose only nonzero entries are $C_{i i+1} = \{A \st A \to w[i,i+1) \in P\}$. The above equation is the one we are going to use to prove the correctness of Valiant's algorithm in Section \ref{Valiant-proof}. To prove that \eqref{TC} defines a unique matrix $X$, we prove (mathematically) that $X$  is equal to what \cite{Valiant} defines as the transitive closure of a matrix:
+\begin{Definition}
+  The (non-associative) \emph{transitive closure} of an upper triangular square matrix $C$ is the matrix $C^+$ defined by
+  \begin{equation}\label{VSpec}
+    C^+ = \sum_{i = 1}^\infty \nap{C}{i},
+  \end{equation}
+  where $\nap{C}{i}$ is the sum of all possible products containing $i$ copies of $C$, defined by:
+  \begin{equation*}
+    \nap{C}{1} = C \quad \text{and} \quad \nap{C}{i} = \sum_{j = 1}^{i - 1}\nap{C}{j}\nap{C}{i - j}.
+  \end{equation*}
+\end{Definition}
+ The sum in \eqref{VSpec} is actually finite, because as me mentioned in the end of Section \ref{Triangular-matrices}, any product of at least $n -1$ upper triangular matrices equals the zero matrix. Hence, if we show that $X$ defined in \eqref{TC} and $C^+$ defined in \eqref{VSpec} are equal, we can use \eqref{VSpec} to compute it, and it must be unique.
+ \begin{Proposition}
+   The two equations \eqref{TC} and \eqref{VSpec} are equivalent: $X$ satisfies 
+   \begin{equation}
+     X = XX + C
+   \end{equation}
+   if and only if 
+   \begin{equation}
+     X = \sum_{i = 1}^\infty \nap{C}{i}.
+   \end{equation}
+ \end{Proposition}
+ \begin{proof}
+   Assume first that $X = \sum_{i = 1}^\infty \nap{C}{i}= \sum_{i = 1}^{n-1}\nap{C}{i}$, where $n \times n$ is the size of $X$. Then, 
+   \begin{equation*}
+     X X = 
+     \left(\sum_{i = 1}^{n-1}\nap{C}{i}\right)\left(\sum_{j = 1}^{n-1}\nap{C}{j}\right) =
+     \sum_{i = 1}^{n - 1}\sum_{j = 1}^{n-1}\nap{C}{i}\nap{C}{j}
+   \end{equation*}
+   If we let $k = i + j$, then, the double sum is equal to 
+   \begin{equation*}
+     \sum_{i = 1}^{n - 1}\sum_{k = 2}^{2n-2}\nap{C}{i}\nap{C}{k - i} = 
+     \sum_{k = 2}^{2n-2}\sum_{i = 1}^{n - 1}\nap{C}{i}\nap{C}{k - i} = 
+     \sum_{k = 2}^{2n-2}\sum_{i = 1}^{n - 1}\nap{C}{i}\nap{C}{k - i} + = 
+\sum_{k = 2}^{2n-2}\nap{C}{k} + 
+   \end{equation*}
+
+ \end{proof}
+
 
 \subsection{Specification of non-associative transitive closure}
 In Section \ref{Parsing as transitive closure}, we showed that parsing can be considered as computing the (non-associative) transitive closure of a matrix. To get an algorithm from this, we want to create a specification for the problem of finding the (non-associative) transitive closure of a matrix. As before, we let $C^+$ denote the transitive closure of $C$. In \cite{Valiant}, the specification is given as
@@ -156,5 +210,3 @@ and adding the extra term $CC^+$, to get
 \end{equation}
 fails to make the specification correct, since when expanding them, these two only ever produce bracketings of the form $(\cdots(CC)\cdots) C$ (and $C(\cdots(CC)\cdots)$.
 
-\todo{fix references to other sections}
-\label{Section:Magma-multiplication}
