@@ -4,7 +4,7 @@ open import Data.Nat
 open import Data.Nat.Properties
 open import Relation.Nullary using (yes; no)
 open import Data.Sum renaming (_⊎_ to _∨_)
-open import Data.Product using (proj₁; proj₂)
+open import Data.Product using (proj₁; proj₂; _×_)
 open import Data.Fin using (Fin; toℕ) renaming (zero to fzero; suc to fsuc)
 open import Algebra.NANRing
 open import Algebra.Monoid
