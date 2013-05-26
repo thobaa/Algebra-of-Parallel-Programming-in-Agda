@@ -4,8 +4,8 @@ In the paper \cite{Valiant}, Leslie G. Valiant gave a divide and conquer algorit
 
 Since the algorithm is a divide and conquer algorithm (where the combine step is also fairly parallelizable), it could potentially be used for parsing in parallel, as suggested in \cite{JP-PP}.
 
-\subsection{The Algorithm} \todo{THOMAS: note that we want to compute the transitive closure here, not \emph{parse}.}
-We want to compute the transitive closure of a parse chart. The main idea of the algorithm is to split the chart along the diagonal, into two subcharts and a rectangular overlap region, see Figure \ref{Figure:ParseChart}. Next, compute the transitive closures of the subcharts, and combine them (somehow) to fill in the overlap part. A chart of size $1 \times 1$ contains just one element, which is zero because it is upper triangular, and the transitive closure of this is again the zero matrix.
+\subsection{The Algorithm}
+We want to compute the transitive closure of a parse chart. The main idea of the algorithm is to split the chart along the diagonal, into two subcharts and a rectangular overlap region (containing parses of strings that overlap the splitting), see Figure \ref{Figure:ParseChart}. Next, compute the transitive closures of the subcharts, and combine them (somehow) to fill in the overlap part. A chart of size $1 \times 1$ contains just one element, which is zero because it is upper triangular, and the transitive closure of this is again the zero matrix.
 
 \label{Section:Subdivision-in-Specification}
 When the chart $X$ is $n \times n$, with $n > 1$, we can write it down as a block matrix 
@@ -62,7 +62,6 @@ so we see that it the condition that $C^+$ is the transitive closure of $C$ is e
 \subsubsection{The overlap part}
 \label{Section:Two-Step-Splitting}
 To compute the overlap part, we need to consider four separate cases, depending on the dimensions of $R$. We will outline a recursive algorithm for computing $\rc{R}$ from $R$, $\tc{U}$ and $\tc{L}$. %function for computing $\rc{R}$ from $R$, $\tc{U}$ and $\tc{L}$, that we will call $\overlap(\tc{U}, R, \tc{L})$ , because when used for parsing, 
-\todo{THOMAS: come up with good reason for name (overlap).}. 
 
 First, if $R$ is a $1 \times 1$ matrix, in which case we must have that $\tc{U}$ and $\tc{L}$ are also $1 \times 1$ matrices, and since they are upper triangular, they both equal the zero matrix. Hence, by \eqref{Equation:R-Specification}, $\rc{R} = R$.%, so we define 
 %\begin{equation}
@@ -295,7 +294,6 @@ where $e_m$ and $e_n$ are empty $m \times 0$ and $n\times 0$ matrices respective
 where $A$ is an arbitrary $m \times n$, $n \times p$ and $m \times n$ matrix, respectively.
 Another is that it keeps the number of constructors down (three constructors for the matrix type), and this is desirable when proving things with Agda, since we generally pattern match on the structures, and this gives us a case for each constructor.
 
-%One (potential) downside with this approach is that while it allows easy construction of zero-matrices of arbitrary size, non-zero matrices still require many constructor application. For example, to make a $2^k \times 1$ vector, we would have to build a tree of $k$ \todo{THOMAS: count} applications of |quad|.
 One Another downside is that there are multiple constructors for matrices of the same size (there is always |empty| and a nonempty way when $m > 0$, $n > 0$), removign some of the advantage we get from having few constructors.
 
 Another approach, which is the one we take in this report, is to have constructors for row and column vectors, $1 \times n$ and $n \times 1$ matrices for arbitrary $n > 1$, along with the single element matrices. We define |rVec| and |cVec| to take a vector of length $n > 1$ and turn it into a $1 \times n$ or $n \times 1$ matrix respectively.
