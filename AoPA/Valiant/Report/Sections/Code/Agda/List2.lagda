@@ -27,37 +27,41 @@ On the first line, we use the absurd pattern |()| to denote the empty case resul
 
 We also need an indexing function (to specify that |maxL xs _| is in the list), and again, we only define it for sensible inputs (nonempty lists). The simplest definition would probably be:
 \begin{code}
-index : ∀ {a} → (xs : [ a ]) → (n : ℕ) → (n < length xs) → a
-index []        n        ()
+index : ∀ {a} → (xs : [ a ]) → (i : ℕ) → (i < length xs) → a
+index []        i        ()
 index (x ∷ xs)  0        _         = x
-index (x ∷ xs)  (suc n)  (s≤s m≤n) = index xs n m≤n
+index (x ∷ xs)  (suc i)  (s≤s m≤n) = index xs i m≤n
 \end{code}
 Where we need the proof in the last line, to call the |index| function recursively.
 
-However, we can shorten the function definition by including the fact that the index is less than the length of the list by using a datatype that combines the index and the proof. One way to do this would be to use a dependent pair, which we define again, because we want it outside of the Curry--Howard correspondence:
+However, we can shorten the function definition by including the fact that the index is less than the length of the list by using a datatype that combines the index and the proof. This datatype is known as |Fin|, where |Fin n| contains the set of all natural numbers strictly less than |n|. One way to define |Fin| would be to use a dependent pair, which we define again to give it a syntax for types (as opposed to the ``logical'' |∃|):
 \begin{code}
 data Σ (A : Set) (B : A → Set) : Set where
   _,_ : (x : A) → B x → Σ A B 
 \end{code}
-The order these definitions should be done is, of course, first define |Σ|, then define |A ∧ B = Σ A (λ x → B)| and |∃ P = Σ _ P| (where the underscore is used to denote the fact that the first argument of |Σ| can be infered from the type of the second).
-
+The order these definitions should be done is, first define |Σ|, then define |A ∧ B = Σ A (λ x → B)| and |∃ P = Σ _ P|, where the underscore is used to denote the fact that the first argument of |Σ| can be infered from the type of the second.
+Then, we could define |Fin| as:
+\begin{spec}
+Fin : ℕ → Set
+Fin n = Σ ℕ (λ i → i < n)
+\end{spec}
 We can now use the Haskell notation |‼| for indexing:
 \begin{spec}
-_‼_ : ∀ {a} → (xs : [ a ]) → Σ ℕ (λ n → n < length xs) → a
-[]         ‼  (n       , ())
+_‼_ : ∀ {a} → (xs : [ a ]) → Fin (length xs) → a
+[]         ‼  (i       , ())
 (x ∷ xs)   ‼  (0       , _)         = x
-(x ∷ xs)   ‼  (suc n   , s≤s m≤n)   = xs ‼ (n , m≤n)
+(x ∷ xs)   ‼  (suc i   , s≤s m≤n)   = xs ‼ (i , m≤n)
 \end{spec}
-We note, however, that we do not really use the proof for anything important. This, along with the fact that |ℕ| is inductively defined (and the structure of the definition of |_≤_|) lets us use an even nicer formulation, where the proof is further embedded into the datatype we use.
+We note, however, that we do not really use the proof part for anything important. This, along with the fact that |ℕ| is inductively defined (and the structure of the definition of |_≤_|) lets us use an even nicer formulation, where the proof is further embedded into the datatype we use.
 
-We choose to define type family |Fin|, where |Fin n| containing the numbers less than |n|, using the simple fact that if $n = 1 + n'$, then $0 \le n$, and if $n = 1 + n'$ and $i \le n'$, then $1 + i \le n$:
+Instead, we choose to define |Fin| as a type family, using the simple fact that if $n = 1 + k$, then $0 \le n$, and if $n = 1 + k$ and $i \le k$, then $1 + i \le n$:
 \begin{code}
 data Fin : ℕ → Set where
   f0     : {n : ℕ} → Fin (suc n)
   fsuc   : {n : ℕ} → Fin n → Fin (suc n)
 \end{code}
-That is, |f0| (representing |0|, but given a different name for clarity---it is not equal to the natural number |0|, they do not even have the same type) is less than any number of the form |suc n|, and for any number |i|, less than some number |n|, |fsuc i| is less than |suc n| (we can see this definition as instansiating the second argument of |_≤_| to |suc n|).
-As with |_≤_|, the |ℕ| is on the right hand side of the colon since again, we are defining a type family.
+That is, |f0| (representing |0|, but given a different name for clarity---it is not equal to the natural number |0|, they do not even have the same type) is less than any number of the form |suc n|, and for any number |i|, less than some number |n|, |fsuc i| is less than |suc n| (we can see this definition as instantiating the second argument of |_≤_| to |suc n|).
+As with |_≤_|, the |ℕ| is on the right hand side of the colon since because we are defining a type family.
 One disadvantage of the choice of |Fin| is that we are not dealing with natural numbers, at all. Instead, we have to define functions like
 \begin{code}
 toℕ : {n : ℕ} → Fin n → ℕ
@@ -72,8 +76,8 @@ fromℕ (suc y)  = fsuc (fromℕ y)
 \end{code}
 and prove that they do what we expect (like that |toℕ (fromℕ i)| equals |i|).
 
-These two different ways of defining things will be used later when we define upper triangular matrixes as a datatype. 
-When we represent matrixes abstractly (as functions from their indices) in Section \ref{Triangle} with the datatype |Triangle|, we do not have a nice inductive definition of them, so we have to use the pairing of a matrix and a proof that it is upper triangular.
+These two different ways of defining things will be used later when we define upper triangular matrices as a datatype. 
+When we represent matrices abstractly (as functions from their indices) in Section \ref{Triangle} with the datatype |Triangle|, we do not have a nice inductive definition of them, so we have to use the pairing of a matrix and a proof that it is upper triangular.
 In Section \ref{Tri}, on the other hand, we define the datatype |Tri| of a concrete representation of upper triangular matrices which have a built in ``proof'' that the matrix is triangular. Then, we do not need to worry about the proof when defining multiplication, for example. If our definition returns a |Tri|, then the result is upper triangular.
 
 We now define the indexing function using |Fin|:
@@ -92,7 +96,7 @@ _‼_ : ∀ {a} → (xs : [ a ]) → (n : Fin (length xs)) → a
 Now we can finally express our specification in Agda.
 \begin{code}
 max-greatest : (xs : [ ℕ ]) → (pf : 0 < length xs) → 
-         ((n : Fin (length xs)) → xs ‼ n ≤ maxL xs pf)
+         (i : Fin (length xs)) → xs ‼ i ≤ maxL xs pf
 \end{code}
 To prove this property of the |maxL| function, we must produce an inhabitant of the above type. We do this in the next section. %This takes quite a bit of work is actually quite a substantial task.
 \subsection{Proving the correctness}
@@ -100,19 +104,19 @@ To prove a proposition in Agda, it is important to look at the structure of the 
 
 We formulate the proof informally. The main idea we use is pattern matching the index into the list, if it is $0$, we want to prove the simpler proposition that |x ≤ maxL (x ∷ xs) pf|, which we call |max-greatest-base|, because it is the base case in an induction on the index:
 \begin{code}
-max-greatest-base : {x : ℕ} {xs : [ ℕ ]} → x ≤ maxL (x ∷ xs) (s≤s z≤n)
+max-greatest-base : (x : ℕ) (xs : [ ℕ ]) → x ≤ maxL (x ∷ xs) (s≤s z≤n)
 \end{code}
-On the other hand, if the index is $i + 1$, the list has length at least $2$, and we proceed by doing noting:
+On the other hand, if the index is $i + 1$, the list has length at least $2$, and we proceed by noting:
 \begin{enumerate}
 \item \label{Ex.List.Induction1} By induction, the $i$th element of the tail is less than the greatest element of the tail.
-\item \label{Ex.List.Induction2} The $i$th element of the tail equals the $i + 1$th element of the list.
+\item \label{Ex.List.Induction2} The $i$th element of the tail equals the $(i + 1)$th element of the list.
 \item \label{Ex.List.Induction3} By the definition of |maxL|, we get that |maxL (x ∷ (x' ∷ xs)) pf| reduces to |max x (maxL (x' ∷ xs) pf')|, and for any |x| and |y|, we should have |y ≤ max x y|.
 \end{enumerate}
 To translate the induction case into Agda code, we need to introduce two new lemmas. By induction, we already know that Point \ref{Ex.List.Induction1} is true. Additionally, Agda infers Point \ref{Ex.List.Induction2}, so there is nothing to prove. However, we still need to prove the second part of Point \ref{Ex.List.Induction3}:
 \begin{code}
 max-≤₂ : {m n : ℕ} → n ≤ max m n
 \end{code}
-Where the subscript |₂| refers to the fact that it is the second argument of |max| that is on the left hand side of the inequality. Then, to combine the three points, we need a way to piece together inequalities, if |i ≤ j| and |j ≤ k|, then |i ≤ k| (i.e., |_≤_| is transitive, see Section \ref{transitive-def}):
+Where the subscript |₂| refers to the fact that it is the second argument of |max| that is on the left hand side of the inequality. Then, to combine the three points, we need a way to piece together inequalities, if |i ≤ j| and |j ≤ k|, then |i ≤ k| (i.e., |_≤_| is transitive, see Section \ref{Intro-defs}):
 \begin{code}
 ≤-trans : {i j k : ℕ} → i ≤ j → j ≤ k → i ≤ k
 \end{code}
@@ -122,52 +126,52 @@ Now we begin proving these lemmas, starting with |≤-trans| as it does not depe
 \begin{code}
 ≤-trans  z≤n          j≤k          = z≤n
 \end{code}
-If it is |s≤s i'≤j'|, Agda infers that |i| is |suc i'|, and |j| is |suc j'| for some |i'|, |j'|, where |i'≤j'| is a proof that |i' ≤ j'|. We then pattern match on the proof of |j ≤ k|, which has to be |s≤s j'≤k'| since |j| is |suc j'|. Hence, we can use induction to get a proof that |i' ≤ k'|, and apply |s≤s| to that proof:
+If it is |s≤s a≤b|, Agda infers that |i| is |suc a|, and |j| is |suc b| for some |a|, |b|, where |a≤b| is a proof that |a ≤ b|. We then pattern match on the proof of |j ≤ k|, which has to be |s≤s b≤c| since |j| is |suc b|. Hence, we can use induction to get a proof that |a ≤ c|, and apply |s≤s| to that proof:
 \restorecolumns
 \begin{code}
-≤-trans  (s≤s i'≤j')  (s≤s j'≤k')  = s≤s (≤-trans i'≤j' j'≤k')
+≤-trans  (s≤s a≤b)    (s≤s b≤c)    = s≤s (≤-trans a≤b b≤c)
 \end{code}
 and we are done.
 
-We continue by proving |max-≤₂|, for this, we introduce another lemma about |_≤_|: |≤-refl|, stating that for any |n|, |n ≤ n| (i.e., |_≤_| is reflexive), which is very easy to prove (if |n| is |0|, a proof is given by the constructor |z≤n|, and if |n| is |suc n'|, by induction, we find a proof of |n' ≤ n'| and |s≤s| takes that proof to a proof that |n ≤ n|:
+We also introduce another lemma about |_≤_|: |≤-refl|, stating that for any |n|, |n ≤ n| (i.e., |_≤_| is reflexive, see Section \ref{Intro-defs}), which is very easy to prove (if |n| is |0|, a proof is given by the constructor |z≤n|, and if |n| is |suc m|, by induction, we find a proof of |m ≤ m| and |s≤s| takes that proof to a proof that |n ≤ n|:
 \begin{code}
 ≤-refl : {n : ℕ} → n ≤ n
 ≤-refl  {0}      = z≤n
 ≤-refl  {suc n}  = s≤s ≤-refl
 \end{code}
-Now we define |max-≤₂|.
-We do this by pattern matching on the second argument (because it is the one involved in the inequality, and depending on its value, we need different constructors for the inequality proof). If it is |0|, we use the constructor |z≤n|, regardless of what the first argument is:
+Now we prove |max-≤₂|.
+We pattern matching on the second argument. If it is |0|, we use the constructor |z≤n|, regardless of what the first argument is:
 \savecolumns
 \begin{code}
-max-≤₂  {m}       {0}       = z≤n
+max-≤₂  {m}      {0}       = z≤n
 \end{code}
-If it is |suc n'|, we need to know what the first argument was, so we pattern match on it. If the first argument is |0|, then, |max 0 (suc n')| reduces to |suc n'|, so we want to prove that |suc n' ≤ suc n'|, which we do by using the lemma |≤-refl| (we can note that we did not actually need the fact that the second argument was non-zero, since |max 0 n| reduces to |n| no matter what |n| is).
+If it is |suc l|, we pattern match on the first argument. If it is |0|, then, |max 0 (suc l)| reduces to |suc l|, so we prove |suc l ≤ suc l| using |≤-refl| (we can note that we did not actually need the fact that the second argument was non-zero, since |max 0 n| reduces to |n| no matter what |n| is):
 \restorecolumns
 \begin{code}  
-max-≤₂  {0}       {suc n'}  = ≤-refl
+max-≤₂  {0}      {suc l}   = ≤-refl
 \end{code}
-On the other hand, if the first argument is |suc m'|, by induction, we find a proof of |n' ≤ max m' n'| (we call |max-≤₂|---we need to supply the first implicit argument which Agda is unable to infer), and use |s≤s| on it to get |suc n' ≤ suc (max m' n')|. Agda then uses the definition of |max| to reduce |max (suc m') (suc n')| to |suc (max m' n')|, so we are in fact done.
+On the other hand if the first argument is |suc k|, we find a proof of |l ≤ max k l| using |max-≤₂|---we need to supply the first implicit argument which Agda is unable to infer---and use |s≤s| on it to get |suc l ≤ suc (max k l)|, which Agda reduces |max (suc k) (suc l)| to |suc (max k l)|, and we are done:
 \restorecolumns
 \begin{code}
-max-≤₂  {suc m'}  {suc n'}  = s≤s (max-≤₂ {m'})
+max-≤₂  {suc k}  {suc l}   = s≤s (max-≤₂ {k})
 \end{code}
 We also prove the similar proposition, that |max| is greater than its first argument, in essentially the same way (we pattern match first on the first argument instead, and this time, Agda is able to infer the arguments of |max-≤₁| in the induction case, so we leave them out):
 \begin{code}
 max-≤₁ : {m n : ℕ} → m ≤ max m n
-max-≤₁  {0}       {n}       = z≤n
-max-≤₁  {suc m'}  {0}       = ≤-refl
-max-≤₁  {suc m'}  {suc n'}  = s≤s max-≤₁
+max-≤₁  {0}       {n}        = z≤n
+max-≤₁  {suc k}   {0}        = ≤-refl
+max-≤₁  {suc k}   {suc l}    = s≤s max-≤₁
 \end{code}
 
 Using |max-≤₁| and |≤-refl|, we are able to prove the initial step in the induction proof, |max-greatest-base|. We pattern match on |xs|. If it is |[]|, we need to show that |x ≤ x|, which we do with |≤-refl|, again:
 \savecolumns
 \begin{code}
-max-greatest-base  {x}  {[]}       = ≤-refl
+max-greatest-base  x  []         = ≤-refl
 \end{code}
 If it is |x' ∷ xs|, we need to prove that |x ≤ maxL (x ∷ (x' ∷ xs)) _|. Agda reduces the right hand side to |max x (maxL (x' ∷ xs) _)|, so we just need to use |max-≤₁| does:
 \restorecolumns
 \begin{code}
-max-greatest-base  {x}  {x' ∷ xs}  = max-≤₁
+max-greatest-base  x  (x' ∷ xs)  = max-≤₁
 \end{code}
 
 Finally, we finish our proof, |max-greatest|. As we said above, we want to pattern match on the index, however, this is not possible to do right away, since the available constructors (if any) for |Fin (length xs)| depends on the length of |xs|. Therefore, we begin by pattern matching on the list. If the list is empty, we fill in the absurd pattern |()| for the proof that it is nonempty:
@@ -179,7 +183,7 @@ Otherwise, |Fin (length xs)| is non-empty, and can pattern match on the index.
 If the index is |f0|, we use the initial step |max-greatest-base|, to prove that |x ≤ maxL (x ∷ xs) pf|:
 \restorecolumns
 \begin{code}
-max-greatest  (x ∷ xs)           (s≤s z≤n)  f0          =  max-greatest-base {x} {xs}
+max-greatest  (x ∷ xs)           (s≤s z≤n)  f0          =  max-greatest-base x xs
 \end{code}
 If the index is |fsuc i|, we pattern match on the tail of the list. If it is empty, we know that the index cannot be |fsuc i|, because we would have |i : Fin 0|, so we fill in |i| with the absurd pattern |()|:
 \restorecolumns
@@ -195,7 +199,11 @@ max-greatest  (x ∷ (x' ∷ xs))    (s≤s z≤n)  (fsuc i)    =  ≤-trans
                                                            (max-greatest _ _ i)
                                                            (max-≤₂ {x})
 \end{code}
-
+We put the whole proof in Figure \ref{Intro-proof-figure}.
+\begin{figure}
+%include Proof.lagda
+\caption{Proof that the |max| function finds an element greater than every element in the list. \label{Intro-proof-figure}}
+\end{figure}
 %To end this example, we note that proving even simple (obvious) propositions in Agda takes quite a bit of work, and a lot of code, but generally not much thinking. After this extended example, we feel that we have illustrated most of the techniques that will be used later on in the report. As we wrote in the introduction to the section, we will often only give the types of the propositions, followed with the types of important lemmas and note what part of the arguments we pattern match on and in what order.
 
 %We also feel that we have illustrated the fact that proving something in Agda often requires a lot of code, but not much thinking, as the above proof essentially proceeds as one would intuitively think to prove the specification correct. Most of the standard concepts used are available in one form or another from the standard library, and we have attempted to keep our names consistent with it (the actual code given in later sections uses the standard library when possible, but we try to include simplified definitions in this report).
@@ -206,9 +214,8 @@ First, Agda has Standard Library that contains most of the definitions we have m
 
 Our second comment is about the structure of Agda programs. Agda code is partitioned into modules, which contain a sequence of function and datatype definitions. 
 Modules can be imported, and an imported module can be opened to bring all definitions into scope in the current module. Additionally, modules can be parametrised by elements of a datatype, which basically means that all functions in the module take an extra argument of that type. To open a parametrised module, an element of the parameter type is needed. We use parametrised modules frequently in this report and in our library, starting in Section \ref{Matrices}.
-\missingfigure{A MODULE DEFINITION}
 
-Finally, there is another way to define a datatype: as a record. A record is similar to a product type, but each field is given a name. This is useful when there is a lot of fields and there is no natural ordering of them. Records behave like small modules, they can contain function definitions, and they can be parametrised and opened, like modules, bringing all their fields and definitions into scope. We define a record type of a dependent pair:
+Finally, there is another way to define a datatype: as a record. A record is similar to a product type, but each field is given a name. This is useful when there is a lot of fields and there is no natural ordering of them. Records behave like small modules, they can contain function definitions, and they can be parametrised and opened, like modules, bringing all their fields and definitions into scope. As an example, we define a record type of a pair:
 \begin{code}
 record Pair (A B : Set) : Set where
   field

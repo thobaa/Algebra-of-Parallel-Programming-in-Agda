@@ -16,7 +16,7 @@ import Algebra.MatrixOperations
 open Algebra.MatrixOperations NaSr
 \end{code}
 %endif
-
+\label{Triangle}
 In Agda, there are two obvious ways to define a triangular matrix. The first is to use records, where a triangular matix is a matrix along with a proof that it is triangular. The second way would be to use functions that take two arguments and return a ring element, but where the second argument must be strictly greater than the first. We show one difference between the two approaches in Figure \ref{Figure:TriangularMatrixOrTriangle}
 \begin{figure}
   \centering

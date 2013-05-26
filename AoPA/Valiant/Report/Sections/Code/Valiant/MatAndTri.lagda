@@ -23,6 +23,7 @@ data Mat : Splitting → Splitting → Set where
                                       Mat r₂ c₁ → Mat r₂ c₂ → 
                                       Mat (bin r₁ r₂) (bin c₁ c₂)
 \end{code}
+\label{Tri}
 Finally, |Tri|:
 \begin{code}
 data Tri : Splitting → Set where

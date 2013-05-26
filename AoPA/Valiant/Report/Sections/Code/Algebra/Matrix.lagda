@@ -1,3 +1,4 @@
+\label{Matrices}
 In Agda, we will only define the type of a matrix over the nonassociative semiring. For simplicity, and to allow us to avoid adding the nonassociative semiring as an argument to every function and proposition, we decide to parametrize the module we place the definition of a matrix in by a nonassociative semiring, and open the nonassociative semiring, renaming things so they start with ``|R-|'' to make it clear when we are referring to the concepts in the underlying nonassociative semiring:
 \begin{spec}
 module Matrix (NaSr : NonassociativeSemiring) where

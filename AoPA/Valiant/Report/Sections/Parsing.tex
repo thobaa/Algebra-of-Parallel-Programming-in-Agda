@@ -4,11 +4,13 @@
 \newcommand{\startsymbol}{S}
 \newcommand{\grammar}{(\nonterminals, \terminals, \productions, \startsymbol)}
 \section{Parsing}
+\label{Parsing}
 Parsing is about analysing the structure of a sequence of tokens coming from some alphabet. We only give a brief overview of the problem here.
 We begin by introducing some concepts of parsing in Section \ref{Parsing-Defs}. Then, in Section \ref{Parsing-Algebra}, we tie these concept together wwith the algebra from Section \ref{Section:Algebra}, and finally, in Section \ref{Parsing-TC}, we show that parsing is equivalent to computing the transitive closure of an upper triangular matrix.
 In Section \ref{Section:Valiant}, we will then focus on a particular algorithm for computing the transitive closure, Valiant's algorithm, that we implement and prove the correctness of using Agda.
 
 \subsection{Definitions}
+\label{Parsing-Defs}
 The goal of parsing is first to decide if a given sequence of tokens belongs to a given language, and second to describe its structure in the language.
 For this, we consider the opposite process of generating a string in a given language. To do this, one uses a grammar for the language, which contains rules that can be used to build strings belonging to the language. %, or to try assign structural properties to a sequences of tokens.
 \begin{Definition}
@@ -83,6 +85,7 @@ In the remainder of the report, we only consider grammars in Chomsky Normal Form
   \end{itemize}
 \end{Example}
 \subsection{Grammar as a nonassociative semiring}
+\label{Parsing-Algebra}
 The set of production rules for a grammar in Chomsky Normal Form which have the form $A \to BC$ could almost be used directly as a definition of multiplication among the nonterminals by replacing the arrows by equals signs:
 \begin{equation*}
   BC = A
