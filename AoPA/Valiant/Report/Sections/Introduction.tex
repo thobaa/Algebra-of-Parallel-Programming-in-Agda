@@ -18,10 +18,10 @@ The full formalization and proof is made up of around 3500 lines of code, partit
 % Agda!
 
 % functional program
-Parsing is used in a large number of areas [examples].
+Parsing is used in a large number of areas, including as an eaerly step during compilation, bioinformatics and computational linguistics. \todo{either cite or expand}
 With the advent of CPUs with multiple cores, it becomes increasingly attractive to try and parse in parallel.
-Because their computations lack side effects, functional programming languages make are suitable for writing parallel programs.
-Additionally, working in Agda allows us to write an algorithm and prove its correctness simultaneously. %In particular, Agda has helped us choose the right definitions in a couple of cases when they have been they have turned out to be the only ones with the right type.
+Because the functions in a functional programming language lack side effects, functional languages seem suitable for writing parallel programs.
+Additionally, working in Agda allows us to write an algorithm with syntax similar to Haskell and prove its correctness simultaneously.
 
 The choice of Valiant's algorithm is due to the fact that, although initially discovered to prove that parsing can be done in the time needed to perform a matrix multiplication, happens to be highly parallel. Additionally, it is a simple enough algorithm to make it feasible to write a formal proof of its correctness.
 

@@ -110,7 +110,7 @@ We present this function case by case. If |m| is |0|, we can construct a proof t
 \begin{code}
 0        ≤?  n  = yes z≤n
 \end{code}
-if |m| is |suc k|, we pattern match on |n|. If |n| is |0|, there is no proof of |m ≤ n|, since no constructor of |_≤_| constructs an element of type |suc k ≤ 0|. The fact that there are no such proofs is denoted by |λ ()|.
+if |m| is |suc k|, we pattern match on |n|. If |n| is |0|, there is no proof of |m ≤ n|, since no constructor of |_≤_| constructs an element of type |suc k ≤ 0|. The fact that there are no such proofs is denoted by |λ ()| (we basically write an anonymous function |suc k ≤ 0 → ⊥| by pattern matching on the empty type |suc k ≤ 0|).
 \restorecolumns
 \begin{code}
 suc k   ≤?  0  = no (λ ())

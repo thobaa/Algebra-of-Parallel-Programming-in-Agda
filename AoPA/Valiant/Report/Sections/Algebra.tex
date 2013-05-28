@@ -177,7 +177,7 @@ A set $R$ together with two binary operations $+$ and $*$ (called addition and m
 \end{Definition}
 Examples of rings include the integers, real and complex numbers with the usual addition and multiplication.
 
-However, for the applications we have in mind, arsing, the algebraic structure in question (see Section \ref{Parsing-Algebra}) does not even have associative multiplication, and does not have inverses for addition. We still have an additive $0$ (the empty set---representing no parse), which is a zero element with regard to multiplication (if the left, say, substring has no parse, then the whole string has no parse). We also do not have a unit element for multiplication (there is no guarantee that there is a string $A$ such that $A$ followed by $X$ has the same parse as $X$ for every string $X$). The usual proof that $0$ is an absorbing element depends on the existence of the ability to cancel (which is implied by the existence of additive inverses in a group), as seen in section \ref{zero-element}. So if we are to define an algebraic structure modelling this, we need to include as an axiom that zero absorbs.
+However, for the applications we have in mind, parsing, the algebraic structure in question (see Section \ref{Parsing-Algebra}) does not even have associative multiplication, and does not have inverses for addition. We still have an additive $0$ (the empty set---representing no parse), which is a zero element with regard to multiplication (if the left, say, substring has no parse, then the whole string has no parse). We also do not have a unit element for multiplication (there is no guarantee that there is a string $A$ such that $A$ followed by $X$ has the same parse as $X$ for every string $X$). The usual proof that $0$ is an absorbing element depends on the existence of the ability to cancel (which is implied by the existence of additive inverses in a group), as seen in section \ref{zero-element}. So if we are to define an algebraic structure modelling this, we need to include as an axiom that zero absorbs.
 
 There are a number of fairly standard \todo{THOMAS: Cite something} generalizations of a ring, but none of these matches our requirements. One generalization is the semiring, which has the same axioms as a ring, except that addition need not have inverses:
 \begin{Definition}
@@ -213,7 +213,7 @@ A set $R$ together with two binary operations $+$ and $*$ forms a \emph{nonassoc
 %% MATRICES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Matrices}
-A matrix is in some sense really just a set of numbers arranged in a rectangle, so there is nothing stopping us from defining such a matrix with entries from an arbitrary set, as opposed to from $\R$ or $\C$. To be similar to the definition we will make in Agda of an abstract matrix (one without a specific implementation in mind), we consider a matrix of size $m \times n$ as a function from a pair of natural numbers $(i,j)$, with $0 \le i < m$, $0 \le j < n$ (or, $i \in \Fin{m}$, $j \in \Fin{n}$, and hence, after currying define: 
+A matrix is in some sense really just a collection of numbers arranged in a rectangle, so there is nothing stopping us from defining such a matrix with entries from an arbitrary set, as opposed to from $\R$ or $\C$. To be similar to the definition we will make in Agda of an abstract matrix (one without a specific implementation in mind), we consider a matrix of size $m \times n$ as a function from a pair of natural numbers $(i,j)$, with $0 \le i < m$, $0 \le j < n$ (or, $i \in \Fin{m}$, $j \in \Fin{n}$), and hence, after currying, define: 
 \begin{Definition}
 A \emph{matrix} $A$ over a set $R$ is a function $A : \Fin{m} \to \Fin{n} \to R$.
 \end{Definition}
@@ -231,9 +231,10 @@ If $R$ is a nonassociative semiring, we can define addition and multiplication o
 
 The most interesting fact about matrices (to our application) is the following two propositions:
 \begin{Proposition}
-If $R$ is a a ring (nonassociative semiring), then the matrices of size $n \times n$ over $R$ also form a ring (nonassociative semiring). Additionally, the matrices over $R$ of arbitrary size form an Abelian group (commutative monoid) under matrix addition. In both cases, the zero matrix plays the role of the zero element.
+If $R$ is a a ring (nonassociative semiring), then the matrices of size $n \times n$ over $R$ also form a ring (nonassociative semiring). Additionally, the matrices over $R$ of size $m \times n$ form an Abelian group (commutative monoid) under matrix addition. In both cases, the zero matrix plays the role of the zero element.
 \end{Proposition}
-The proof is fairly easy but boring. We provide part of the proof when $R$ is a nonassociative semiring in Agda, is particualar, we prove that addition is commutative, and that the zero matrix is a zero element with multiplication. The whole proof for a nonassociative semiring is available in our library.
+The proof is fairly easy but boring. We provide part of the proof when $R$ is a nonassociative semiring in Agda: we prove that addition is commutative and that the zero matrix is a zero element of multiplication. The whole proof for a nonassociative semiring is available in our library.
+
 %include /Code/Algebra/MatrixProof.lagda
 \subsubsection{Upper triangular matrices}
 \label{Triangular-matrices}
@@ -245,4 +246,4 @@ The standard definition of upper triangular matrix allows nonzero elements on th
 Since we are only interested in upper triangular matrices, we will usually refer to them as just \emph{triangular} matrices.
 %include /Code/Algebra/Triangle.lagda
 
-In our library, we use a more general definition of triangularity: a matrix is triangular of degree $d$ if it is zero whenever $j - i \le d$, that is, it is zero on the main diagonal and on $d - 1$ diagonals above it (an upper triangular matrix is triangular of degree $1$). We prove there that if $A$ is triangular of degree $d_A$ and $B$ is triangular of degree $d_B$, then $AB$ is triangular of degree $d_A + d_B$. In particular, any product of at least $n-1$ upper triangular matrices is equal to the zero matrix (there are $n-1$ diagonals above the main diagonal, and the product has to be zero on them all).
+In our library, we use a more general definition of triangularity: a matrix is triangular of degree $d$ if it is zero whenever $j - i \le d$, that is, it is zero on the main diagonal and on $d - 1$ diagonals above it (an upper triangular matrix is triangular of degree $1$). We prove there that if $A$ is triangular of degree $d_A$ and $B$ is triangular of degree $d_B$, then $AB$ is triangular of degree $d_A + d_B$. In particular, any product of at least $n-1$ upper triangular matrices is equal to the zero matrix (there are $n-1$ diagonals above the main diagonal, and the product has to be zero on them all). We use this fact in Section \ref{Valiant's-spec} to prove (not in Agda) that the (seemingly infinite) sum \eqref{VSpec} is actually finite and hence defines a unique upper triangular matrix.

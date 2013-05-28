@@ -1,7 +1,7 @@
 %if False
 \begin{code}
 module Algebra.Short.Zero where
-private postulate _∧_ : Set → Set →  Set
+open import Data.Product using () renaming (_×_ to _∧_)
 Zero : {X : Set} → (X → X → Set) → X → (X → X → X) → Set
 \end{code}
 %endif

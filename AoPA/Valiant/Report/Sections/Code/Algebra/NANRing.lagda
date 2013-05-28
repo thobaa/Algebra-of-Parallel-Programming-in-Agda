@@ -1,13 +1,14 @@
 %if False
 \begin{code}
 open import Algebra.Equivalence
+open import Algebra.ShortDefs
 open import Data.Nat using ()
 open import Algebra.Monoid
 open import Data.Product renaming (_×_ to _∧_)
 module Algebra.NANRing where
 \end{code}
 %endif
-In Agda, we begin by defining the proposition that something is a nonassociative semiring, with operations |_+_| and |_*_| and additive identity |R0|. We open the |IsCommutativeMonoid| record for |_+_|, renaming the fields in it, adding |+-| to the ones referring to the addition.
+\todo{$*$-sign should be uniform.} In Agda, we begin by defining the proposition that something is a nonassociative semiring, with operations |_+_| and |_*_| and additive identity |R0|. We open the |IsCommutativeMonoid| record for |_+_|, and prefix the ones referring to addition with |+-|.\todo{Note that distributive has different name in stl}
 \savecolumns
 \begin{code}
 record IsNonassociativeSemiring  {R : Set} (_≈_ : R → R → Set) 
@@ -18,9 +19,8 @@ record IsNonassociativeSemiring  {R : Set} (_≈_ : R → R → Set)
 
     +-isCommutativeMonoid  : IsCommutativeMonoid _≈_ _+_ R0
 
-    distrib      :  (∀ x y z → (x * (y + z)) ≈ ((x * y) + (x * z))) ∧ 
-                    (∀ x y z → ((y + z) * x) ≈ ((y * x) + (z * x)))
-    zero         :  (∀ x → (R0 * x) ≈ R0) ∧ (∀ x → (x * R0) ≈ R0)
+    distrib      :  Distributive _≈_ _*_ _+_ 
+    zero         :  Zero _≈_ R0 _*_
 
   open IsCommutativeMonoid +-isCommutativeMonoid public
          renaming  (  assoc               to  +-assoc
@@ -72,3 +72,4 @@ module NS-Reasoning (ns : NonassociativeSemiring) where
   open NonassociativeSemiring ns public
   open EqR setoid public
 \end{code}
+\todo{Congruences}

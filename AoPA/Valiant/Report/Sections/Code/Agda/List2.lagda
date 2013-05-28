@@ -219,7 +219,7 @@ Finally, there is another way to define a datatype: as a record. A record is sim
 \begin{code}
 record Pair (A B : Set) : Set where
   field
-    fst : A
-    snd : B
+    fst  : A
+    snd  : B
 \end{code}
 When defining algebraic structures in Section \ref{Algebra}, records are very useful for handling the axioms needed, since they have no natural ordering.

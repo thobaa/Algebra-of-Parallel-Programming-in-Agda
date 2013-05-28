@@ -17,10 +17,28 @@ open Algebra.MatrixOperations NaSr
 \end{code}
 %endif
 \label{Triangle}
-In Agda, there are two obvious ways to define a triangular matrix. The first is to use records, where a triangular matix is a matrix along with a proof that it is triangular. The second way would be to use functions that take two arguments and return a ring element, but where the second argument must be strictly greater than the first. We show one difference between the two approaches in Figure \ref{Figure:TriangularMatrixOrTriangle}
+In Agda, there are two obvious ways to define a triangular matrix. The first is to use records, where a triangular matix is a matrix along with a proof that it is triangular. The second way would be to use functions that take two arguments and return a ring element, but where the second argument must be strictly greater than the first. We illustrate these two approaches in Figure \ref{Figure:TriangularMatrixOrTriangle} \todo{ALL: Should these be here, are they good for anything???}
 \begin{figure}
   \centering
-  \missingfigure{draw figure of two matrices, one with zeros below diagonal, one with nothing (or stars or somethign)\label{Figure:TriangularMatrixOrTriangle}}
+  %\missingfigure{draw figure of two matrices, one with zeros below diagonal, one with nothing (or stars or somethign)}
+  \begin{equation*}
+    \begin{pmatrix}
+      0      & a_{1 2} & \hdots  & \hdots & a_{1 n}   \\
+      0      & 0       & a_{2 3} & \hdots & a_{2 n}   \\
+      \vdots & \vdots  & \ddots  & \ddots & \vdots    \\
+      0      & \hdots  & \hdots  & 0      & a_{n-1 n} \\
+      0      & 0       & 0       & 0      & 0      
+    \end{pmatrix}
+    \quad 
+    \begin{pmatrix}
+             & a_{1 2} & \hdots  & \hdots & a_{1 n}   \\
+             &         & a_{2 3} & \hdots & a_{2 n}   \\
+             &         &         & \ddots & \vdots    \\
+             &         &         &        & a_{n-1 n} \\
+             &         &         &        &        
+    \end{pmatrix}
+  \end{equation*}
+  \caption{A figure showing an upper triangular matrix on the left and a ``triangle'' on the right. \label{Figure:TriangularMatrixOrTriangle}}
 \end{figure}
 
 We choose the first approach here, because it will make it possible to use the majority of the work from when we proved that matrices form a nonassociative semiring to show that triangular matrices also form a nonassociative semiring (or a ring, if their elements come from a ring), under the obvious multiplication, addition and equality. The only problem we will have is to prove that the multiplication is closed. %Here it is important repeat that by triangular, we mean upper triangular (although everything would work equally well if we used it to mean lower triangular, as long as it doesn't include both upper and lower) if both upper and lower triangular matrices were allowed, we would not get a ring, , since it is well known that any matrix can be factorized as a product of a lower and an upper triangular matrix.
@@ -48,8 +66,8 @@ We define a datatype of triangular matrices, which we name |Triangle| as a recor
 \begin{code}
 record Triangle (n : ℕ) : Set where
   field 
-    mat : Matrix n n
-    tri : (i j : Fin n) → toℕ j ≤ toℕ i → mat i j R≈ R0
+    mat  : Matrix n n
+    tri  : (i j : Fin n) → toℕ j ≤ toℕ i → mat i j R≈ R0
 \end{code}
 
 We also define two |Triangle|s to be equal if they have the same underlying matrix, since the proof is only there to ensure us that they are actually upper triangular and should not matter when comparing matrices.
@@ -58,19 +76,19 @@ _T≈_ : {n : ℕ} → Triangle n → Triangle n → Set
 A T≈ B = Triangle.mat A M≈ Triangle.mat B
 \end{code}
 
-Next, we go on to define addition and multiplication of triangles. We apply the matrix operations to the |mat| fields and modify the |tri| proofs appropriately. For addition, the proof modification is straightforward (although there is an extra |R0| that we need to take care of with |e'∙e''≈e|:
+Next, we go on to define addition and multiplication of triangles. We apply the matrix operations to the |mat| fields and modify the |tri| proofs appropriately. For addition, the proof modification is straightforward (although there is an extra |R0| that we take care of with |e'∙e''≈e|):
 \begin{code}
 _T+_ : {n : ℕ} → Triangle n → Triangle n → Triangle n
 A T+ B = record 
-  {  mat = Triangle.mat A M+ Triangle.mat B
-  ;  tri = λ i j i≤j → e'∙e''≈e R+-CM  (Triangle.tri A i j i≤j) 
-                                       (Triangle.tri B i j i≤j) 
+  {  mat  = Triangle.mat A M+ Triangle.mat B
+  ;  tri  = λ i j i≤j → e'∙e''≈e R+-CM  (Triangle.tri A i j i≤j) 
+                                        (Triangle.tri B i j i≤j) 
   }
 \end{code}
 
-For multiplication, the proof modification required is a bit more complicated, and requires a lemma related to dot-products. We will prove first that the dot product of two vectors $u$ and $v$, where for every $i$, either the $i$th component of $u$ or the $i$th component of $v$ is zero, is zero, and to do this, we need a further (short) lemma that the product of two elements, one of which is zero is zero. We include the case where the first element is zero:
+For multiplication, the proof modification required is a bit more complicated, and requires a lemma related to dot-products. We will prove first that the dot product of two vectors $u$ and $v$ is zero if for every $i$, either the $i$th component of $u$ or the $i$th component of $v$ is zero. To do this, we need a further (short) lemma that the product of two elements, one of which is zero is zero. We include the case where the first element is zero:
 \begin{code}
-r*s-zero : (r s : R) → r R≈ R0 ∨ s R≈ R0 → r R* s R≈ R0
+r*s-zero : (r s : R) → (r R≈ R0) ∨ (s R≈ R0) → r R* s R≈ R0
 r*s-zero r s (inj₁ r≈0) = begin 
   r R* s 
     ≈⟨ *-cong r≈0 refl ⟩
@@ -79,7 +97,7 @@ r*s-zero r s (inj₁ r≈0) = begin
   R0 ∎
   where open CM-Reasoning R+-CM
 \end{code}
-the case where |s| is zero is similar.
+and the case where |s| is zero is similar.
 %if False
 \begin{code}
 r*s-zero r s (inj₂ s≈0) = begin 
@@ -119,8 +137,8 @@ one0-mat : {n : _} → (A B : Triangle n) → (i j : Fin n)
          → toℕ j ≤ toℕ i → (k : Fin n) 
          → Triangle.mat A i k R≈ R0 ∨ Triangle.mat B k j R≈ R0
 one0-mat A B i j j≤i k  with toℕ k ≤? toℕ i 
-one0-mat A B i j j≤i k  | yes k≤i  = inj₁ (Triangle.tri A i k k≤i)
-one0-mat A B i j j≤i k  | no  k≰i  = inj₂ (Triangle.tri B k j (begin 
+one0-mat A B i j j≤i k  | yes  k≤i  = inj₁ (Triangle.tri A i k k≤i)
+one0-mat A B i j j≤i k  | no   k≰i  = inj₂ (Triangle.tri B k j (begin 
   toℕ j 
     ≤⟨ j≤i ⟩ 
   toℕ i
@@ -130,7 +148,7 @@ one0-mat A B i j j≤i k  | no  k≰i  = inj₂ (Triangle.tri B k j (begin
   toℕ k ∎))
   where open Data.Nat.≤-Reasoning
 \end{code}
-where the module |≤-Reasoning| lets us use syntax similar to the to prove that |toℕ j ≤ toℕ k|.
+where the module |≤-Reasoning| lets us use syntax similar to the one we used in Section \ref{CM-EqReasoning} to prove that inequalities among natural numbers.
 
 Now, we combine these to give the proof of triangularity for |A T* B|.
 \begin{code}

@@ -12,99 +12,18 @@
 \include{unicodedefs}
 
 %include agda.fmt
-
+\renewcommand{\st}{\mid}
 \newcommand{\un}{\mbox{\texttt{\_}}}   % short underscore
 \newcommand{\unopunt}[1]{\ensuremath{\un\Varid{#1}\un}}
 \newcommand{\unopun}[1]{\ensuremath{\un{#1}\un}}
 \newcommand{\unop}[1]{\ensuremath{\un{#1}}}
-%format _∷_   = "\unopun{∷}"
-%format _≡_   = "\unopun{≡}"
-%format _<_   = "\unopun{<}"
-%format _∧_   = "\unopun{∧}"
-%format _¸_   = "\unopun{,}"
-%format _∨_   = "\unopun{∨}"
-%format _+_   = "\unopun{+}"
-%format _v+_  = "\unopun{\mathbin{+_{\!_v}}}"
-%format _m+_  = "\unopun{\mathbin{+_{\!_m}}}"
-%format _t+_  = "\unopun{\mathbin{+_{\!_t}}}"
-%format _v≈_  = "\unopun{\mathbin{≈_{\!_v}}}"
-%format _m≈_  = "\unopun{\mathbin{≈_{\!_m}}}"
-%format _t≈_  = "\unopun{\tensor{≈}{_t}}"
-%format _t*_  = "\unopun{\tensor{*}{_t}}"
-%format _vt*_ = "\unopun{\tensor[_v]{*}{_t}}"
-%format _tv*_ = "\unopun{\tensor[_t]{*}{_v}}"
-%format _mt*_ = "\unopun{\tensor[_m]{*}{_t}}"
-%format _tm*_ = "\unopun{\tensor[_t]{*}{_m}}"
-%format _∙_   = "\unopun{∙}"
-%format _M+_  = "\unopun{\mathbin{+_{\!_M}}}"
-%format _M≈_  = "\unopun{\mathbin{≈_{\!_M}}}"
-%format _M*_  = "\unopun{\mathbin{*_{\!_M}}}"
-%format _T≈_  = "\unopun{\mathbin{≈_{\!_T}}}"
-%format _T+_  = "\unopun{\mathbin{+_{\!_T}}}"
-%format _≤?_  = "\unopunt{≤?}"
-%format _≤?′_ = "\unopun{≤?′}"
-%format _∼_   = "\unopun{∼}"
 
-% format [_]   = "AA"
-% format "[]"    = "AA"
-
-%format not = "\Varid{not}"
-
-% by thomas
-%format _≤_ = "\unopun{≤}"
-%format _⁻¹ = "\unop{⁻¹}"
-%format _≈_   = "\unopun{≈}"
-%format _*_   = "\unopun{*}"
-%format _R*_   = "\unopun{\mathbin{*_{\!_R}}}"
-%format _R+_   = "\unopun{\mathbin{+_{\!_R}}}"
-%format _R≈_   = "\unopun{\mathbin{≈_{\!_R}}}"
-%format NonassociativeSemiring._+_ = NonassociativeSemiring."\unopun{+}"
-%format NonassociativeSemiring._≈_ = NonassociativeSemiring."\unopun{≈}"
-% format [          = "[\mskip5.5mu "
-% format ]          = "\mskip5.5mu]"
-
-%format R+ = "\mathbin{+_{\!\!_R}}"
-%format R* = "\mathbin{*_{\!\!_R}}"
-%format R≈ = "\mathbin{≈_{_R}}"
-%format v+ = "\mathbin{+_{\!_v}}"
-%format v* = "\mathbin{*_{\!\!_v}}"
-%format v≈ = "\mathbin{≈_{\!_v}}"
-%format m+ = "\tensor{+}{_m}"
-%format m* = "\tensor{*}{_m}"
-%format m≈ = "\mathbin{≈_{\!_m}}"
-%format t+ = "\tensor{+}{_t}"
-%format t* = "\tensor{*}{_t}"
-%format t≈ = "\mathbin{≈_{\!_t}}"
-%format _vm*_ = "\unopun{\!\tensor[_v]{*}{_m}}" 
-%format _mv*_ = "\unopun{\tensor[_m]{*}{_v}}" 
-%format vm* = "\tensor[_v]{*}{_m}" 
-%format mv* = "\tensor[_m]{*}{_v}" 
-%format tm* = "\tensor[_t]{*}{_m}" 
-%format mt* = "\tensor[_m]{*}{_t}" 
-%  "\mathbin{{}_t*_{\!_{m}}}"
-%format tv* = "\tensor[_t]{*}{_v}"
-%format vt* = "\tensor[_v]{*}{_t}"
-%format V+ = "\mathbin{+_{\!_V}}"
-%format V* = "\mathbin{*_{\!\!_V}}"
-%format V≈ = "\mathbin{≈_{\!_V}}"
-%format M+ = "\mathbin{+_{\!_M}}"
-%format M* = "\mathbin{*_{\!\!_M}}"
-%format M≈ = "\mathbin{≈_{\!_M}}"
-%format T+ = "\mathbin{+_{\!_T}}"
-%format T* = "\mathbin{*_{\!\!_T}}"
-%format T≈ = "\mathbin{≈_{\!_T}}"
-
-%format _-_ = "\unopunt{-}"
-
-
-%format "yes" = "\Varid{yes}\;\;\;\;\;"
-% subst comment a  = "-- \text{ " a "}"
-% /by thomas
+%include Formatting_Directives.tex
 
 %subst dummy = "\un"
 %**It is also possible to adjust the spacing for space (function appl.)
-% %subst space = "\,"
-% %subst space = "\;"
+% subst space = "\,"
+%subst space = "\;\;"
 
 \usepackage[utf8x]{inputenc}
 
@@ -115,6 +34,7 @@
 \title{An Agda proof of Valiant's algorithm for context free parsing}
 \author{Thomas Bååth Sjöblom}
 \date{\today}
+\todo{Lambdas somewhere}
 \maketitle
 \newpage
 \tableofcontents
