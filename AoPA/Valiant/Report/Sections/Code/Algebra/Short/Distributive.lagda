@@ -1,7 +1,8 @@
 %if False
 \begin{code}
 module Algebra.Short.Distributive where
-private postulate _∧_ : Set → Set →  Set
+--private postulate _∧_ : Set → Set →  Set
+open import Data.Product using () renaming (_×_ to _∧_)
 Distributive : {X : Set} → (X → X → Set) → (X → X → X) → (X → X → X) → Set
 \end{code}
 %endif

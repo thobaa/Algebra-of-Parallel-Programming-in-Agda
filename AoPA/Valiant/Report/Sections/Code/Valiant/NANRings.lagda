@@ -3,7 +3,7 @@
 open import Algebra.NANRing
 open import Valiant.Splitting
 open import Data.Unit
-open import Data.Product
+open import Data.Product using (proj₁; _,_)
 --open import Algebra.Structures --using (CommutativeMonoid)
 --open import Algebra hiding (Monoid)
 
@@ -19,7 +19,7 @@ open Valiant.Operations NaSr
 --open NonassociativeSemiring NaSr renaming (_+_ to _R+_; _*_ to _R*_; +-identity to R+-identity; _≈_ to _R≈_; Carrier to R)
 \end{code}
 %endif
-\subsubsection{Proving that they are nonassociative semiings}
+\subsection{Proving that they are nonassociative semiings}
 We will now prove that |Vec|, |Mat| and |Tri| are commutative monoids with |_v+_|, |_m+_| and |_t+_|, and |Tri| is a nonassociative semiring with |_t+_| and |_t*_| as defined above. One big reason for doing this is that it will make it possible to use the equational reasoning introduced in Section \ref{Algebra-reasoning}. We will prove
 \begin{spec}
 ∀ {s}      →   IsCommutativeMonoid  _v≈_  _v+_  (zeroVec {s})

@@ -4,7 +4,7 @@ import Algebra.Matrix
 import Algebra.MatrixOperations
 open import Data.Fin using (Fin)
 open import Data.Nat
-open import Data.Product
+open import Data.Product using (Σ; proj₁; _,_)
 open import Algebra.Monoid
 open import Algebra.NANRing
 module Algebra.MatrixProof (NaSr : NonassociativeSemiring) where

@@ -25,8 +25,8 @@ This is a fairly cumbersome way of writing numbers, and it is possible to make A
 \end{code}
 so that we may write:
 \begin{code}
-two  : ℕ
-two  = 2
+two : ℕ
+two = 2
 \end{code}
 Next, we define lists, 
 \begin{code}

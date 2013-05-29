@@ -1,13 +1,13 @@
-\section{Algebra}
+\chapter{Algebra}
 \label{Algebra}
 \label{Section:Algebra}
 In this section, we are going to introduce a number of algebraic definitions. Some (like commutative monoid and nonassociative semiring) will be useful later in the report, while other (like group and ring) are mentioned as possibly familiar examples and for comparison.
 
 In Section \ref{Intro-defs}, we introduce a number of well known propositions that show up in the definitions of algebraic structures as axioms and comment on differences between defining an algebraic structure in mathematics and in Agda. Then, in Sections \ref{Set-with-one-op} and \ref{Set-with-two-op}, we use these properties to define algebraic structures consisting of sets with one and two binary operations, respectively.
-\subsection{Introductory definitions}
+\section{Introductory definitions}
 \label{Intro-defs}
 When defining an algebraic structure (consisting of just one set), one gives the set of objects, a number of binary operations on the objects and a number of axioms that the set and the operations are required to satisfy. In this section, we are going to introduce common such axioms. 
-\subsubsection{Equivalence relations}
+\subsection{Equivalence relations}
 \label{Algebra-equality}
 The axioms usually refer to equalities between different sequences of operation applications, like the axiom in a group that $x \cdot (y \cdot z) = (x \cdot y) \cdot z$ for all $x$, $y$ and $z$. However, to define these things in Agda, we note that we do not have a concept of equality for terms of an arbitrary datatype. Further, the most ``basic'' equality definition (called propositional equality), stating just that $x = x$ for all $x$ and defined by
 \begin{code}
@@ -46,7 +46,7 @@ When a relation is an equivalence relation, we will usually denote it by $\appro
 
 
 
-\subsubsection{Propositions about one operation}
+\subsection{Propositions about one operation}
 Next, we define some propositions that binary operations (i.e., functions $X \to X \to X$) can satisfy. These are properties that ordinary addition and multiplication of numbers satisfy.
 \begin{Definition} %%% Associative
 A binary operation $\cdot$ on a set $X$ is \emph{associative} if $x \cdot (y \cdot z) = (x \cdot y) \cdot z$ for all $x$, $y$, $z \in X$.
@@ -86,7 +86,7 @@ In Agda, since the proposition that every element has an inverse is a universal 
 If the operation is addition of numbers, the inverse of $x$ is given by $-x$, and if the operation is multiplication of numbers, the inverse is given by $1/x$. In computer science, inverses occur more rarely.
 Indeed, none of the algebraic structures we have used to prove the correctness of Valiant's algorithm include inverses.
 
-\subsubsection{Propositions about two operations}
+\subsection{Propositions about two operations}
 \label{two-operations}
 When we have two different binary operations on the same set, we often want them to interact with each other sensibly. Here we define two such ways of interaction.
 
@@ -123,10 +123,10 @@ If we do not have inverses, we cannot perform the final step (for example, if $+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% GROUPS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Sets with one operation} % alternate title: genralizations
+\section{Sets with one operation} % alternate title: genralizations
 \label{Set-with-one-op}
 In this section, we are going to discuss algebraic structures made up of a set and a binary operation on the set.
-\subsubsection{Groups}
+\subsection{Groups}
 In mathematics, the most common such structure is the group. Many mathematical objects form groups, including the integers $\Z$, the rational numbers $\Q$, the real numbers $\R$ and the complex numbers $\C$, with addition as the binary opertaion, and the non-zero rational numbers $\Q\setminus{0}$, non-zero real numbers $\R\setminus{0}$, and non-zero complex numbers $\C\setminus{0}$, with multiplication as the binary operation. Although, groups satisfy too many axioms to be useful to us, we give the definition below, to clarify the difference between them and the perhaps less familiar structure, the monoid, that we present next.
 \begin{Definition}
 A \emph{group} is a set $G$ together with a binary operation $\cdot$ on $G$, satisfying the following:
@@ -142,7 +142,7 @@ A group where the binary operation is commutative is said to be \emph{Abelian}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% MONOIDS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Monoids}
+\subsection{Monoids}
 In this section, we discuss monoids, which are slightly more general than groups in that they do not require the existence of inverses. Monoids are important for programming because it is rare that a datatype satisfies all the axioms of a group.
 
 Example of monoids (that are not also groups) include the natural numbers, with $\cdot$ as either multiplication or addition, sets ($M$ is a collection of sets, $\cdot$ is union and the identity element is the empty set), lists ($M$ is a collection of lists, $\cdot$ is list concatenation and the identity element is the empty list).
@@ -162,10 +162,10 @@ A monoid where the binary operation is commutative is a \emph{commutative monoid
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% RING LIKE STRUCTURES (two operations on a set)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Sets with two operations}
+\section{Sets with two operations}
 \label{Set-with-two-op}
 In this section, we discuss algebraic structures that consist of a set together with two binary operations. As we discussed in Section \ref{two-operations}, we want them to interact sensibly.
-\subsubsection{Rings}
+\subsection{Rings}
 The basic example of this kind of structure is a ring:
 \begin{Definition}
 A set $R$ together with two binary operations $+$ and $*$ (called addition and multiplication) forms a \emph{ring} if:
@@ -212,7 +212,7 @@ A set $R$ together with two binary operations $+$ and $*$ forms a \emph{nonassoc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% MATRICES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Matrices}
+\subsection{Matrices}
 A matrix is in some sense really just a collection of numbers arranged in a rectangle, so there is nothing stopping us from defining such a matrix with entries from an arbitrary set, as opposed to from $\R$ or $\C$. To be similar to the definition we will make in Agda of an abstract matrix (one without a specific implementation in mind), we consider a matrix of size $m \times n$ as a function from a pair of natural numbers $(i,j)$, with $0 \le i < m$, $0 \le j < n$ (or, $i \in \Fin{m}$, $j \in \Fin{n}$), and hence, after currying, define: 
 \begin{Definition}
 A \emph{matrix} $A$ over a set $R$ is a function $A : \Fin{m} \to \Fin{n} \to R$.
@@ -236,7 +236,7 @@ If $R$ is a a ring (nonassociative semiring), then the matrices of size $n \time
 The proof is fairly easy but boring. We provide part of the proof when $R$ is a nonassociative semiring in Agda: we prove that addition is commutative and that the zero matrix is a zero element of multiplication. The whole proof for a nonassociative semiring is available in our library.
 
 %include /Code/Algebra/MatrixProof.lagda
-\subsubsection{Upper triangular matrices}
+\subsection{Upper triangular matrices}
 \label{Triangular-matrices}
 For our applications, we will be interested in matrices that have no nonzero elements on or below the diagonal.
 \begin{Definition}

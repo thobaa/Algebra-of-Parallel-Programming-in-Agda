@@ -17,7 +17,7 @@ open import Algebra.Monoid
 --open NonassociativeSemiring NaSr renaming (_+_ to _R+_; _*_ to _R*_; _≈_ to _R≈_)
 \end{code}
 %endif
-\subsubsection{Implementing the algorithm}
+\subsection{Implementing the algorithm}
 Using the above operations, we can now define Valiant's algorithm in Agda, following the outline in Section \ref{Valiant-summing-up}. First we define functions for the overlap part:
 \begin{code}
 overlapRow : {s : Splitting} → Vec s → Tri s → Vec s
@@ -52,7 +52,7 @@ valiant (tri U R L)  = tri U⁺ (overlap U⁺ R L⁺) L⁺
          L⁺  = (valiant L)        
 \end{code}
 In the next section, we are going to define the specification and prove the algorithm correct.
-\subsubsection{Specification and Proof in Agda}
+\subsection{Specification and Proof in Agda}
 We are now ready to express the transitive closure problem in Agda. It is a relation between two |Tri|s, that is, a function that takes two |Tri|s, |C⁺| and |C|, and returns the propostion that |C⁺| is the transitive closure of |C|, which is true if |C⁺| and |C| satisfy the specification \eqref{Equation:JPTSpec} as implemented in Agda:
 \begin{code}
 _is-tc-of_ : {s : Splitting} → Tri s → Tri s → Set
@@ -74,7 +74,7 @@ vˣ is-tcCol-of (U⁺ , v) = vˣ v≈ U⁺ tv* vˣ v+ v
 \end{code}
 
 
-\subsubsection{Proof}
+\subsection{Proof}
 In this section, we are going to prove the correctness of Valiant's algorithm, as defined in the previous section, in words, for every splitting |s| and every upper triangular matrix |C : Tri s|, |valiant C| is the transitive closure of |C|. We begin by giving the types of the different propositions, so we can use them in an arbitrary order later. The first is the main proposition:
 \begin{code}
 v-tc    : {s : Splitting}  (C : Tri s) → (valiant C) is-tc-of C

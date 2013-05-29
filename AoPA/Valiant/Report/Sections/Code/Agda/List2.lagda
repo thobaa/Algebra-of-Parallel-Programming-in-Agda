@@ -99,7 +99,7 @@ max-greatest : (xs : [ ℕ ]) → (pf : 0 < length xs) →
          (i : Fin (length xs)) → xs ‼ i ≤ maxL xs pf
 \end{code}
 To prove this property of the |maxL| function, we must produce an inhabitant of the above type. We do this in the next section. %This takes quite a bit of work is actually quite a substantial task.
-\subsection{Proving the correctness}
+\section{Proving the correctness}
 To prove a proposition in Agda, it is important to look at the structure of the proposition. Then one needs to determine which part of the proposition one should pattern match on. To do this, it is a good idea to have a plan for the proof.
 
 We formulate the proof informally. The main idea we use is pattern matching the index into the list, if it is $0$, we want to prove the simpler proposition that |x ≤ maxL (x ∷ xs) pf|, which we call |max-greatest-base|, because it is the base case in an induction on the index:
@@ -207,7 +207,7 @@ We put the whole proof in Figure \ref{Intro-proof-figure}.
 %To end this example, we note that proving even simple (obvious) propositions in Agda takes quite a bit of work, and a lot of code, but generally not much thinking. After this extended example, we feel that we have illustrated most of the techniques that will be used later on in the report. As we wrote in the introduction to the section, we will often only give the types of the propositions, followed with the types of important lemmas and note what part of the arguments we pattern match on and in what order.
 
 %We also feel that we have illustrated the fact that proving something in Agda often requires a lot of code, but not much thinking, as the above proof essentially proceeds as one would intuitively think to prove the specification correct. Most of the standard concepts used are available in one form or another from the standard library, and we have attempted to keep our names consistent with it (the actual code given in later sections uses the standard library when possible, but we try to include simplified definitions in this report).
-\subsection{Final remarks about Agda}
+\section{Final remarks about Agda}
 We end the section about Agda by going over a few parts of Agda that we have not mentioned but will be used in the remainder of the report. 
 
 First, Agda has Standard Library that contains most of the definitions we have made above (sometimes under slightly different names, for example, |_∧_| is called |_×_|, and in more generality---definitions are made to work for all of |Set₁|, |Set₂|, \ldots). In the remainder of the report, and in our library proving the correctness of Valiant's algorithm, we use the Standard Library definitions whenever possible.

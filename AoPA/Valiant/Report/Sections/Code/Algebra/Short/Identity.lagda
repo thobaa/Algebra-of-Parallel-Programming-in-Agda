@@ -1,7 +1,7 @@
 %if False
 \begin{code}
 
-open import Data.Product renaming (_×_ to _∧_)
+open import Data.Product using () renaming (_×_ to _∧_)
 module Algebra.Short.Identity where
 Identity : {X : Set} → (X → X → Set) →  X → (X → X → X) →  Set
 --private postulate _∧_ : Set → Set → Set

@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[11pt,a4paper]{report}
 
 \usepackage{thesis}
 %\usepackage{bbm}
@@ -6,12 +6,14 @@
 
 
 \def\textmu{}
-
+\usepackage{blkarray}
 \usepackage{tensor}
 \usepackage{ucs}
 \include{unicodedefs}
 
 %include agda.fmt
+\newcommand{\mytitle}{An Agda proof of the correctness of Valiant's algorithm for context free parsing}
+\newcommand{\myname}{Thomas B\aa{}\aa{}th Sj\"{o}blom}
 \renewcommand{\st}{\mid}
 \newcommand{\un}{\mbox{\texttt{\_}}}   % short underscore
 \newcommand{\unopunt}[1]{\ensuremath{\un\Varid{#1}\un}}
@@ -24,21 +26,50 @@
 %**It is also possible to adjust the spacing for space (function appl.)
 % subst space = "\,"
 %subst space = "\;\;"
+% too big spacing around :, = and ->
+%format : = "\!\!\mathbin{:}\!\!"
+%format = = "\!\!\mathbin{=}\!\!"
+%format → = "\!\!\Varid{→}\!\!"
 
 \usepackage[utf8x]{inputenc}
 
+%% FROM THESIS TEMPLATE:
+% Packages and commands file
+\input{ThesisTemplate/include/packagescommands}
 
+% Settings (Metadata)
+%\input{ThesisTemplate/include/settings}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 
 \begin{document}
 
-\title{An Agda proof of Valiant's algorithm for context free parsing}
-\author{Thomas Bååth Sjöblom}
-\date{\today}
-\todo{Lambdas somewhere}
-\maketitle
+% Title page and abstract
+\input{ThesisTemplate/include/titlepageabstract}
+
+% Table of contents
 \newpage
+\pagenumbering{roman}
+\setcounter{page}{1}
+\pagestyle{fancy}
+\setspecialhdr
 \tableofcontents
+
+% Main area
+\newpage
+\setdefaulthdr
+\pagenumbering{arabic}	
+\setcounter{page}{1}
+
+%\title{An Agda proof of Valiant's algorithm for context free parsing}
+%\author{Thomas Bååth Sjöblom}
+%\date{\today}
+
+%\maketitle
+%\newpage
+%\tableofcontents
+
 %include ./Sections/Introduction.tex
+\todo{Lambdas somewhere}
 %include ./Sections/Agda.tex
 %include ./Sections/Algebra.tex
 %include ./Sections/Parsing.tex
@@ -48,5 +79,6 @@
 \listoftodos
 \bibliography{references}
 \bibliographystyle{plainnat}
+\addcontentsline{toc}{chapter}{\numberline{} Bibliography} % For pdf
 
 \end{document}

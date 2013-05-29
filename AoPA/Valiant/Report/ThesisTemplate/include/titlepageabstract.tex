@@ -1,0 +1,70 @@
+% Chalmers title page
+\begin{titlepage} %% ACTUALLY, THE COVER...
+
+\AddToShipoutPicture{\backgroundpic{-4}{56.7}{ThesisTemplate/fig/auxiliary/frontpage}}
+\mbox{}
+\vfill
+\addtolength{\voffset}{2cm}
+\begin{flushleft}
+	{\noindent {\Huge An Agda proof of the correctness of Valiant's algorithm for context free parsing} \\[0.5cm]
+	\emph{\Large Master's Thesis in Computer Science -- algorithms, languages and logic} \\[.8cm]%\todo{it's nice that they spell the program name differently (with or without comma before ``and logic'', in the student portal and on the info page}
+	
+	{\huge THOMAS B\AA\AA{}TH SJ\"{O}BLOM}\\[.8cm]
+	
+	{\Large Department of Computer Science and Engineering \\
+	%Non-linear Dynamics \& Statistical Physics \\
+	\textsc{Chalmers University of Technology} \\
+	Gothenburg, Sweden 2013 \\
+%huh?	Master's Thesis 2011:1\\
+	} 
+	}
+\end{flushleft}
+
+\end{titlepage}
+\ClearShipoutPicture
+% End Chalmers title page
+
+\pagestyle{empty}
+\newpage
+\clearpage
+\mbox{}
+\newpage
+\clearpage
+\thispagestyle{empty}
+
+%%%%%%%%%% TITLE PAGE
+\newpage
+\clearpage
+\input{ThesisTemplate/include/title.tex}
+%%%%%%%%%% IMPRINT PAGE
+\newpage
+\clearpage
+\input{ThesisTemplate/include/imprint.tex}
+
+
+\begin{abstract}\todo{expand ABSTRACT a bit!}
+Parsing is an important problem with applications ranging from compilers to bioinformatics. To perform the parsing more quickly, it would be desirable to be able to parse in parallel. Valiant's algorithm \cite{Valiant} is a divide and conquer algorithm for parsing and can be used to perform a large part of the work in parallel. It is fairly easy to implement in a functional programming languages, using pattern matching. Agda is a dependently typed functional programming language that doubles as a proof assistant and is hence very suitable for proving implementing and proving the correctness of Valiant's algorithm. 
+
+In this thesis, we provide a specification for the parsing problem and prove that it is equivalent to the specification of the transitive closure used in \cite{Valiant}. We compare the two specifications and use our specification to derive Valiant's algorithm. We then implement it in Agda and prove our implementation correct (according to our specification).
+
+We also give short introductions to parsing, programming and proving with Agda and to using algebraic structures in Agda.
+
+
+%Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+\end{abstract}
+% keywords: dependently typed programming, formal proof, Agda, Valiant, parallel parsing, transitive closure, nonassociative multiplication
+\newpage
+\clearpage
+\mbox{}
+\newpage
+\clearpage
+\thispagestyle{empty}
+\section*{Acknowledgements}
+I would like to thank my supervisor Jean-Phillipe Bernardy and my examiner Patrik Jansson for their support, patience and optimism during the creation of this master's thesis.
+
+I would also like to thank Anders Martinsson for listening to me failing to explain what parsing is on three separate occasions.\\[1cm]
+
+\hfill Thomas B\aa\aa{}th Sj\"{o}blom, Gothenburg, May 29 2013
+\newpage
+\clearpage
+\mbox{}

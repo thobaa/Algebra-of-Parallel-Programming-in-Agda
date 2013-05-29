@@ -4,7 +4,7 @@ open import Algebra.Equivalence
 open import Algebra.ShortDefs
 open import Data.Nat using ()
 open import Algebra.Monoid
-open import Data.Product renaming (_×_ to _∧_)
+open import Data.Product using () renaming (_×_ to _∧_)
 module Algebra.NANRing where
 \end{code}
 %endif

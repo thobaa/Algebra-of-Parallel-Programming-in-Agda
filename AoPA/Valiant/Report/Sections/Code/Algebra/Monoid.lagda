@@ -3,7 +3,7 @@
 --open import Relation.Binary
 open import Relation.Binary
 --open import Algebra.Equivalence this should not be used maybe
-open import Data.Product renaming (_×_ to _∧_)
+open import Data.Product using (proj₁) renaming (_×_ to _∧_)
 
 open import Algebra.ShortDefs
 module Algebra.Monoid where
@@ -99,7 +99,7 @@ record CommutativeMonoid : Set₁ where
   infix 4   _≈_
 \end{code}
 %endif
-\subsubsection{Equational Reasoning in Commutative Monoids}
+\subsection{Equational Reasoning in Commutative Monoids}
 \label{CM-EqReasoning}
 \label{Section-where-eqr-helper-is-defined}
 Commutative monoids are one of the datatypes we will use the most, in particular, we will want to prove equalities among members of a commutative monoid. The Agda Standard Library contains a module |EqReasoning| that lets us reason about equalities using a very natural syntax. To allow easy access to this module, we we import it, give it the alias |EqR|:

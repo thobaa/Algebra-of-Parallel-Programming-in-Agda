@@ -5,7 +5,7 @@ module Agda.CH where
 infix 4 _≤_
 \end{code}
 %endif
-\subsection{The Curry--Howard Correspondence}
+\section{The Curry--Howard Correspondence}
 \label{CH}
 To consider proofs and propositions in Agda, and to allow functions to depend on them and their existence, we make use of the Curry--Howard correspondence: propositions as types, proofs as programs (for more detailed introduction to it, see for example \cite{Dep-types-at-work}). The Curry--Howard correspondence states that a proposition $P$ can be seen as the type containing all ``proof objects'', of $P$ (we will refer to them simply as proofs in the remainder). To prove $P$ then means to give an element of the type corresponding to $P$ (i.e., a proof of $P$).
 
@@ -30,7 +30,7 @@ If we have an element of type |m ≤ n|, meant to represent the , it is either c
 
 We now present the logical operations (as interpreted in constructive logic) that are done on propositions to generate new propositions, and their implementations in Agda, using syntax similar to the one used in logic, through the Curry--Howard correspondence.
 
-\subsubsection{Predicate logic}
+\subsection{Predicate logic}
 We begin with concepts from predicate logic, and in the next section, we consider propositional logic.
 
 To define a conjunction between two propositions |P| and |Q|, we use the pair, defined as
@@ -75,7 +75,7 @@ data ⊤ : Set where
 \end{code}
 To prove this proposition we simply use the element |tt|.
 
-\subsubsection{Propositional logic}
+\subsection{Propositional logic}
 Now we move on to define the quantifications (universal and existential) in predicate logic.
  
 For universal quantification, we again use functions, but this time, dependent functions: If $P$ is a predicate on $X$ (a function that takes elements of $X$ to propositions $P(x)$), the proposition $\forall x. P(x)$ corresponds to the type |(x : X) → P x|, since to give a function of that type would mean providing a way to construct an element of |P x| (that is, a proof of $P(x)$) for every |x : X|, which is what $\forall x. P(x)$ means.
@@ -92,7 +92,7 @@ data ∃ {X : Set} (P : X → Set) : Set where
 %\end{spec}
 %in Agda (we introduce an anonymous function |λ x → P x|, taking |x| to |P x| using lambda notation).
 
-\subsubsection{Decidability}
+\subsection{Decidability}
 Finally we discuss decidable propositions. Constructively, the law of excluded middle---saying that for any proposition $P$, $P \lor \lnot P$ is true---is not valid. There is no algorithm that takes an arbitrary proposition and returns either a proof of it, or a proof that it implies $\bot$. However, there are many propositions for which it is valid. These propositions are said to be \emph{decidable}. In Agda, if |P| is a proposition, we define the proposition that |P| is decidable with the |Dec P|:
 \begin{code}
 data Dec (P : Set) : Set where

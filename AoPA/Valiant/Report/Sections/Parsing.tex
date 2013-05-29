@@ -3,13 +3,13 @@
 \newcommand{\terminals}{\Sigma}
 \newcommand{\startsymbol}{S}
 \newcommand{\grammar}{(\nonterminals, \terminals, \productions, \startsymbol)}
-\section{Parsing}
+\chapter{Parsing}
 \label{Parsing}
 Parsing is about analysing the structure of a sequence of tokens coming from some alphabet. We only give a brief overview of it here.
 We begin by introducing some concepts of parsing in Section \ref{Parsing-Defs}. Then, in Section \ref{Parsing-Algebra}, we tie these concept together with the algebra from Section \ref{Section:Algebra}, and finally, in Section \ref{Valiant's-spec}, we show that parsing is equivalent to computing the transitive closure of an upper triangular matrix.
 In Section \ref{Valiant}, we then focus on a particular algorithm for computing the transitive closure, Valiant's algorithm, that we implement and prove correct using Agda.
 
-\subsection{Definitions}
+\section{Definitions}
 \label{Parsing-Defs}
 The goal of parsing is first to decide if a given sequence of tokens belongs to a given language, and second to describe its structure within the language.
 For this, we consider the opposite process of generating a string in a given language. To do this, one uses a grammar for the language, which contains rules that can be used to build strings belonging to the language. %, or to try assign structural properties to a sequences of tokens.
@@ -102,7 +102,7 @@ In the remainder of the report, we only consider grammars in Chomsky Normal Form
   \item $S = E$.
   \end{itemize}
 \end{Example}
-\subsection{Grammar as a nonassociative semiring}
+\section{Grammar as a nonassociative semiring}
 \label{Parsing-Algebra}
 The set of production rules for a grammar in Chomsky Normal Form which have the form $A \to BC$ could almost be used directly as a definition of multiplication among the nonterminals by replacing the arrows by equals signs:
 \begin{equation*}
@@ -117,7 +117,7 @@ The solution to these two problems is to instead consider \emph{sets} of nonterm
 
 In general, this multiplication does not satisfy any algebraic axioms on its own, it is neither associative nor commutative.
 Since we are considering sets, it is natural to choose set union as addition and hence $\emptyset$ as $0$, and with this, the above multiplication distributes over addition and the empty set is an absorbing (or zero) element for it.
-\subsubsection{A specification for parsing}
+\subsection{A specification for parsing}
 In this section, we find a specification for the problem of parsing a string with a grammar in Chomsky Normal Form. Then, in the next section, we compare it to the specification used in \cite{Valiant}.
 %In this section, we reformulate the parsing problem for a grammar in CNF form as the problem of finding the transitive closure of an upper triangle matrix.
 %Valiant showed this when defining his algorithm in \cite{Valiant}, but he uses a different specification of the transitive closure, which is  less suitable for proofs in Agda.
@@ -142,7 +142,7 @@ where $C$ is the matrix whose only nonzero entries are $C_{i i+1} = \{A \st A \t
 
 
 
-\subsection{The specification used by Valiant}
+\section{The specification used by Valiant}
 \label{Valiant's-spec}
 In this section, we present the specification used in \cite{Valiant}, and prove that it is equivalent to our specification above \eqref{TC}. In particular, this implies that our specification defines a unique $X$, and proving that Valiant's algorithm computes it (in Section \ref{Valiant-proof}) proves that it exists.
 
@@ -206,7 +206,7 @@ We prove \ref{2} by induction on $i + j$. If $i+j = 2$, we get the statement tha
 
 Next, we prove \ref{1}, again by induction on $i + j$. If $i + j = 2$, then $\nap{C}{i}\nap{C}{j} = CC$, which is a term in $R_2$. If $i + j = n + 1$, then there are $k_i$ and $k_j$ such that $\nap{C}{i}$ and $\nap{C}{j}$ are terms of $R_{k_i}$ and $R_{k_j}$ respectively (if $i$ or $j$ is $1$, then $R_1$ will do, otherwise we use induction, since $i$ and $j \le n$). Then if we let $k = \max(k_i,k_j)$, by \ref{2}, $R_k$ contains both, and hence, $R_{k+1}$ contains their product. 
 
-We prove \ref{3} by induction on $k$. First, $R_1$ contains no structurally equal terms. Second, if $R_k$ contains no structurally equal terms, then if $R_{k+1}$ contains two structurally equal terms, they must both be products, say $X_1Y_1$ and $X_2Y_2$, and then, $R_{k}$ contains all four factors $X_1$, $Y_1$, $X_2$ and $Y_2$, but for $X_1Y_1$ to be structurally equal to $X_2Y_2$, their outermost parenthesis must be equal, and so we must have that $X_1$ is structurally equal to $X_2$ and $Y_1$ is structurally equal to $Y_2$, since otherwise the placement of the parenthesis would be different in the products. 
+We prove \ref{3} by induction on $k$. First, $R_1$ contains no structurally equal terms. Second, if $R_k$ contains no structurally equal terms, then if $R_{k+1}$ contains two structurally equal terms, they must both be products, say $X_1Y_1$ and $X_2Y_2$, and then, $R_{k}$ contains all four factors $X_1$, $Y_1$, $X_2$ and $Y_2$, but for $X_1Y_1$ to be structurally equal to $X_2Y_2$, their outermost parentheses must be equal, and so we must have that $X_1$ is structurally equal to $X_2$ and $Y_1$ is structurally equal to $Y_2$, since otherwise the placement of the parentheses would be different in the products. 
 
 We prove \ref{4} by induction on $k$. In $R_1$, $XX$ is the only term containing $X$, and contains $2$ factors. If it is true for $k = n$, then when formin $R_{n+1}$, we multiply each term containing $X$, which contains at least $n + 1$ factors, by something and the result thus contains at least $n+2$ factors.
 \end{proof}

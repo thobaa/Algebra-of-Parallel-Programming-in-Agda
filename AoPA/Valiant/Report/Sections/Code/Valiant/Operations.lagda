@@ -27,7 +27,7 @@ infix 4 _t≈_
 
 \end{code}
 %endif
-\subsubsection{Operations on our datatypes}
+\subsection{Operations on our datatypes}
 In this section, we will define operations: addition, multiplication and equality, for |Vec|, |Mat| and |Tri|. %We really only want the operations for |Tri|, but, for example, to multiply two |Tri|s, we need to be able to multiply the rectangular parts with triangles, and to do this, in turn, we need to be able to multiply two matrices, which further requires us to have the ability to multiply vectors.
 
 Addition is straightforward, since matrix addition is done pointwise, so we just recurse on the subparts, first we need to define it for |Vec|:
