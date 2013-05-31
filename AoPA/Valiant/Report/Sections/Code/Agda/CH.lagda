@@ -7,7 +7,7 @@ infix 4 _≤_
 %endif
 \section{The Curry--Howard Correspondence}
 \label{CH}
-To consider proofs and propositions in Agda, and to allow functions to depend on them and their existence, we make use of the Curry--Howard correspondence: propositions as types, proofs as programs (for more detailed introduction to it, see for example \cite{DepTypAtWork}). The Curry--Howard correspondence states that a proposition $P$ can be seen as the type containing all ``proof objects'', of $P$ (we will refer to them simply as proofs in the remainder). To prove $P$ then means to give an element of the type corresponding to $P$ (i.e., a proof of $P$).
+To consider proofs and propositions in Agda, and to allow functions to depend on them and their existence, we use the Curry--Howard correspondence: propositions as types, proofs as programs (for a more detailed introduction to it, see for example \cite{DepTypAtWork}). The Curry--Howard correspondence states that a proposition $P$ can be seen as the type containing all ``proof objects'', of $P$ (we will refer to them simply as proofs in the remainder). To prove $P$ then means to give an element of the type corresponding to $P$ (i.e., a proof of $P$).
 
 %We identify the type of all small types |Set| with the set of all propositions.
 
@@ -15,8 +15,8 @@ To give an example of viewing propositions as types, we take a look at the propo
 %if False
 \begin{code}
 data _≤_ : ℕ → ℕ → Set where
-  z≤n : {n : ℕ}   → zero ≤ n
-  s≤s : {m n : ℕ} → (m≤n : m ≤ n) → suc m ≤ suc n
+  z≤n  : {n : ℕ}    → zero ≤ n
+  s≤s  : {m n : ℕ}  → (m≤n : m ≤ n) → suc m ≤ suc n
 \end{code}
 %endif
 \begin{spec}
@@ -24,9 +24,9 @@ data _≤_ : ℕ → ℕ → Set where
   z≤n : {n : ℕ}   → zero ≤ n
   s≤s : {m n : ℕ} → m ≤ n → suc m ≤ suc n
 \end{spec}
-Here we note the placement of the |ℕ|s in the first line. They are placed on the right side of the colon because they are indices of |_≤_|. This means that we are defining a type family (consisting of the types |m ≤ n| for every |m n : ℕ|. We can see that we need to do this from the fact that the two constructors produce elements of different types, |zero ≤ n| and |suc m ≤ suc n|, respectively. We also make note of the names we have given the constructors. In the remainder of this report, we often make use of the convention that |Pxy| (without the spaces) is the name of an element of datatype |P x y| (with spaces), so |m≤n| is a proof that |m ≤ n|.
+Here we note the placement of the |ℕ|s in the first line. They are placed on the right side of the colon because they are indices of |_≤_|. This means that we are defining a type family (consisting of the types |m ≤ n| for every |m n : ℕ|. We can see that we need to do this from the fact that the two constructors produce elements of different types, |zero ≤ n| and |suc m ≤ suc n|, respectively. We also make note of the names we have given the constructors. In the remainder of this report, we often use the convention that |Pxy| (without the spaces) is the name of an element of datatype |P x y| (with spaces), so |m≤n| is a proof that |m ≤ n|.
 
-If we have an element of type |m ≤ n|, meant to represent the , it is either constructed by |z≤n|, which means that |m| is |zero|, so that the proposition ``|m| is at most |n|'' is true. Otherwise, it is constructed by |s≤s|, and we must have |m = suc k|, |n = suc l| for some |k|, |l| and an element of type |k ≤ l|. But then, the proposition ``|k| is at most than |l|'' is true, and hence, again ``|m| is at most |n|'' is true. So providing an element of type |m ≤ n| means providing a proof that |m ≤ n|. Intuitively, we see that identifying propositions and types makes sense. 
+If we have an element of type |m ≤ n| it is either constructed by |z≤n|, which means that |m| is |zero|, so that the proposition ``|m| is at most |n|'' is true. Or it is constructed by |s≤s|, and we must have |m = suc k|, |n = suc l| for some |k|, |l| and an element of type |k ≤ l|. But then, the proposition ``|k| is at most than |l|'' is true, and hence, again ``|m| is at most |n|'' is true. So providing an element of type |m ≤ n| means providing a proof that |m ≤ n|. Intuitively, we see that identifying propositions and types makes sense. 
 
 We now present the logical operations (as interpreted in constructive logic) that are done on propositions to generate new propositions, and their implementations in Agda, using syntax similar to the one used in logic, through the Curry--Howard correspondence.
 
@@ -49,13 +49,13 @@ This coincides with the logical notion of a conjunction, which requires a proof 
 For disjunction, we use a disjoint sum:
 \begin{code}
 data _∨_ (P Q : Set) : Set where
-  inl : P → P ∨ Q
-  inr : Q → P ∨ Q
+  inl  : P  → P ∨ Q
+  inr  : Q  → P ∨ Q
 \end{code}
 The two constructors mean that to construct an element of |P ∨ Q| we need either an element of |P| or of |Q|.
 
 For implication, one simply uses functions, |P → Q|,
-because implication in constructive logic means a method for converting a proof of |P| to a proof of |Q|¸ and this is exactly what a function is. 
+because implication in constructive logic means a method for converting a proof of |P| to a proof of |Q|, and this is exactly what a function is. 
 
 The last predicate logic operation is negation. Constructively, the negation of a proposition means that the proposition implies falsity. We use the empty type to represent falsity:
 \begin{code}
@@ -93,7 +93,7 @@ data ∃ {X : Set} (P : X → Set) : Set where
 %in Agda (we introduce an anonymous function |λ x → P x|, taking |x| to |P x| using lambda notation).
 
 \subsection{Decidability}
-Finally we discuss decidable propositions. Constructively, the law of excluded middle---saying that for any proposition $P$, $P \lor \lnot P$ is true---is not valid. There is no algorithm that takes an arbitrary proposition and returns either a proof of it, or a proof that it implies $\bot$. However, there are many propositions for which it is valid. These propositions are said to be \emph{decidable}. In Agda, if |P| is a proposition, we define the proposition that |P| is decidable with the |Dec P|:
+Finally we discuss decidable propositions. Constructively, the law of excluded middle---saying that for any proposition $P$, $P \lor \lnot P$ is true---is not valid. There is no algorithm that takes an arbitrary proposition and returns either a proof of it, or a proof that it implies $\bot$. However, there are many propositions for which it is valid. These propositions are said to be \emph{decidable}. In Agda, if |P| is a proposition, we define the proposition that |P| is decidable as |Dec P|:
 \begin{code}
 data Dec (P : Set) : Set where
   yes  :    P  → Dec P
@@ -110,7 +110,7 @@ We present this function case by case. If |m| is |0|, we can construct a proof t
 \begin{code}
 0        ≤?  n  = yes z≤n
 \end{code}
-if |m| is |suc k|, we pattern match on |n|. If |n| is |0|, there is no proof of |m ≤ n|, since no constructor of |_≤_| constructs an element of type |suc k ≤ 0|. The fact that there are no such proofs is denoted by |λ ()| (we basically write an anonymous function |suc k ≤ 0 → ⊥| by pattern matching on the empty type |suc k ≤ 0|).
+if |m| is |suc k|, we pattern match on |n|. If |n| is |0|, there is no proof of |m ≤ n|, since no constructor of |_≤_| constructs an element of type |suc k ≤ 0|. The fact that there are no such proofs is denoted by |λ ()| (we basically write an anonymous function of type |(suc k ≤ 0) → ⊥| by pattern matching on the empty type |suc k ≤ 0|).
 \restorecolumns
 \begin{code}
 suc k   ≤?  0  = no (λ ())

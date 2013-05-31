@@ -18,7 +18,8 @@ record IsMonoid {M : Set}  (_≈_ : M → M → Set) (_∙_ : M → M → M)
     isEquivalence : IsEquivalence _≈_
     ∙-cong    : ∀ {x x' y y'} → x ≈ x' → y ≈ y' → (x ∙ y) ≈ (x' ∙ y')
     assoc     : Associative _≈_ _∙_
-    identity  : Identity _≈_ e _∙_ --(∀ x → (e ∙ x) ≈ x) ∧ (∀ x → (x ∙ e) ≈ x)
+    identity  : Identity _≈_ e _∙_   
+              -- |(∀ x → (e ∙ x) ≈ x) ∧ (∀ x → (x ∙ e) ≈ x)|
 \end{code}
 We add the line 
 \restorecolumns

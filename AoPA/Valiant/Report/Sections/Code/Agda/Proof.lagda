@@ -62,12 +62,12 @@ max-greatest-base  x  []         = ≤-refl
 max-greatest-base  x  (x' ∷ xs)  = max-≤₁
 
 -- the proof
-max-greatest : (xs : [ ℕ ]) → (pf : 0 < length xs) → 
-         (i : Fin (length xs)) → xs ‼ i ≤ maxL xs pf
+max-greatest :  (xs : [ ℕ ]) → (pf : 0 < length xs) → 
+                (i : Fin (length xs)) → xs ‼ i ≤ maxL xs pf
 max-greatest  []                 ()         _
 max-greatest  (x ∷ xs)           (s≤s z≤n)  f0          =  max-greatest-base x xs
 max-greatest  (x ∷ [])           (s≤s z≤n)  (fsuc ())
 max-greatest  (x ∷ (x' ∷ xs))    (s≤s z≤n)  (fsuc i)    =  ≤-trans 
-                                                           (max-greatest _ _ i)
-                                                           (max-≤₂ {x})
+                                                             (max-greatest _ _ i)
+                                                             (max-≤₂ {x})
 \end{code}

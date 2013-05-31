@@ -16,9 +16,9 @@ For convenience, we define a strictly less than relation:
 _<_ : ℕ → ℕ → Set
 m < n = suc m ≤ n
 \end{code}
-We do not need to create a new datatype using |data| for this since we can use the fact that |m < n| should be equivalent to |suc m ≤ n|. In fact, with this definition, Agda will evaluate any occurence of |m < n| to |suc m ≤ n| internally, which helps us when we write proofs. 
+We do not need to create a new datatype using |data| for this because we can use the fact that |m < n| should be equivalent to |suc m ≤ n|. In fact, with this definition, Agda will evaluate any occurence of |m < n| to |suc m ≤ n| internally, which helps us when we write proofs. 
 
-Now, we can define the type of the |maxL| function. First, we give the type:
+Now, we can define the type of the |maxL| function:
 \begin{code}
 maxL : (xs : [ ℕ ]) → (0 < length xs) → ℕ
 \end{code}
@@ -35,8 +35,8 @@ We also need an indexing function (to specify that |maxL xs _| is in the list), 
 \begin{code}
 index : ∀ {a} → (xs : [ a ]) → (i : ℕ) → (i < length xs) → a
 index []        i        ()
-index (x ∷ xs)  0        _         = x
-index (x ∷ xs)  (suc i)  (s≤s m≤n) = index xs i m≤n
+index (x ∷ xs)  0        _          = x
+index (x ∷ xs)  (suc i)  (s≤s m≤n)  = index xs i m≤n
 \end{code}
 Where we need the proof in the last line, to call the |index| function recursively.
 
@@ -51,7 +51,7 @@ Then, we could define |Fin| as:
 Fin : ℕ → Set
 Fin n = Σ ℕ (λ i → i < n)
 \end{spec}
-We can now use the Haskell notation |‼| for indexing:
+With |Fin n| defined we can use the Haskell notation |‼| for indexing:
 \begin{spec}
 _‼_ : ∀ {a} → (xs : [ a ]) → Fin (length xs) → a
 []         ‼  (i       , ())
@@ -86,14 +86,14 @@ These two different ways of defining things will be used later when we define up
 When we represent matrices abstractly (as functions from their indices) in Section \ref{Triangle} with the datatype |Triangle|, we do not have a nice inductive definition of them, so we have to use the pairing of a matrix and a proof that it is upper triangular.
 In Section \ref{Tri}, on the other hand, we define the datatype |Tri| of a concrete representation of upper triangular matrices which have a built in ``proof'' that the matrix is triangular. Then, we do not need to worry about the proof when defining multiplication, for example. If our definition returns a |Tri|, then the result is upper triangular.
 
-We now define the indexing function using |Fin|:
+We now define the indexing function using the inductive family |Fin|:
 %if False
 \begin{code}
 infix 10 _‼_
 \end{code}
 %endif
 \begin{code}
-_‼_ : ∀ {a} → (xs : [ a ]) → (n : Fin (length xs)) → a
+_‼_ : ∀ {a} → (xs : [ a ]) → (i : Fin (length xs)) → a
 []         ‼ ()
 (x ∷ xs)   ‼ f0       = x
 (x ∷ xs)   ‼ fsuc i   = xs ‼ i
@@ -109,7 +109,7 @@ To prove this property of the |maxL| function, we must produce an inhabitant of 
 To prove a proposition in Agda, it is important to look at the structure of the proposition. Then one needs to determine which part of the proposition one should pattern match on. To do this, it is a good idea to have a plan for the proof.
 
 \subsection{Informal proof}
-We formulate the proof informally. The main idea we use is pattern matching the index into the list, if it is $0$, we want to prove the simpler proposition that |x ≤ maxL (x ∷ xs) pf|, which we call |max-greatest-base|, because it is the base case in an induction on the index:
+We formulate the proof informally. The main idea we use is pattern matching on the index into the list. If the index is $0$, we want to prove the simpler proposition that |x ≤ maxL (x ∷ xs) pf|, which we call |max-greatest-base|, because it is the base case in an induction on the index:
 \begin{code}
 max-greatest-base : (x : ℕ) (xs : [ ℕ ]) → x ≤ maxL (x ∷ xs) (s≤s z≤n)
 \end{code}
@@ -124,7 +124,7 @@ To translate the induction case into Agda code, we need to introduce two new lem
 \begin{code}
 max-≤₂ : {m n : ℕ} → n ≤ max m n
 \end{code}
-Where the subscript |₂| refers to the fact that it is the second argument of |max| that is on the left hand side of the inequality. Then, to combine the three points, we need a way to piece together inequalities, if |i ≤ j| and |j ≤ k|, then |i ≤ k| (i.e., |_≤_| is transitive, see Section \ref{Intro-defs}):
+where the subscript |₂| refers to the fact that it is the second argument of |max| that is on the left hand side of the inequality. Then, to combine the three points, we need a way to piece together inequalities, if |i ≤ j| and |j ≤ k|, then |i ≤ k| (i.e., |_≤_| is transitive, see Section \ref{Intro-defs}):
 \begin{code}
 ≤-trans : {i j k : ℕ} → i ≤ j → j ≤ k → i ≤ k
 \end{code}
@@ -163,7 +163,7 @@ On the other hand if the first argument is |suc k|, we find a proof of |l ≤ ma
 \begin{code}
 max-≤₂  {suc k}  {suc l}   = s≤s (max-≤₂ {k})
 \end{code}
-We also prove the similar proposition, that |max| is greater than its first argument, in essentially the same way (we pattern match first on the first argument instead, and this time, Agda is able to infer the arguments of |max-≤₁| in the induction case, so we leave them out):
+We also prove the similar proposition, that |max| is greater than its first argument, in essentially the same way. We pattern match first on the first argument instead, and this time, Agda is able to infer the arguments of |max-≤₁| in the induction case, so we leave them out:
 \begin{code}
 max-≤₁ : {m n : ℕ} → m ≤ max m n
 max-≤₁  {0}       {n}        = z≤n
@@ -205,13 +205,13 @@ So using |max-≤₂|, and |≤-trans| to put things together, we finish the pro
 \restorecolumns
 \begin{code}
 max-greatest  (x ∷ (x' ∷ xs))    (s≤s z≤n)  (fsuc i)    =  ≤-trans 
-                                                           (max-greatest _ _ i)
-                                                           (max-≤₂ {x})
+                                                             (max-greatest _ _ i)
+                                                             (max-≤₂ {x})
 \end{code}
 We put the whole proof in Figure \ref{Intro-proof-figure}.
 \begin{figure}
 %include Proof.lagda
-\caption{Proof that the |max| function finds an element greater than every element in the list. \label{Intro-proof-figure}}
+\caption{Proof that the |maxL| function finds a maximal element in the list. \label{Intro-proof-figure}}
 \end{figure}
 %To end this example, we note that proving even simple (obvious) propositions in Agda takes quite a bit of work, and a lot of code, but generally not much thinking. After this extended example, we feel that we have illustrated most of the techniques that will be used later on in the report. As we wrote in the introduction to the section, we will often only give the types of the propositions, followed with the types of important lemmas and note what part of the arguments we pattern match on and in what order.
 

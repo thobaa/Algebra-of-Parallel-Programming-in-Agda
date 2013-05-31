@@ -7,7 +7,7 @@ Agda is a dependently typed functional language based on Martin-Löf type theory
 In this section, we give a short introduction to using Agda to write programs and proofs.
 
 \section{Introduction}
-That Agda is a functional programming language means that programs consist of a sequence of definitions of datatypes and functions. We begin with some general introduction to Agda in Section \ref{General-intro}, and then begin with an extended exampl in \ref{Example-start}, that we keep up for the remainder of Section \ref{Agda}, to motivate the introduction of new concepts.
+That Agda is a functional programming language means that programs consist of a sequence of definitions of datatypes and functions. We begin with some general introduction to Agda in Section \ref{General-intro}, and then begin with an extended example in \ref{Example-start}, that we keep up for the remainder of Section \ref{Agda}, to motivate the introduction of new concepts.
 \subsection{General introduction}
 \label{General-intro}
 One of the simplest datatypes we can define is the type |Bool| of truth values, consisting of the elements |True| and |False|. In Agda, we define it like this:
@@ -21,39 +21,40 @@ There are a couple of things to note about the definition:
 \item The word |data| states that we are defining a new datatype. The list of constructors follow the word |where|. 
 \item Following |data|, we give the name of the new type, |Bool|.
 \end{itemize}
-Moreover, everything has a type, and we generally need to provide the types (as opposed to languages like Haskell or ML, where it is usually possible for the compiler to infer them) and statements of the form |a : b| mean that |a| is an element of type |b|. In this case, |True| and |False| are elements of type |Bool|, while |Bool| is an element of type |Set|, the type of small types (which itself is an element of |Set₁|, which is an element of |Set₂|, and so on).
+Moreover, everything has a type, and we generally need to provide the types as opposed to languages like Haskell or ML, where it is usually possible for the compiler to infer them. Statements of the form |a : b| mean that |a| is an element of type |b|. In this case, |True| and |False| are elements of type |Bool|, while |Bool| is an element of type |Set|, the type of small types (which itself is an element of |Set₁|, which is an element of |Set₂|, and so on).
 The spacing in the above example is important. Agda allows identifiers to be almost any sequence of unicode symbols, excluding spaces and parentheses (but including unicode characters like |₁| in |Set₁|). Because of this, we need to write spaces in |Bool : Set|, because |Bool:Set| is a valid identifier. In the same spirit, there are no rules specifying that some identifiers need to begin with upper or lower case letters (as opposed to Haskell's requirement that constructors and types begin with an upper case letter and variables begin with a lower case letter). We could define a (different, but isomorphic) type |bool|:
 \begin{code}
 data bool : Set where   -- this type is not used in this report,
-  true   : bool         -- included only as an example
+  true   : bool         -- included here only as an example
   False  : bool
 \end{code}
 Note that different types can have constructors with the same name (like |False| for |Bool| and |bool|), but this can lead to some hard to understand error messages from the type checker.
 
-As an example of a function definition, we define a function |not| that takes a |Bool| and returns the other one:
+As an example of a function definition, we define a function |not| that takes one |Bool| and returns the other one:
 \begin{code}
 not : Bool → Bool    -- (1)
 not True   = False   -- (2)
 not False  = True    -- (3)
 \end{code}
-Line (1) is the type definition, |not| has type |Bool → Bool| (function from |Bool| to |Bool|). Next, we define |not|, and this is done by pattern matching. On Line (2), we state that |not| applied to |True| is |False|, and on Line (3) that |not| applied to |False| is |True|. As in Haskell, function application is written without parentheses: |f x| means |f| applied to |x|, and associates to the left: |g x y| means |(g x) y|, where |g : X → Y → Z|, and |X → Y → Z| means |X → (Y → Z)| (i.e., the arrow\;\;\;| → |\;\;\;associates to the right), so that |g x : Y → Z|.
+Line (1) is the type definition, |not| has type |Bool → Bool| (function from |Bool| to |Bool|). Next, we define |not|, and this is done by pattern matching. On Line (2), we state that |not| applied to |True| is |False|, and on Line (3) that |not| applied to |False| is |True|. As in Haskell, function application is written without parentheses: |f x| means |f| applied to |x|, and associates to the left: |g x y| means |(g x) y|, where |g : X → Y → Z|. The type |X → Y → Z| means |X → (Y → Z)| (i.e., the arrow\;\;\;| → |\;\;\;associates to the right), so that |g x : Y → Z|.
 
-Agda is a total programming language, which means that every function terminates, and a program never crashes. In particular, the following definitions are not legal Agda code. First,
+Agda is a total programming language, which means that every function terminates, and programs never crash. In particular, the following definitions are not legal Agda code. First,
 \begin{code}
 not' : Bool → Bool
 not' True = False
 \end{code}
-is illegal, since if |not'| is applied to |False|, there is no case, and the program would crash. This is fairly easy to control, roughly speaking, the system just needs to make sure that all available constructors appear in the definition. Second,
+is illegal, because if |not'| would be applied to |False| the program would crash. This is fairly easy to control: roughly speaking the system just needs to make sure that all available constructors appear in the definition. Second,
 \begin{code}
 not'' : Bool → Bool
 not'' x = not'' x
 \end{code}
-is illegal since evaluating |not'' x| would reduce it to |not'' x|, which then has to be evaluated, creating an infinite loop. This is more difficult to control, since it is well known that there is no program that can determine if an arbitrary program eventually terminates or not (the Halting problem cannot be solved \cite{Turing}). Agda sidesteps this problem by using a conservative termination-checker that only accepts a subset of terminating programs. Among other things, it requires that recursive calls are only made of subexpressions of the arguments  (see \cite{AgdaRefManTot} for a more detailed discussion of the termination checker).
+is illegal because trying to evaluate |not'' e| would reduce it to |not'' e|, which then has to be evaluated, creating an infinite loop. This is more difficult to control, since it is well known that there is no program that can determine if an arbitrary program eventually terminates or not (the Halting problem cannot be solved \cite{Turing}). Agda sidesteps this problem by using a conservative termination-checker that only accepts a subset of terminating programs. Among other things, it requires that recursive calls are only made of subexpressions of the arguments  (see \cite{AgdaRefManTot} for a more detailed discussion of the termination checker).
 
 If we only want to use a function locally, we can define an anonymous function using a |λ| expression, as in |λ x → not (not x)|. Such functions are accepted whenever a function is needed. We cannot use pattern matching to define anonymous functions. 
 
 \subsection{Starting the extended example}
 \label{Example-start}
+\todo{Two section references are undefined here}
 In this section, we will define a function that takes a list of natural numbers and returns its maximum. The return value should be greater than or equal to every element in the list. In Section \ref{Example-property}, we state this property using Agda, and finally, in Section \ref{Example-proof} we are going to prove in Agda that this property hold.
 
 The first reason for doing this is to continue our introduction to Agda, by defining more complicated functions and poining out additional features of the language (and in particular proving things with it). The second reason is that a proof in Agda can require quite a bit of boilerplate code, and hence, in later sections, we only include parts of them, and we feel that there should be a complete proof written in Agda somewhere in this thesis.
