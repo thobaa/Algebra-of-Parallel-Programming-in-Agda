@@ -1,6 +1,6 @@
 \label{Matrices}
 \label{Section:Matrices}
-In Agda, we will only define the type of a matrix over a nonassociative semiring. For simplicity, and to allow us to avoid adding the nonassociative semiring as an argument to every function and proposition, we decide to parametrize the module we place the definition of a matrix in by a nonassociative semiring, and open the nonassociative semiring, renaming things so they start with ``|R-|'' to make it clear when we are referring to the concepts in the underlying nonassociative semiring:
+In our Agda development we only define the type of a matrix over a nonassociative semiring. For simplicity, and to allow us to avoid adding the nonassociative semiring as an argument to every function and proposition, we decide to parametrize the module we place the definition of a matrix in by a nonassociative semiring, and open the nonassociative semiring, renaming things so they start with ``|R-|'' to make it clear when we are referring to the concepts in the underlying nonassociative semiring:
 \begin{spec}
 module Matrix (NaSr : NonassociativeSemiring) where
 open NonassociativeSemiring NaSr 
@@ -29,11 +29,11 @@ infix 4 _M≈_
 open NonassociativeSemiring NaSr public renaming (_+_ to _R+_; _*_ to _R*_; _≈_ to _R≈_; zero to R-zero; +-comm to R+-comm; +-identity to R+-identity; refl to R-refl;  +-commutativeMonoid  to R+-CM;  +-cong      to  R+-cong)
 \end{code}
 %endif
-If we did not open the record, then instead of for example |a R+ b| for adding |a| to |b|, we would have to write the much less readable
+If we had not opened the record, then instead of |a R+ b| for adding |a| to |b|, we would have to write the much less readable
 \begin{spec}
 (NonassociativeSemiring._+_ NaSr) a b
 \end{spec}
-Now we define our matrix type in Agda by giving a name to the type of functions |Fin m| to Fin
+Now we define our matrix type in Agda:
 \begin{code}
 Matrix : ℕ → ℕ → Set
 Matrix m n = Fin m → Fin n → R

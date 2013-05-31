@@ -166,21 +166,6 @@ We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The e
   \begin{subfigure}[b]{0.4\textwidth}
     \centering
     \begin{tikzpicture}
-      \matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}] (a) {
-        \tc{U_U} & \rc{U_R} & A   & B   \\
-           & \tc{U_L} & C   & D   \\
-           &    & \tc{L_U} & \rc{L_R} \\
-           &    &    & \tc{L_L} \\
-      };
-      \draw (a-2-2.north west) -- (a-2-2.south east) -- (a-2-2.north east) -- cycle;
-      \draw (a-3-3.north west) -- (a-3-3.south east) -- (a-3-3.north east) -- cycle;
-      \draw (a-2-3.north west) -- (a-2-3.south west) -- (a-2-3.south east) -- (a-2-3.north east) -- cycle;
-    \end{tikzpicture}
-    \subcaption{Computation of $\rc{C}$.}
-  \end{subfigure}
-  \begin{subfigure}[b]{0.4\textwidth}
-    \centering
-    \begin{tikzpicture}
       \matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}, left of = a-1-4] (m) {
         \tc{U_U} & \rc{U_R} & A   & B   \\
         & \tc{U_L} & \rc{C}   & D   \\
@@ -195,25 +180,6 @@ We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The e
       \draw (m-2-3.center) circle (3.5*1.4142mm);
     \end{tikzpicture}
     \subcaption{Computation of $\rc{A}$.}
-  \end{subfigure}
-
-  \begin{subfigure}[b]{0.4\textwidth}
-    \centering
-\begin{tikzpicture}
-\matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}] (m) {
-\tc{U_U} & \rc{U_R} & A   & B   \\
-    & \tc{U_L} & \rc{C}   & D   \\
-    &     & \tc{L_U} & \rc{L_R} \\
-    &     &     & \tc{L_L} \\
-};
-\draw (m-2-2.north west) -- (m-2-2.south east) -- (m-2-2.north east) -- cycle;
-\draw (m-4-4.north west) -- (m-4-4.south east) -- (m-4-4.north east) -- cycle;
-\draw (m-2-4.north west) -- (m-2-4.south west) -- (m-2-4.south east) -- (m-2-4.north east) -- cycle;
-\draw [->] (m-2-3.south east) -- (m-3-4.north west);
-\draw (m-3-4.center) circle (3.5*1.4142mm);
-\draw (m-2-3.center) circle (3.5*1.4142mm);
-\end{tikzpicture}
-    \subcaption{Computation of $\rc{D}$.}
   \end{subfigure}
   \begin{subfigure}[b]{0.4\textwidth}
     \centering
@@ -235,6 +201,40 @@ We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The e
 \draw (n-2-4.center) circle (3.5*1.4142mm);
 \end{tikzpicture}
     \subcaption{Computation of $\rc{B}$.}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{0.4\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}] (a) {
+        \tc{U_U} & \rc{U_R} & A   & B   \\
+           & \tc{U_L} & C   & D   \\
+           &    & \tc{L_U} & \rc{L_R} \\
+           &    &    & \tc{L_L} \\
+      };
+      \draw (a-2-2.north west) -- (a-2-2.south east) -- (a-2-2.north east) -- cycle;
+      \draw (a-3-3.north west) -- (a-3-3.south east) -- (a-3-3.north east) -- cycle;
+      \draw (a-2-3.north west) -- (a-2-3.south west) -- (a-2-3.south east) -- (a-2-3.north east) -- cycle;
+    \end{tikzpicture}
+    \subcaption{Computation of $\rc{C}$.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\textwidth}
+    \centering
+\begin{tikzpicture}
+\matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}] (m) {
+\tc{U_U} & \rc{U_R} & A   & B   \\
+    & \tc{U_L} & \rc{C}   & D   \\
+    &     & \tc{L_U} & \rc{L_R} \\
+    &     &     & \tc{L_L} \\
+};
+\draw (m-2-2.north west) -- (m-2-2.south east) -- (m-2-2.north east) -- cycle;
+\draw (m-4-4.north west) -- (m-4-4.south east) -- (m-4-4.north east) -- cycle;
+\draw (m-2-4.north west) -- (m-2-4.south west) -- (m-2-4.south east) -- (m-2-4.north east) -- cycle;
+\draw [->] (m-2-3.south east) -- (m-3-4.north west);
+\draw (m-3-4.center) circle (3.5*1.4142mm);
+\draw (m-2-3.center) circle (3.5*1.4142mm);
+\end{tikzpicture}
+    \subcaption{Computation of $\rc{D}$.}
   \end{subfigure}
 \caption{Illustration of the overlap step.\label{Fig:Overlap4} Overlap is called on the two triangles and the square to which we add any circled parts, multiplied according to the arrows.}
 \end{figure}

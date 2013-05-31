@@ -48,5 +48,5 @@ _M*_ : {m n p : ℕ} → Matrix m n → Matrix n p → Matrix m p
          col : {m n : ℕ} → Fin n → Matrix m n → Vector m
          col j B = λ k → B k j
 \end{code}
-Here, Agda helps us in making sure that the definition is correct. If we start from the fact that the product of a $m \times n$ matrix and an $n \times p$ matrix is an $m \times p$ matrix, Agda more or less makes sure that our vectors are row vectors for |A| and column vectors for |B|.
+Here, Agda helps us in making sure that the definition is correct. If we start from the fact that the product of a $m \times n$ matrix and an $n \times p$ matrix is an $m \times p$ matrix, Agda more or less makes sure that our vectors are row vectors for |A| and column vectors for~|B|.
 Alternatively, if we by writing down the formula \eqref{Matrix-mul} as the definition, Agda forces |A| to have as many rows as |B| has columns.

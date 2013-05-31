@@ -7,11 +7,11 @@
 \label{Parsing}
 Parsing is about analysing the structure of a sequence of tokens coming from some alphabet. We only give a brief overview of it here.
 We begin by introducing some concepts of parsing in Section \ref{Parsing-Defs}. Then, in Section \ref{Parsing-Algebra}, we tie these concept together with the algebra from Section \ref{Section:Algebra}, and finally, in Section \ref{Valiant's-spec}, we show that parsing is equivalent to computing the transitive closure of an upper triangular matrix.
-In Section \ref{Valiant}, we then focus on a particular algorithm for computing the transitive closure, Valiant's algorithm, that we implement and prove correct using Agda.
+In Section~\ref{Valiant}, we then focus on a particular algorithm for computing the transitive closure, Valiant's algorithm, that we implement and prove correct using Agda.
 
 \section{Definitions}
 The goal of parsing is first to decide if a given sequence of tokens belongs to a given language, and second to describe its structure within the language.
-For this, we consider process opposite to parsing: generating a string in a given language. To do this, one uses a grammar for the language, which contains rules that can be used to build strings belonging to the language.
+For this, we consider the process opposite to parsing: generating a string in a given language. To do this, one uses a grammar for the language, which contains rules that can be used to build all strings in the language.
 %\subsection{Definitions}
 \label{Parsing-Defs}
 Here, we define concepts relevant to our thesis.
@@ -114,7 +114,7 @@ In the remainder of the report, we only consider grammars in Chomsky Normal Form
     \item$T_+ \to +$
     \item$T_* \to *$
     \item$T_( \to ($
-    \item$T_) \to )$
+    \item$T_) \to {)}$
     \end{enumerate}
 %    \begin{tabular}{l r c l}
 %    1.  &$E$  & $ \to$ & $TX \mid TY \mid T_( \mid i$\\
@@ -152,7 +152,7 @@ In this section, we find a specification for the problem of parsing a string wit
 %In this section, we reformulate the parsing problem for a grammar in CNF form as the problem of finding the transitive closure of an upper triangle matrix.
 %Valiant showed this when defining his algorithm in \cite{Valiant}, but he uses a different specification of the transitive closure, which is  less suitable for proofs in Agda.
 
-One approach to parsing a string $w$ of length $n$ is to form a matrix $X$ containing the sets of all non-terminals that generate a substring: if we define $w[i,j)$ to be the substring starting at the $i$th symbol in $w$ and ending at the $(j-1)$st, we let $X_{i j}$ be the set of all nonterminals generating of $w[i,j)$. The matrix formed this way is upper triangular since if $j \le i$, $X_{i j}$ is the set of all parses of an empty string.
+One approach to parsing a string $w$ of length $n$ is to form a matrix $X$ containing the sets of all non-terminals that generate a substring: if we define $w[i,j)$ to be the substring starting at the $i$th symbol in $w$ and ending at the $(j-1)$st, we let $X_{i j}$ be the set of all nonterminals generating $w[i,j)$. The matrix formed this way is upper triangular since if $j \le i$, $X_{i j}$ is the set of all parses of an empty string.
 
 Now, if we consider what nonterminals should be in the set $X_{i j}$, we note that:
 \begin{itemize}
@@ -187,7 +187,7 @@ In \citep{Valiant}, the following definition of the transitive closure of a matr
     \nap{C}{1} = C \quad \text{and} \quad \nap{C}{n} = \sum_{i = 1}^{n - 1}\nap{C}{i}\nap{C}{n - i}.
   \end{equation*}
 \end{Definition}
-The sum in \eqref{VSpec} is actually finite, because as we mentioned in the end of Section \ref{Triangular-matrices}, any product of at least $n -1$ upper triangular matrices equals the zero matrix. Hence, if we show that $X$ defined in \eqref{TC} and $C^+$ defined in \eqref{VSpec} are equal, we can use \eqref{VSpec} to compute it, and it must be unique.
+The sum in \eqref{VSpec} is actually finite, because as we mentioned in the end of Section \ref{Triangular-matrices}, any product of at least $n -1$ upper triangular matrices equals the zero matrix. Hence, if we show that $X$ defined in \eqref{TC} and $C^+$ defined in \eqref{VSpec} are equal, we could use \eqref{VSpec} to compute it, and it must therefore be unique.
  \begin{Proposition}
    The two equations \eqref{TC} and \eqref{VSpec} are equivalent: If $C$ is upper triangular, then $X$ is upper triangular and satisfies
    \begin{equation}
@@ -212,7 +212,7 @@ The sum in \eqref{VSpec} is actually finite, because as we mentioned in the end 
    \begin{equation*}
      \sum_{k = 2}^{n-1}\sum_{l = 1}^{k-1}\nap{C}{l}\nap{C}{k-l} = \sum_{k = 2}^{n-1}\nap{C}{k},
    \end{equation*}
-   and so, $XX + C = \sum_{k = 1}^{n-1}\nap{C}{k} = X$, and clearly.
+   and so, $XX + C = \sum_{k = 1}^{n-1}\nap{C}{k} = X$.
 
    Next, we assume that $X$ is upper triangular and satisfies 
    \begin{equation*}
@@ -232,7 +232,7 @@ The sum in \eqref{VSpec} is actually finite, because as we mentioned in the end 
    \end{enumerate}
    From these facts, we can deduce that $X = \sum_{i = 1}^{n-1}\nap{C}{i}$: By \ref{1} and \ref{2}, there is a $R_k$ that contains all products $\nap{C}{i}\nap{C}{j}$ with $i < n - 1$, $j < n - 1$, and hence contains the sum $\sum_{i = 2}^{n-1}\nap{C}{i}$. By definition, it also contains $C$, so it contains $\sum_{i = 1}^{n-1}\nap{C}{i}$. Thus, (for example) $R_{k + n}$ also contains the whole sum. Since any term in $R_{k + n}$ involving $X$ contains at least $k + n + 1$ factors by \ref{4}, those terms are zero. So any other terms in $R_{k + n}$ are products of $C$s only. But any such term would either be a product of more than $n-1$  $C$s, and hence equal to zero, or a product of at most $n-1$ $C$s, and hence nonexistent since by \ref{3} there are no duplicates, and the term is in the sum $\sum_{i = 1}^{n-1}\nap{C}{i}$, so $X = R_{k + n} = \sum_{i = 1}^{n-1}\nap{C}{i}$.
 
-We prove \ref{2} by induction on $i + j$. If $i+j = 2$, we get the statement that $CC$ is a term in every $R_k$, $k \ge 2$ (since it is a term in $R_2$) , but this is clearly true, since $R_{k - 1} = Y + C$, so that $R_{k} = (Y + C)(Y + C) + C = YY + YC + CY + CC + C$. If $i + j = n + 1$, and $\nap{C}{i}\nap{C}{j}$ is a term in $R_{k}$ for some $k \ge 2$, then from the definition of $R_k$, $\nap{C}{i}$ and $\nap{C}{j}$ are terms in $R_{k-1}$, and hence are terms in every $R_l$, $l \ge k-1$ by induction (since each of $\nap{C}{i}$ and $\nap{C}{j}$ are either equal to $C$ and hence a term in every $R_l$, or a sum of $\nap{C}{i'}{j'}$, with $i' + j' = i$ or $j$ which is at most $n$).
+We prove \ref{2} by induction on $i + j$. If $i+j = 2$, we get the statement that $CC$ is a term in every $R_k$, $k \ge 2$ (since it is a term in $R_2$), and this is clearly true, since $R_{k - 1} = Y + C$, so that $R_{k} = (Y + C)(Y + C) + C = YY + YC + CY + CC + C$. If $i + j = n + 1$, and $\nap{C}{i}\nap{C}{j}$ is a term in $R_{k}$ for some $k \ge 2$, then from the definition of $R_k$, $\nap{C}{i}$ and $\nap{C}{j}$ are terms in $R_{k-1}$, and hence are terms in every $R_l$, $l \ge k-1$ by induction (since each of $\nap{C}{i}$ and $\nap{C}{j}$ are either equal to $C$ and hence a term in every $R_l$, or a sum of $\nap{C}{i'}{j'}$, with $i' + j' = i$ or $j$ which is at most $n$).
 
 Next, we prove \ref{1}, again by induction on $i + j$. If $i + j = 2$, then $\nap{C}{i}\nap{C}{j} = CC$, which is a term in $R_2$. If $i + j = n + 1$, then there are $k_i$ and $k_j$ such that $\nap{C}{i}$ and $\nap{C}{j}$ are terms of $R_{k_i}$ and $R_{k_j}$ respectively (if $i$ or $j$ is $1$, then $R_1$ will do, otherwise we use induction, since $i$ and $j \le n$). Then if we let $k = \max(k_i,k_j)$, by \ref{2}, $R_k$ contains both, and hence, $R_{k+1}$ contains their product. 
 

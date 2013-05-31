@@ -16,8 +16,8 @@ open Algebra.MatrixOperations NaSr
 %endif
 We begin to prove that they form a commutative monoid. This is done by giving an element |M+-isCommutativeMonoid| of type 
 \begin{code}
-M+-isCommutativeMonoid :  ∀ {m n} → IsCommutativeMonoid 
-                          (_M≈_ {m} {n}) _M+_ zeroMatrix
+M+-isCommutativeMonoid :  ∀ {m n} → 
+  IsCommutativeMonoid  (_M≈_ {m} {n}) _M+_ zeroMatrix
 \end{code}
 We need to supply the implicit arguments to |_M≈_| to make Agda understand what size of matrices the proposition concerns.
 To define this element, we need to give a proof that it is a monoid, and a proof that it is commutative. Here, we only include the proof of the |comm|-axiom, the proofs involved in proving |isMonoid| are similar to it. The proof should be an element of type
@@ -76,8 +76,8 @@ M+-isCommutativeMonoid = record { isMonoid = cheat0; comm = M+-comm }
 
 To prove that the square matrices form a nonassociative semiring, we need to give an element |M-isNonassociativeSemiring| of type
 \begin{code}
-M-isNonassociativeSemiring : ∀ {n} → IsNonassociativeSemiring 
-                             (_M≈_ {n}) (_M+_) _M*_ zeroMatrix
+M-isNonassociativeSemiring : ∀ {n} → 
+  IsNonassociativeSemiring (_M≈_ {n}) (_M+_) _M*_ zeroMatrix
 \end{code}
 which includes giving proofs that matrices with addition form a commutative monoid, along with proofs that matrix multiplication respects matrix equality and distributes over matrix addition, and that |zeroMatrix| is a zero element. The last part consists of two conjuncts. We prove the left one here.
 
@@ -95,7 +95,7 @@ where
 zeroVector : {n : ℕ} → Vector n
 zeroVector _ = R0
 \end{code}
-We prove that |zeroVector ∙ v ≈ R0| for any |v| by induction on the lenght. The only interesting fact that appears is that the type of |∙-zero {suc n} {v}| reduces to 
+We prove that |zeroVector ∙ v ≈ R0| for any |v| by induction on the length. The only interesting fact that appears is that the type of |∙-zero {suc n} {v}| reduces to 
 \begin{spec}
 (R0 R* head v) R+ (zeroVector ∙ tail v) R≈ R0
 \end{spec}
@@ -127,7 +127,7 @@ Then we define
 M-zeroˡ {n} x i j = ∙-zero {n}
 \end{code}
 
-Finally, we give a name to the matrix nonassociative semiring, so we can supply it as an element of type |NonassociativeSemiring| (of course, we do the same with commutative monoid):
+Finally, we give a name to the matrix nonassociative semiring, so we can supply it as an element of type |NonassociativeSemiring| (we do the same with commutative monoid):
 \begin{code}
 M-nonassociativeSemiring : ∀ {n} → NonassociativeSemiring
 M-nonassociativeSemiring {n} = record {

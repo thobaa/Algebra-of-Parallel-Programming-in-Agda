@@ -11,9 +11,9 @@ module Algebra.NANRing where
 In Agda, we begin by defining the proposition that something is a nonassociative semiring, with operations |_+_| and |_*_| and additive identity |R0|. We open the |IsCommutativeMonoid| record for |_+_|, and prefix the ones referring to addition with |+-|.
 \savecolumns
 \begin{code}
-record IsNonassociativeSemiring  {R : Set} (_≈_ : R → R → Set) 
-                                           (_+_ _*_ : R → R → R) 
-                                           (R0 : R) : Set₁ where
+record IsNonassociativeSemiring  {R : Set}  (_≈_ : R → R → Set) 
+                                            (_+_ _*_ : R → R → R) 
+                                            (R0 : R) : Set₁ where
   field
     *-cong       :  ∀ {x x' y y'} → x ≈ x' → y ≈ y' → (x * y) ≈ (x' * y')
 

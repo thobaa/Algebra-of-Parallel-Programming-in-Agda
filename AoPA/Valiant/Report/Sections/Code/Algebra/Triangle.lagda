@@ -77,7 +77,7 @@ _T≈_ : {n : ℕ} → Triangle n → Triangle n → Set
 A T≈ B = Triangle.mat A M≈ Triangle.mat B
 \end{code}
 
-Next, we go on to define addition and multiplication of triangles. We apply the matrix operations to the |mat| fields and modify the |tri| proofs appropriately. For addition, the proof modification is straightforward (although there is an extra |R0| that we take care of with |e'∙e''≈e|):
+Next, we go on to define addition and multiplication of triangles. We apply the matrix operations to the |mat| fields and modify the |tri| proofs appropriately. For addition, the proof modification is straightforward (we take care of the |R0 R+ R0| with |e'∙e''≈e|):
 \begin{code}
 _T+_ : {n : ℕ} → Triangle n → Triangle n → Triangle n
 A T+ B = record 
@@ -87,7 +87,7 @@ A T+ B = record
   }
 \end{code}
 
-For multiplication, the proof modification required is a bit more complicated, and requires a lemma related to dot-products. We will prove first that the dot product of two vectors $u$ and $v$ is zero if for every $i$, either the $i$th component of $u$ or the $i$th component of $v$ is zero. To do this, we need a further (short) lemma that the product of two elements, one of which is zero is zero. We include the case where the first element is zero:
+For multiplication, the proof modification required is a bit more complicated, and requires a lemma related to dot-products. We first prove that the dot product of two vectors $u$ and $v$ is zero if for every $i$, either the $i$th component of $u$ or the $i$th component of $v$ is zero. To do this, we need a further (short) lemma that the product of two elements, one of which is zero is zero. We include the case where the first element is zero:
 \begin{code}
 r*s-zero : (r s : R) → (r R≈ R0) ∨ (s R≈ R0) → r R* s R≈ R0
 r*s-zero r s (inj₁ r≈0) = begin 
@@ -156,8 +156,8 @@ Now, we combine these to give the proof of triangularity for |A T* B|.
 _T*_ : {n : ℕ} → Triangle n → Triangle n → Triangle n
 A T* B = record 
   { mat = Triangle.mat A M* Triangle.mat B
-  ; tri = λ i j j≤i → u∙v-zero  (row i (Triangle.mat A)) 
-                                (col j (Triangle.mat B)) 
+  ; tri = λ i j j≤i → u∙v-zero  (row  i  (Triangle.mat A)) 
+                                (col  j  (Triangle.mat B)) 
                                 (one0-mat A B i j j≤i) 
   }
 \end{code}
