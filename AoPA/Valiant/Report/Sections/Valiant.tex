@@ -101,7 +101,7 @@ We subdivide $\tc{U}$ and $\tc{L}$ along the same rows and columns:
   %\bordermatrix{&i&j\cr
   %i&  \tc{U_U} & \rc{U_R} \cr&i
   %j& \zeromatrix   & \tc{U_L}
-  %}
+  % }
   %\begin{pmatrix}
   %  \tc{U_U} & \rc{U_R} \\
   %  \zeromatrix   & \tc{U_L}
@@ -118,7 +118,7 @@ We subdivide $\tc{U}$ and $\tc{L}$ along the same rows and columns:
 %\bordermatrix{&k&l \cr
  %   k&\tc{L_U} & \rc{L_R} \cr
   %  l&\zeromatrix   & \tc{L_L}
-  %}
+  % }
   %\begin{pmatrix}
   %  \tc{L_U} & \rc{L_R} \\
   %  \zeromatrix   & \tc{L_L}
@@ -161,7 +161,6 @@ The third equation states that  $\rc{C}$ satisfies the overlap specification wit
 statest that $\rc{A}$ satisfies it with $\tc{U} = \tc{U_U}$, $\tc{L} = \tc{L_U}$, $R = \rc{U_R}\rc{C} + A$. Similarily for the second and fourth equations.
 
 We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The equations for $\rc{A}$ and $\rc{D}$ in turn both contain $\rc{C}$, while $\rc{C}$ does not contain any of the other parts. So we can compute them recursively, starting with $\rc{C}$, and then computing $\rc{A}$ and $\rc{D}$, finishing with $\rc{B}$. We illustrate the recursion paths in Figure \ref{Fig:Overlap4}.
-\todo{make the circles tighter like in the example with |U_R| in fig.1}
 \begin{figure}
   \centering
   \begin{subfigure}[b]{0.4\textwidth}
@@ -176,7 +175,7 @@ We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The e
       \draw (m-1-1.north west) -- (m-1-1.south east) -- (m-1-1.north east) -- cycle;
       \draw (m-3-3.north west) -- (m-3-3.south east) -- (m-3-3.north east) -- cycle;
       \draw (m-1-3.north west) -- (m-1-3.south west) -- (m-1-3.south east) -- (m-1-3.north east) -- cycle;
-      \draw[->] (m-1-2.south east) -- (m-2-3.north west);
+      \draw[->, thick] (m-1-2) -- (m-2-3);
       
       %\draw (m-2-3.center) circle (3.5mm);
     \end{tikzpicture}
@@ -194,8 +193,8 @@ We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The e
 \draw (n-1-1.north west) -- (n-1-1.south east) -- (n-1-1.north east) -- cycle;
 \draw (n-4-4.north west) -- (n-4-4.south east) -- (n-4-4.north east) -- cycle;
 \draw (n-1-4.north west) -- (n-1-4.south west) -- (n-1-4.south east) -- (n-1-4.north east) -- cycle;
-\draw [->] (n-1-2.south) -- (n-2-4.west);
-\draw [->] (n-1-3.south) -- (n-3-4.west);
+\draw [->, thick] (n-1-2) -- (n-2-4);
+\draw [->, thick] (n-1-3) -- (n-3-4);
 %\draw (n-1-3.center) circle (3.5*1.4142mm);
 %\draw (n-3-4.center) circle (3.5*1.4142mm);
 %\draw (n-1-2.center) circle (3.5*1.4142mm);
@@ -231,7 +230,7 @@ We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The e
 \draw (m-2-2.north west) -- (m-2-2.south east) -- (m-2-2.north east) -- cycle;
 \draw (m-4-4.north west) -- (m-4-4.south east) -- (m-4-4.north east) -- cycle;
 \draw (m-2-4.north west) -- (m-2-4.south west) -- (m-2-4.south east) -- (m-2-4.north east) -- cycle;
-\draw [->] (m-2-3.south east) -- (m-3-4.north west);
+\draw [->, thick] (m-2-3) -- (m-3-4);
 %draw (m-3-4.center) circle (3.5*1.4142mm);
 %draw (m-2-3.center) circle (3.5*1.4142mm);
 \end{tikzpicture}
