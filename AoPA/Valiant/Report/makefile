@@ -3,6 +3,13 @@ all:
 #	#C.pdf
 	pdflatex C.tex
 
+ref:	
+	lhs2TeX --agda -o C.tex Report.tex
+	pdflatex C.tex
+	bibtex C
+	pdflatex C.tex
+	pdflatex C.tex
+
 C.pdf: C.tex
 #	pdflatex C.tex
 	latexmk -pdf C.tex

@@ -8,7 +8,7 @@ open import Data.Product using () renaming (_×_ to _∧_)
 module Algebra.NANRing where
 \end{code}
 %endif
-\todo{$*$-sign should be uniform.} In Agda, we begin by defining the proposition that something is a nonassociative semiring, with operations |_+_| and |_*_| and additive identity |R0|. We open the |IsCommutativeMonoid| record for |_+_|, and prefix the ones referring to addition with |+-|.\todo{Note that distributive has different name in stl}
+In Agda, we begin by defining the proposition that something is a nonassociative semiring, with operations |_+_| and |_*_| and additive identity |R0|. We open the |IsCommutativeMonoid| record for |_+_|, and prefix the ones referring to addition with |+-|.
 \savecolumns
 \begin{code}
 record IsNonassociativeSemiring  {R : Set} (_≈_ : R → R → Set) 
@@ -72,4 +72,3 @@ module NS-Reasoning (ns : NonassociativeSemiring) where
   open NonassociativeSemiring ns public
   open EqR setoid public
 \end{code}
-\todo{Congruences}

@@ -6,7 +6,12 @@ module Agda.List2 where
 
 \end{code}
 %endif
-We now go back to defining the |maxL| function. First, for convenience, we define a strictly less than relation:
+We now go back to the example started in Section \ref{Example-start}.
+
+\subsection{Defining |maxL|}
+First, we define the |maxL| function.
+
+For convenience, we define a strictly less than relation:
 \begin{code}
 _<_ : ℕ → ℕ → Set
 m < n = suc m ≤ n
@@ -25,6 +30,7 @@ maxL (x ∷ (x' ∷ xs))  _ = max x (maxL (x' ∷ xs) (s≤s z≤n))
 \end{code}
 On the first line, we use the absurd pattern |()| to denote the empty case resulting from pattern matching on the proof (there are no cases when pattern matchin on an element of |1 ≤ 0|, and |()| is used to denote this, since Agda does not allow us to just leave out a case). On the second two lines, we do not care about what the input proof is (it is |s≤s z≤n| in both cases, so we write |_|, which takes the place of the variable but does not allow it to be used in the definition to signify that it is not important).
 
+\subsection{Indexing function and specification}
 We also need an indexing function (to specify that |maxL xs _| is in the list), and again, we only define it for sensible inputs (nonempty lists). The simplest definition would probably be:
 \begin{code}
 index : ∀ {a} → (xs : [ a ]) → (i : ℕ) → (i < length xs) → a
@@ -37,7 +43,7 @@ Where we need the proof in the last line, to call the |index| function recursive
 However, we can shorten the function definition by including the fact that the index is less than the length of the list by using a datatype that combines the index and the proof. This datatype is known as |Fin|, where |Fin n| contains the set of all natural numbers strictly less than |n|. One way to define |Fin| would be to use a dependent pair, which we define again to give it a syntax for types (as opposed to the ``logical'' |∃|):
 \begin{code}
 data Σ (A : Set) (B : A → Set) : Set where
-  _,_ : (x : A) → B x → Σ A B 
+  _c_ : (x : A) → B x → Σ A B 
 \end{code}
 The order these definitions should be done is, first define |Σ|, then define |A ∧ B = Σ A (λ x → B)| and |∃ P = Σ _ P|, where the underscore is used to denote the fact that the first argument of |Σ| can be infered from the type of the second.
 Then, we could define |Fin| as:
@@ -102,6 +108,7 @@ To prove this property of the |maxL| function, we must produce an inhabitant of 
 \section{Proving the correctness}
 To prove a proposition in Agda, it is important to look at the structure of the proposition. Then one needs to determine which part of the proposition one should pattern match on. To do this, it is a good idea to have a plan for the proof.
 
+\subsection{Informal proof}
 We formulate the proof informally. The main idea we use is pattern matching the index into the list, if it is $0$, we want to prove the simpler proposition that |x ≤ maxL (x ∷ xs) pf|, which we call |max-greatest-base|, because it is the base case in an induction on the index:
 \begin{code}
 max-greatest-base : (x : ℕ) (xs : [ ℕ ]) → x ≤ maxL (x ∷ xs) (s≤s z≤n)
@@ -112,6 +119,7 @@ On the other hand, if the index is $i + 1$, the list has length at least $2$, an
 \item \label{Ex.List.Induction2} The $i$th element of the tail equals the $(i + 1)$th element of the list.
 \item \label{Ex.List.Induction3} By the definition of |maxL|, we get that |maxL (x ∷ (x' ∷ xs)) pf| reduces to |max x (maxL (x' ∷ xs) pf')|, and for any |x| and |y|, we should have |y ≤ max x y|.
 \end{enumerate}
+\subsection{Lemmas}
 To translate the induction case into Agda code, we need to introduce two new lemmas. By induction, we already know that Point \ref{Ex.List.Induction1} is true. Additionally, Agda infers Point \ref{Ex.List.Induction2}, so there is nothing to prove. However, we still need to prove the second part of Point \ref{Ex.List.Induction3}:
 \begin{code}
 max-≤₂ : {m n : ℕ} → n ≤ max m n
@@ -163,6 +171,7 @@ max-≤₁  {suc k}   {0}        = ≤-refl
 max-≤₁  {suc k}   {suc l}    = s≤s max-≤₁
 \end{code}
 
+\subsection{Assembling the proof}
 Using |max-≤₁| and |≤-refl|, we are able to prove the initial step in the induction proof, |max-greatest-base|. We pattern match on |xs|. If it is |[]|, we need to show that |x ≤ x|, which we do with |≤-refl|, again:
 \savecolumns
 \begin{code}
@@ -210,7 +219,7 @@ We put the whole proof in Figure \ref{Intro-proof-figure}.
 \section{Final remarks about Agda}
 We end the section about Agda by going over a few parts of Agda that we have not mentioned but will be used in the remainder of the report. 
 
-First, Agda has Standard Library that contains most of the definitions we have made above (sometimes under slightly different names, for example, |_∧_| is called |_×_|, and in more generality---definitions are made to work for all of |Set₁|, |Set₂|, \ldots). In the remainder of the report, and in our library proving the correctness of Valiant's algorithm, we use the Standard Library definitions whenever possible.
+First, Agda has Standard Library \cite{AgdaStaLib} that contains most of the definitions we have made above (sometimes under slightly different names, for example, |_∧_| is called |_×_|, and in more generality---definitions are made to work for all of |Set₁|, |Set₂|, \ldots). In the remainder of the report, and in our library proving the correctness of Valiant's algorithm, we use the Standard Library definitions whenever possible.
 
 Our second comment is about the structure of Agda programs. Agda code is partitioned into modules, which contain a sequence of function and datatype definitions. 
 Modules can be imported, and an imported module can be opened to bring all definitions into scope in the current module. Additionally, modules can be parametrised by elements of a datatype, which basically means that all functions in the module take an extra argument of that type. To open a parametrised module, an element of the parameter type is needed. We use parametrised modules frequently in this report and in our library, starting in Section \ref{Matrices}.

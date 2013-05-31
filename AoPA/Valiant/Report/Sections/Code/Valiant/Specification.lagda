@@ -18,7 +18,7 @@ open import Algebra.Monoid
 \end{code}
 %endif
 \subsection{Implementing the algorithm}
-Using the above operations, we can now define Valiant's algorithm in Agda, following the outline in Section \ref{Valiant-summing-up}. First we define functions for the overlap part:
+Using the above operations, we can now define Valiant's algorithm in Agda, following the outline in Section \ref{Valiant-summing-up}. First we define functions for the overlap part (we introduce two new functions |overlapRow| and |overlapCol| for the cases when one dimension of the matrix is $1$):
 \begin{code}
 overlapRow : {s : Splitting} → Vec s → Tri s → Vec s
 overlapRow (one x)    zer             = one x
@@ -48,17 +48,17 @@ we use |where| definitions to avoid having to repeat code and to show that thing
 valiant : {s : Splitting} → Tri s → Tri s
 valiant zer          = zer
 valiant (tri U R L)  = tri U⁺ (overlap U⁺ R L⁺) L⁺
-  where  U⁺  = (valiant U)
-         L⁺  = (valiant L)        
+  where  U⁺  = valiant U
+         L⁺  = valiant L        
 \end{code}
-In the next section, we are going to define the specification and prove the algorithm correct.
-\subsection{Specification and Proof in Agda}
-We are now ready to express the transitive closure problem in Agda. It is a relation between two |Tri|s, that is, a function that takes two |Tri|s, |C⁺| and |C|, and returns the propostion that |C⁺| is the transitive closure of |C|, which is true if |C⁺| and |C| satisfy the specification \eqref{Equation:JPTSpec} as implemented in Agda:
+In the next section, we give a specification for the algorithm, and in Section \ref{Proof}, we prove it correct.
+\subsection{Specification in Agda}
+We are now ready to express the transitive closure problem in Agda. It is a relation between two |Tri|s, that is, a function that takes two |Tri|s, |C⁺| and |C|, and returns the propostion that |C⁺| is the transitive closure of |C|, which is true if |C⁺| and |C| satisfy the specification \eqref{TC} as implemented in Agda:
 \begin{code}
 _is-tc-of_ : {s : Splitting} → Tri s → Tri s → Set
 C⁺ is-tc-of C = C⁺ t≈ C⁺ t* C⁺ t+ C
 \end{code}
-Additionally, for use in our proof, we want to define the various sub-specifications we used, from equations \eqref{Equation:R-Specification}, \eqref{R-Spec-Row} and \eqref{R-Spec-Col}, where the first one is considered as a relation between a |Mat| and a |Tri| (the |Mat| satisfies the specification when inserting the parts of the |Tri|:
+Additionally, for use in our proof, we want to define three sub-specifications: \eqref{Equation:R-Specification} and its restriction to the case when one dimension is $1$, where the first one is considered as a relation between a |Mat| and a |Tri| (the |Mat| satisfies the specification when inserting the parts of the |Tri|):
 \begin{code}
 _is-tcMat-of_ : {s₁ s₂ : Splitting} → Mat s₁ s₂ → Tri (bin s₁ s₂) → Set
 Rˣ is-tcMat-of (tri U⁺ R L⁺) = Rˣ m≈ U⁺ tm* Rˣ m+ Rˣ mt* L⁺ m+ R
@@ -74,7 +74,9 @@ vˣ is-tcCol-of (U⁺ , v) = vˣ v≈ U⁺ tv* vˣ v+ v
 \end{code}
 
 
-\subsection{Proof}
+\subsection{The proof}
+\label{Valiant:Proof}
+\label{Proof}
 In this section, we are going to prove the correctness of Valiant's algorithm, as defined in the previous section, in words, for every splitting |s| and every upper triangular matrix |C : Tri s|, |valiant C| is the transitive closure of |C|. We begin by giving the types of the different propositions, so we can use them in an arbitrary order later. The first is the main proposition:
 \begin{code}
 v-tc    : {s : Splitting}  (C : Tri s) → (valiant C) is-tc-of C
@@ -90,28 +92,23 @@ giving an object of the first type is easy:
 v-tc zer = tt
 v-tc (tri U R L) = v-tc U , v-mat (valiant U) R (valiant L) , v-tc L
 \end{code}
-v-mat The other parts take a bit more code, but that code is for shuffling nonassociative semiring objects around and is easy to write. We include the proof of the correctness of |overlapRow| here:
+The other parts take a bit more code, but that code is for shuffling nonassociative semiring objects around and is easy to write. We include the proof of the correctness of |overlapRow| here:
 \begin{code}
 v-row (one x) zer = R-sym (proj₁ R+-identity x)
 v-row {bin s₁ s₂} (two u v) (tri U R L) = (v-row u U) , (begin 
   overlapRow (overlapRow u U vm* R v+ v) L 
     ≈⟨ v-row (overlapRow u U vm* R v+ v) L ⟩ 
-  overlapRow (overlapRow u U vm* R v+ v) L vt* L v+ 
-  (overlapRow u U vm* R v+ v)
-    ≈⟨ refl ⟩
-  v₁ v+ (v₂ v+ v₃) 
+  v₁ v+ (v₂ v+ v) 
     ≈⟨ sym (assoc v₁ v₂ v₃) ⟩
-  (v₁ v+ v₂) v+ v₃
+  (v₁ v+ v₂) v+ v
     ≈⟨ ∙-cong (comm v₁ v₂) refl ⟩
-  (v₂ v+ v₁) v+ v₃
+  (v₂ v+ v₁) v+ v
     ≈⟨ refl ⟩
   overlapRow u U vm* R v+  overlapRow  
     (overlapRow u U vm* R v+ v) L  vt* L v+ v ∎)
   where  open CM-Reasoning (Vec-commutativeMonoid {s₂})
          v₁ = overlapRow (overlapRow u U vm* R v+ v) L vt* L
-         v₂ = overlapRow u U vm* R
-         v₃ = v
-        
+         v₂ = overlapRow u U vm* R        
 \end{code}
 the other proofs are similar.
 %if False

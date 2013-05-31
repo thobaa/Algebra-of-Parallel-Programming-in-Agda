@@ -2,7 +2,7 @@
 Agda is a dependently typed functional programming language based on Martin--Löf type theory that can also be used as a proof assistant. Valiant's algorithm is a highly parallel algorithm for computing the transitive closure of a matrix in the time needed to multiply two matrices. Computing the transitive closure of an upper triangular matrix is a problem that appears when parsing a context free language.
 
 For this thesis, we use Agda to formalize enough matrix algebra to formally prove the correctness of Valiant's algorithm.
-The full formalization and proof is made up of around 3500 lines of code, partitioned into around 30 modules, all of which is available at \verb¦https://github.com/thobaa/Algebra-of-Parallel-Programming-in-Agda¦.
+The full formalization and proof is made up of around 3500 lines of code, partitioned into around 30 modules, all of which is available at \url{https://github.com/thobaa/Algebra-of-Parallel-Programming-in-Agda}.
 
 % questions to answer: what are we doing? Why are we doing it?
 %\subsection{What?}
@@ -18,7 +18,7 @@ The full formalization and proof is made up of around 3500 lines of code, partit
 % Agda!
 
 % functional program
-Parsing is used in a large number of areas, including as an eaerly step during compilation, bioinformatics and computational linguistics. \todo{either cite or expand}
+Parsing is used as an early step in a many places where it is necessary to analyse some kind of text. Examples include compilers, where source code is turned into a tree structure that contains information about the properties a segment of code has (is it a statement, an if-expression, etc.) to help with type checking and machine code generation.
 With the advent of CPUs with multiple cores, it becomes increasingly attractive to try and parse in parallel.
 Because the functions in a functional programming language lack side effects, functional languages seem suitable for writing parallel programs.
 Additionally, working in Agda allows us to write an algorithm with syntax similar to Haskell and prove its correctness simultaneously.

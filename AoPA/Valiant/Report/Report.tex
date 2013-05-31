@@ -3,7 +3,10 @@
 \usepackage{thesis}
 %\usepackage{bbm}
 \usepackage{todonotes}
-
+\usepackage{tikz}
+\usetikzlibrary{matrix}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \def\textmu{}
 \usepackage{blkarray}
@@ -50,13 +53,13 @@
 \newpage
 \pagenumbering{roman}
 \setcounter{page}{1}
-\pagestyle{fancy}
-\setspecialhdr
+%\pagestyle{fancy}
+%\setspecialhdr
 \tableofcontents
 
 % Main area
 \newpage
-\setdefaulthdr
+%\setdefaulthdr
 \pagenumbering{arabic}	
 \setcounter{page}{1}
 
@@ -69,16 +72,19 @@
 %\tableofcontents
 
 %include ./Sections/Introduction.tex
-\todo{Lambdas somewhere}
 %include ./Sections/Agda.tex
 %include ./Sections/Algebra.tex
 %include ./Sections/Parsing.tex
 %include ./Sections/Valiant.tex
 %include ./Sections/Discussion.tex
 
-\listoftodos
-\bibliography{references}
+%\listoftodos
 \bibliographystyle{plainnat}
+\cleardoublepage
+\phantomsection
+\bibliography{references}
 \addcontentsline{toc}{chapter}{\numberline{} Bibliography} % For pdf
+
+
 
 \end{document}

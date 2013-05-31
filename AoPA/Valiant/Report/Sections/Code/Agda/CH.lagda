@@ -7,7 +7,7 @@ infix 4 _≤_
 %endif
 \section{The Curry--Howard Correspondence}
 \label{CH}
-To consider proofs and propositions in Agda, and to allow functions to depend on them and their existence, we make use of the Curry--Howard correspondence: propositions as types, proofs as programs (for more detailed introduction to it, see for example \cite{Dep-types-at-work}). The Curry--Howard correspondence states that a proposition $P$ can be seen as the type containing all ``proof objects'', of $P$ (we will refer to them simply as proofs in the remainder). To prove $P$ then means to give an element of the type corresponding to $P$ (i.e., a proof of $P$).
+To consider proofs and propositions in Agda, and to allow functions to depend on them and their existence, we make use of the Curry--Howard correspondence: propositions as types, proofs as programs (for more detailed introduction to it, see for example \cite{DepTypAtWork}). The Curry--Howard correspondence states that a proposition $P$ can be seen as the type containing all ``proof objects'', of $P$ (we will refer to them simply as proofs in the remainder). To prove $P$ then means to give an element of the type corresponding to $P$ (i.e., a proof of $P$).
 
 %We identify the type of all small types |Set| with the set of all propositions.
 
@@ -37,12 +37,12 @@ To define a conjunction between two propositions |P| and |Q|, we use the pair, d
 %if False
 \begin{code}
 --infixl 1 _∧_
---infixl 1 _,_
+--infixl 1 _c_
 \end{code}
 %endif
 \begin{code}
 data _∧_ (P Q : Set) : Set where  
-  _,_ : P → Q → P ∧ Q
+  _c_ : P → Q → P ∧ Q
 \end{code}
 This coincides with the logical notion of a conjunction, which requires a proof of both conjuncts, because as seen above, to construct an element of |P ∧ Q|, one needs an element of each of |P| and |Q|.
 
@@ -84,7 +84,7 @@ Agda includes the syntax |∀ x| for |(x : _)| in type definitions (where the un
 Finally, existential quantification, $\exists x. P(x)$, which in constructive logic is interpreted to be true if there is a pair $(x_0, P x_0)$ of a witness $x_0$ along with a proof of $P (x_0)$. Like for conjunction, we use a pair. But this time, the second element of the pair depends on the first:
 \begin{code}
 data ∃ {X : Set} (P : X → Set) : Set where
-  _,_ : (x : X) → P x → ∃ P
+  _c_ : (x : X) → P x → ∃ P
 \end{code}
 %We also note that if $P$ is a sentence containing $x$, the sentence $\exists x. P(x)$ where we quantify over $x$ would be written as 
 %\begin{spec}

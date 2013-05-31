@@ -52,7 +52,7 @@ zer        t+ zer             = zer
 tri U R L  t+ tri U' R' L'    = tri (U t+ U')  (R m+ R')  (L t+ L')
 \end{code}
 For multiplication, we need to do a bit more work. The first thing to note is that if we have two matrices split into blocks, where the splitting of the columns of the first matrix equals the splitting of the rows of the second, matrix multiplication works out nicely with regard to the block structures:
-\begin{equation}
+\begin{equation*}
 \begin{pmatrix}
 A & B \\
 C & D 
@@ -66,7 +66,7 @@ C' & D'
 A A' + B C'    &    A B' + B D' \\
 C A' + D C'    &    C B' + D D'
 \end{pmatrix}.
-\end{equation}
+\end{equation*}
 We will use this formula to define multiplication for |Mat|. We will therefore not define multiplication for |Mat|s where the inner splittings are not equal---so our |Mat| multiplication is less general that arbitrary matrix multiplication, but it is all we need, and the simplicity of it is very helpful.
 
 Nevertheless, the definition takes quite a bit of work (we need to define multiplication of |Mat s₁ s₂| and an |Mat s₂ s₃|, for all cases of |s₁|, |s₂| and |s₃|, in all, $8$ different cases). The above equation takes care of the case when |s₁| |s₂| and |s₃| are all |bin| of something. To take care of the remaining cases, we should consider vector--vector multiplication (two cases, depending on whether we are multiplying a row vector by a column vector or a column vector by a row vector), vector--matrix multiplication, matrix--vector multiplication, scalar--vector multiplication, vector--scalar multiplication, and finally scalar--scalar multiplication. All of which are different, but all can be derived from the above equation, if we allow the submatrices to have $0$ as a dimension, for example, vector--matrix multiplication is given by
@@ -84,22 +84,22 @@ Nevertheless, the definition takes quite a bit of work (we need to define multip
   \end{pmatrix},
 \end{align*}
 and column vector--row vector multiplication (the outer product) is given by
-\begin{equation}
+\begin{equation*}
   \begin{pmatrix}
     u \\
     v
   \end{pmatrix}
-  (
-    u' , v'
-  ) 
+  \begin{pmatrix}
+    u & v
+  \end{pmatrix}
 = 
   \begin{pmatrix}
     uu' & uv' \\
     vu' & vv'
-  \end{pmatrix}
-\end{equation}
+  \end{pmatrix}.
+\end{equation*}
 
-We now begin defining these multiplications in Agda. There is some dependency between them, for example, to define outer product, we need both kinds of scalar--vector multiplication (although we don't need anything to define the dot product). We hence begin with the simplest kinds of multiplication, first scalar--vector mutliplication:
+We now begin defining these multiplications in Agda. There is some dependency between them, for example, to define outer product, we need both kinds of scalar--vector multiplication (although we do not need anything to define the dot product). We hence begin with the simplest kinds of multiplication, first scalar--vector mutliplication:
 \begin{code}
 _sv*_ : {s : Splitting} → R → Vec s → Vec s
 x sv* one x' = one (x R* x')
@@ -164,14 +164,14 @@ cVec v mv* one x = v vs* x
 quad A B C D mv* two u v = two (A mv* u v+ B mv* v) (C mv* u v+ D mv* v)
 \end{code}
 %endif
-Finally, using all of the above definitions, we can define matrix multiplication:
+Finally, using all of the above definitions, we can define matrix multiplication:\label{Mat-Mult}
 \begin{code}
 _m*_ : {s₁ s₂ s₃ : Splitting} → Mat s₁ s₂ → Mat s₂ s₃ → Mat s₁ s₃
 sing x          m*  sing x'           = sing  (x R* x')
 sing x          m*  rVec v            = rVec  (x sv* v)
 rVec v          m*  cVec v'           = sing  (v ∙ v')
-rVec (two u v)  m*  quad A B C D      = rVec  (two  
-           (u vm* A v+ v vm* C)  (u vm* B v+ v vm* D))
+rVec (two u v)  m*  quad A B C D      = rVec 
+  (two (u vm* A v+ v vm* C)  (u vm* B v+ v vm* D))
 cVec v          m*  sing x            = cVec  (v vs* x)
 cVec v          m*  rVec v'           = v ⊗ v'
 quad A B C D    m*  cVec (two u v)    = cVec  (two  (A mv* u v+ B mv* v) 
@@ -211,10 +211,12 @@ Using these, we can define triangle--triangle multiplication:
 \begin{code}
 _t*_ : {s : Splitting} → Tri s → Tri s → Tri s
 zer t* zer = zer
-tri U R L t* tri U' R' L' = tri (U t* U') (U tm* R' m+ R mt* L') (L t* L')
+tri U R L t* tri U' R' L' = tri (U t* U')  (U tm* R' m+ R mt* L') 
+                                           (L t* L')
 \end{code}
 
-The final part needed to express the transitive closure specification \ref{tc-spec} in Agda is a concept of equality among triangles (and for this, we need equality for matrices and vectors, as before). In all cases, we want to lift the nonassociative semiring-equality to the datatype in question. As before (see Section \ref{Algebra-Equality}), equality is a relation, it takes two objects of a datatype to a proposition (an element of |Set|). We begin with |Vec|, where one element vectors if they contain the same element, and two element vectors are equal if their left parts are equal and their right parts are equal:
+The final part needed to express the transitive closure specification \eqref{TC} in Agda is a concept of equality among triangles (and for this, we need equality for matrices and vectors, as before). In all cases, we want to lift the nonassociative semiring-equality to the datatype in question. %As before (see Section \ref{Algebra-Equality}), equality is a relation, it takes two objects of a datatype to a proposition (an element of |Set|). 
+We begin with |Vec|, where one element vectors if they contain the same element, and two element vectors are equal if their left parts are equal and their right parts are equal:
 \begin{code}
 _v≈_ : {s : Splitting} → Vec s → Vec s → Set
 one x    v≈ one x'     = x R≈ x'
@@ -228,12 +230,13 @@ _m≈_ : {s₁ s₂ : Splitting} → Mat s₁ s₂ → Mat s₁ s₂ → Set
 sing x        m≈ sing x'           = x R≈ x'
 rVec v        m≈ rVec v'           = v v≈ v'
 cVec v        m≈ cVec v'           = v v≈ v'
-quad A B C D  m≈ quad A' B' C' D'  = A m≈ A' ∧ B m≈ B' ∧ C m≈ C' ∧ D m≈ D'
+quad A B C D  m≈ quad A' B' C' D'  =  (A m≈ A') ∧ (B m≈ B') ∧ 
+                                      (C m≈ C') ∧ (D m≈ D')
 \end{code}
 and to finish this section, equality for |Tri|:
 \begin{code}
 _t≈_ : {s : Splitting} → Tri s → Tri s → Set
 zer        t≈ zer           = ⊤
-tri U R L  t≈ tri U' R' L'  = U t≈ U' ∧ R m≈ R' ∧ L t≈ L'
+tri U R L  t≈ tri U' R' L'  = (U t≈ U') ∧ (R m≈ R') ∧ (L t≈ L')
 \end{code}
 where two |zer| are always equal (|⊤| is the true proposition).

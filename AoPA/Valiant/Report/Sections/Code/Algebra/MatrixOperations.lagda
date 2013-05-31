@@ -39,7 +39,7 @@ _∙_  {suc n}  u   v = (head u R* head v) R+ (tail u ∙ tail v)
          tail    : {n : ℕ} → Vector (suc n) → Vector n
          tail v  = λ i → v (fsuc i)
 \end{code}
-With it, we define matrix multiplication (in Agda, we can't use |AB| or |A B| for matrix multiplication since juxtaposition means function application):
+With it, we define matrix multiplication (in Agda, we cannot use |AB| or |A B| for matrix multiplication since juxtaposition means function application):
 \begin{code}
 _M*_ : {m n p : ℕ} → Matrix m n → Matrix n p → Matrix m p
 (A M* B) i j = row i A ∙ col j B

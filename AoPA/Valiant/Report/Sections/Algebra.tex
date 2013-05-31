@@ -30,7 +30,7 @@ It turns out that there are three properties we want a concept of equality to ha
   \item Transitive: for $x$, $y$, $z \in X$, if $x \sim y$ and $y \sim z$, then $x \sim z$.
   \end{itemize}
 \end{Definition}
-The following proposition formalizes the way it behaves like an equality (for a proof, see for example \cite{Equivalence-proof}):
+The following proposition formalizes the way it behaves like an equality:% (for a proof, see for example \cite{Equivalence-proof}):
 \begin{Proposition}
 An equivalence relation $\sim$ partitions the elements of a set $X$ into disjoint nonempty equivalence classes (subsets $[x] = \{y \in X \st y \sim x\}$) satisfying: 
 \begin{itemize}
@@ -42,7 +42,6 @@ This means that if we use an equivalence relation as ``equality'' on a set, we a
 
 %include /Code/Algebra/Equivalence.lagda
 When a relation is an equivalence relation, we will usually denote it by $\approx$ instead of $\sim$.
-\todo{Chase down the last few underscores-- there are many in valiant!.}
 
 
 
@@ -126,7 +125,7 @@ If we do not have inverses, we cannot perform the final step (for example, if $+
 \section{Sets with one operation} % alternate title: genralizations
 \label{Set-with-one-op}
 In this section, we are going to discuss algebraic structures made up of a set and a binary operation on the set.
-\subsection{Groups}
+\subsection{Monoid-like structures}
 In mathematics, the most common such structure is the group. Many mathematical objects form groups, including the integers $\Z$, the rational numbers $\Q$, the real numbers $\R$ and the complex numbers $\C$, with addition as the binary opertaion, and the non-zero rational numbers $\Q\setminus{0}$, non-zero real numbers $\R\setminus{0}$, and non-zero complex numbers $\C\setminus{0}$, with multiplication as the binary operation. Although, groups satisfy too many axioms to be useful to us, we give the definition below, to clarify the difference between them and the perhaps less familiar structure, the monoid, that we present next.
 \begin{Definition}
 A \emph{group} is a set $G$ together with a binary operation $\cdot$ on $G$, satisfying the following:
@@ -142,8 +141,7 @@ A group where the binary operation is commutative is said to be \emph{Abelian}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% MONOIDS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Monoids}
-In this section, we discuss monoids, which are slightly more general than groups in that they do not require the existence of inverses. Monoids are important for programming because it is rare that a datatype satisfies all the axioms of a group.
+We move on to discuss monoids, which are slightly more general than groups in that they do not require the existence of inverses. Monoids are important for programming because it is rare that a datatype satisfies all the axioms of a group.
 
 Example of monoids (that are not also groups) include the natural numbers, with $\cdot$ as either multiplication or addition, sets ($M$ is a collection of sets, $\cdot$ is union and the identity element is the empty set), lists ($M$ is a collection of lists, $\cdot$ is list concatenation and the identity element is the empty list).
 
@@ -165,7 +163,7 @@ A monoid where the binary operation is commutative is a \emph{commutative monoid
 \section{Sets with two operations}
 \label{Set-with-two-op}
 In this section, we discuss algebraic structures that consist of a set together with two binary operations. As we discussed in Section \ref{two-operations}, we want them to interact sensibly.
-\subsection{Rings}
+\subsection{Ring-like structures}
 The basic example of this kind of structure is a ring:
 \begin{Definition}
 A set $R$ together with two binary operations $+$ and $*$ (called addition and multiplication) forms a \emph{ring} if:
@@ -179,7 +177,7 @@ Examples of rings include the integers, real and complex numbers with the usual 
 
 However, for the applications we have in mind, parsing, the algebraic structure in question (see Section \ref{Parsing-Algebra}) does not even have associative multiplication, and does not have inverses for addition. We still have an additive $0$ (the empty set---representing no parse), which is a zero element with regard to multiplication (if the left, say, substring has no parse, then the whole string has no parse). We also do not have a unit element for multiplication (there is no guarantee that there is a string $A$ such that $A$ followed by $X$ has the same parse as $X$ for every string $X$). The usual proof that $0$ is an absorbing element depends on the existence of the ability to cancel (which is implied by the existence of additive inverses in a group), as seen in section \ref{zero-element}. So if we are to define an algebraic structure modelling this, we need to include as an axiom that zero absorbs.
 
-There are a number of fairly standard \todo{THOMAS: Cite something} generalizations of a ring, but none of these matches our requirements. One generalization is the semiring, which has the same axioms as a ring, except that addition need not have inverses:
+There are a number of fairly standard generalizations of a ring, but none of these matches our requirements. One generalization is the semiring, which has the same axioms as a ring, except that addition need not have inverses:
 \begin{Definition}
 A set $R$ together with two binary operations $+$ and $*$ forms a \emph{semiring} if:
 \begin{itemize}
@@ -191,7 +189,7 @@ A set $R$ together with two binary operations $+$ and $*$ forms a \emph{semiring
 \end{Definition}
 Another generalization is the nonassociative ring, which instead does away with the requirement that multiplication is associative and that there is an identity element for multiplication.
 \begin{Definition}
-A set $R$ together with two binary operations $+$ and $*$ forms a \emph{non-associative ring} if:
+A set $R$ together with two binary operations $+$ and $*$ forms a \emph{non\-associative ring} if:
 \begin{itemize}
 \item It is an Abelian group with respect to $+$.
 \item It is closed under $*$.
@@ -199,8 +197,8 @@ A set $R$ together with two binary operations $+$ and $*$ forms a \emph{non-asso
 \end{itemize}
 \end{Definition}
 We take this to mean that the modifier \emph{nonassociative} removes the requirement that the set together with $*$ is a monoid from the axioms of the structure. Hence, we make the following (nonstandard) definition:
-\begin{Definition}
-A set $R$ together with two binary operations $+$ and $*$ forms a \emph{nonassociative semiring} if:
+\begin{Definition}\label{Def:NonassocSemiring}
+A set $R$ together with two binary operations $+$ and $*$ forms a \emph{non\-associative semiring} if:
 \begin{itemize}
 \item It is a commutative monoid with respect to $+$.
 \item $*$ distributes over $+$.

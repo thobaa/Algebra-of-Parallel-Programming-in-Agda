@@ -29,7 +29,7 @@ in the record to put the fields from |IsEquivalence| in scope when the |IsMonoid
 
 The set |M| is sometimes called the \emph{carrier} of the monoid (or any other structure), and the Agda Standard Library uses this name.
 
-We note that we need to include the the equality |_≈_| along with the fact that it should be an equivalence relation in the definition. We also want a proof that |∙-cong| that the operation and the equality interact nicely, if |x| and |x'| are equal and |y| and |y'| are equal, then |x ∙ y| and |x' ∙ y'| should be equal. \todo{THOMAS: should cong be mentioned in the introductory defs section? NO?}
+We note that we need to include the the equality |_≈_| along with the fact that it should be an equivalence relation in the definition. We also want a proof that |∙-cong| that the operation and the equality interact nicely, if |x| and |x'| are equal and |y| and |y'| are equal, then |x ∙ y| and |x' ∙ y'| should be equal.
 
 We can then define a record for the type |Monoid|, containing all monoids. Note that the type of |Monoid| is |Set₁|, because like |Set| itself, |Monoid| is ``too big'' to be in |Set|.
 \savecolumns
@@ -115,7 +115,7 @@ module CM-Reasoning (cm : CommutativeMonoid) where
 So that the module |CM-Reasoning| takes a commutative monoid as a parameter and brings into scope the commutative monoid axioms and the contents of the |EqReasoning| module. We often use this module locally, using a |where|-definition.
 
 As an example of equational reasoning, we prove a simple lemma with it, that if two elements in a commutative monoid are equal to the identity element, then so is their sum. We use a |let| statement in the type to open the record |CommutativeMonoid| locally and make the type more readable.
-\label{e'e''e}\todo{ALL: what is good name? |e∙e≈e|?}
+\label{e'e''e}%\todo{ALL: what is good name? |e∙e≈e|?}
 \begin{code}
 e'∙e''≈e : ∀ cm → let open CommutativeMonoid cm in 
   {e' e'' : M} → e' ≈ e → e'' ≈ e → e' ∙ e'' ≈ e
@@ -135,6 +135,6 @@ e'∙e''≈e cm e'≈e e''≈e = trans (∙-cong e'≈e e''≈e) (proj₁ identi
 \end{spec}
 where |proj₁| is the projection that takes a pair to its first element.
 
-For more complicated lemmas, or in case of many lemmas, there are automated approaches to proving equalities in commutative monoids in Agda, but they were not used for this thesis. \todo{THOMAS: perhaps good note in discussion, also give a reference}
+For more complicated lemmas, or in case of many lemmas, there are automated approaches to proving equalities in commutative monoids in Agda, but they were not used for this thesis, see for example \url{https://personal.cis.strath.ac.uk/conor.mcbride/pub/Hmm/CMon.agda}.
 %http://www.galois.com/~emertens/monoidsolver/MonoidSolver.html
 %https://personal.cis.strath.ac.uk/conor.mcbride/pub/Hmm/CMon.agda

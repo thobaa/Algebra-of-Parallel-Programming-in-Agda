@@ -19,8 +19,8 @@ open Valiant.Operations NaSr
 --open NonassociativeSemiring NaSr renaming (_+_ to _R+_; _*_ to _R*_; +-identity to R+-identity; _≈_ to _R≈_; Carrier to R)
 \end{code}
 %endif
-\subsection{Proving that they are nonassociative semiings}
-We will now prove that |Vec|, |Mat| and |Tri| are commutative monoids with |_v+_|, |_m+_| and |_t+_|, and |Tri| is a nonassociative semiring with |_t+_| and |_t*_| as defined above. One big reason for doing this is that it will make it possible to use the equational reasoning introduced in Section \ref{Algebra-reasoning}. We will prove
+\subsection{Nonassociative Semirings}
+We will now prove that |Vec|, |Mat| and |Tri| are commutative monoids with |_v+_|, |_m+_| and |_t+_|, and |Tri| is a nonassociative semiring with |_t+_| and |_t*_| as defined above. One big reason for doing this is that it will make it possible to use the equational reasoning introduced in Section \ref{Section-where-eqr-helper-is-defined}. We will prove
 \begin{spec}
 ∀ {s}      →   IsCommutativeMonoid  _v≈_  _v+_  (zeroVec {s})
 ∀ {s₁ s₂}  →   IsCommutativeMonoid  _m≈_  _m+_  (zeroMat {s₁} {s₂})
@@ -35,7 +35,7 @@ Tri-isCommutativeMonoid : {s : Splitting} → IsCommutativeMonoid _t≈_ _t+_ (z
 Tri-isNonassociativeSemiring : {s : Splitting} → IsNonassociativeSemiring _t≈_ _t+_ _t*_ (zeroTri {s})
 \end{code}
 %endif
-the reason we include the Splitting in the zero element is that we need to make Agda infer what datatype we are talking about. To prove these things is generally very easy, but requires a lot of code. The interested reader is referred to the full code at \cite{CODE}. 
+the reason we include the Splitting in the zero element is that we need to make Agda infer what datatype we are talking about. To prove these things is generally very easy, but requires a lot of code. Complete proofs are available in our library. 
 We also define instances of |CommutativeMonoid| (for |Vec|, |Mat| and |Tri|) and |NonassociativeSemiring| (for |Tri|).
 
 Proving things about addition means pushing the statements into the algebraic structure below. We examplify by proving that |zeroVec| is the left identity of |_v+_|:
@@ -87,7 +87,7 @@ t*-zeroˡ {bin s₁ s₂}  (tri U R L)  =
             (tm*-zeroˡ R) (mt*-zeroˡ {s₁} L)  ,  
   t*-zeroˡ L
 \end{code}
-where |tt| is the constructor of the true proposition (we want to prove two |zer| are equal), and
+where |tt| is the constructor of the true proposition (we want to prove that any two |zer| are equal), and
 \begin{spec}
 tm*-zeroˡ  : {s₁ s₂ : Splitting} → (x : Mat s₁ s₂) 
            → zeroTri tm* x m≈ zeroMat

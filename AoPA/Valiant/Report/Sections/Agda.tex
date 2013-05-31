@@ -1,13 +1,16 @@
 \chapter{Agda}
 \label{Agda}
-Agda is a dependently typed functional language based on Martin-Löf type theory \cite{Martin-Löf}. The implementation of the current version of Agda, Agda 2, was started by Ulf Norell as a part of his PhD \citep{NorellAgda}.
+Agda is a dependently typed functional language based on Martin-Löf type theory \citep{Martin-Lof}. The implementation of the current version of Agda, Agda 2, was started by Ulf Norell as a part of his PhD \citep{NorellAgda}.
 %That Agda is a functional language means that an Agda program consists of definitions of datatypes and (recursive) functions. %..............
 %That Agda has dependent types means that the datatypes in Agda can depend on the \emph{values} of other datatypes (which need not be known at compile time). %For example, we can define a datatype of matrices and a function that performs matrix multiplication in such a way that the typechecker %....................
 %That it is based on Martin-Löf type theory means that it %......................
 In this section, we give a short introduction to using Agda to write programs and proofs.
 
 \section{Introduction}
-That Agda is a functional programming language means that programs consist of a sequence of definitions of datatypes and functions. One of the simplest datatypes we can define is the type |Bool| of truth values, consisting of the elements |True| and |False|. In Agda, we define it like this:
+That Agda is a functional programming language means that programs consist of a sequence of definitions of datatypes and functions. We begin with some general introduction to Agda in Section \ref{General-intro}, and then begin with an extended exampl in \ref{Example-start}, that we keep up for the remainder of Section \ref{Agda}, to motivate the introduction of new concepts.
+\subsection{General introduction}
+\label{General-intro}
+One of the simplest datatypes we can define is the type |Bool| of truth values, consisting of the elements |True| and |False|. In Agda, we define it like this:
 \begin{code}
 data Bool : Set where
   True   : Bool
@@ -33,7 +36,7 @@ not : Bool → Bool    -- (1)
 not True   = False   -- (2)
 not False  = True    -- (3)
 \end{code}
-Line (1) is the type definition, |not| has type |Bool → Bool| (function from |Bool| to |Bool|). Next, we define |not|, and this is done by pattern matching. On Line (2), we state that |not| applied to |True| is |False|, and on Line (3) that |not| applied to |False| is |True|. As in Haskell, function application is written without parentheses: |f x| means |f| applied to |x|, and associates to the left: |g x y| means |(g x) y|, where |g : X → Y → Z|, and |X → Y → Z| means |X → (Y → Z)| (i.e., the arrow\;\;\;| → |\;\;\;\todo{note this arrow}associates to the right), so that |g x : Y → Z|.
+Line (1) is the type definition, |not| has type |Bool → Bool| (function from |Bool| to |Bool|). Next, we define |not|, and this is done by pattern matching. On Line (2), we state that |not| applied to |True| is |False|, and on Line (3) that |not| applied to |False| is |True|. As in Haskell, function application is written without parentheses: |f x| means |f| applied to |x|, and associates to the left: |g x y| means |(g x) y|, where |g : X → Y → Z|, and |X → Y → Z| means |X → (Y → Z)| (i.e., the arrow\;\;\;| → |\;\;\;associates to the right), so that |g x : Y → Z|.
 
 Agda is a total programming language, which means that every function terminates, and a program never crashes. In particular, the following definitions are not legal Agda code. First,
 \begin{code}
@@ -45,11 +48,13 @@ is illegal, since if |not'| is applied to |False|, there is no case, and the pro
 not'' : Bool → Bool
 not'' x = not'' x
 \end{code}
-is illegal since evaluating |not'' x| would reduce it to |not'' x|, which then has to be evaluated, creating an infinite loop. This is more difficult to control, since it is well known that there is no program that can determine if an arbitrary program eventually terminates or not (the Halting problem cannot be solved \cite{Turing}). Agda sidesteps this problem by using a conservative termination-checker that only accepts a subset of terminating programs. Among other things, it requires that recursive calls are only made of subexpressions of the arguments  (see \cite{Agda-reference-manual-totality} for a more detailed discussion of the termination checker). 
+is illegal since evaluating |not'' x| would reduce it to |not'' x|, which then has to be evaluated, creating an infinite loop. This is more difficult to control, since it is well known that there is no program that can determine if an arbitrary program eventually terminates or not (the Halting problem cannot be solved \cite{Turing}). Agda sidesteps this problem by using a conservative termination-checker that only accepts a subset of terminating programs. Among other things, it requires that recursive calls are only made of subexpressions of the arguments  (see \cite{AgdaRefManTot} for a more detailed discussion of the termination checker).
 
-\section{Beginning to write a program}
-In this section, we will define a function that takes a list of natural numbers and returns its maximum. Then we are going to state a property we expect the function to have:  The return value should be greater than every element in the list.
-Finally, we are going to prove that this property hold. All of this will be done in Agda, which means that the Agda system guarantees that our proofs are correct!
+If we only want to use a function locally, we can define an anonymous function using a |λ| expression, as in |λ x → not (not x)|. Such functions are accepted whenever a function is needed. We cannot use pattern matching to define anonymous functions. 
+
+\subsection{Starting the extended example}
+\label{Example-start}
+In this section, we will define a function that takes a list of natural numbers and returns its maximum. The return value should be greater than or equal to every element in the list. In Section \ref{Example-property}, we state this property using Agda, and finally, in Section \ref{Example-proof} we are going to prove in Agda that this property hold.
 
 The first reason for doing this is to continue our introduction to Agda, by defining more complicated functions and poining out additional features of the language (and in particular proving things with it). The second reason is that a proof in Agda can require quite a bit of boilerplate code, and hence, in later sections, we only include parts of them, and we feel that there should be a complete proof written in Agda somewhere in this thesis.
 %\subsection{Some datatypes and functions}
@@ -57,5 +62,5 @@ The first reason for doing this is to continue our introduction to Agda, by defi
 
 %include /Code/Agda/CH.lagda
 
-\section{Finishing the program}
+\section{Continuing the example}
 %include /Code/Agda/List2.lagda

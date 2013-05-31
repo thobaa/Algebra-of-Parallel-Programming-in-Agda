@@ -12,3 +12,4 @@ Distributive _≈_ _∙_ _+_ =  (∀ x y z → (x ∙ (y + z)) ≈ ((x ∙ y) + 
                             ∧ 
                             (∀ x y z → ((y + z) ∙ x) ≈ ((y ∙ x) + (z ∙ x)))
 \end{code}
+In the Agda Standard Library, the module containing the function properties is parametrised by an equivalence relation, so the properties do not need the argument |_≈_|. Instead of |Distributive|, the property is called |_DistributesOver_| in the standard library, giving it a very readable syntax.

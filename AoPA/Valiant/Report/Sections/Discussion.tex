@@ -1,12 +1,15 @@
-\chapter{Discussion}
-\section{Related work}
-\section{Future work}
-Some future work:
-Fit into Algebra of Programming (maybe).
+\chapter{Concluding remarks}
+This thesis was initially intended to put Valiant's algorithm into the Algebra of programming framework \citep{AoP}. Algebra of programming is about expressing specifications as a relation, using relational catamorphisms and the converses of catamorphisms, and then derive a function that refines the relation using universal properties of catamorphisms. We wanted to use Agda for this, because there has been some work on doing Algebra of programming derivations in Agda \citep{AoPA}, and because of the ability to implement the algorithm and prove it correct in the same language, ensuring us that we made no implementation errors. We see two main reasons for failing to do this.
 
-Points: (for introduction too)
-\begin{itemize}
-\item give a different (more natural) specification of parsing / transitive closure and prove that it is equivalent and easy to prove that valiant's (simplified) is correct 
-\item AOP (A)
-\item structure of datatypes is important. use records as a kind of interface. example with adding empty or removing sing.
-\end{itemize}
+First, 
+Valiant's algorithm is a catamorphism on the |Tri| datatype (it recurses on the two sub-triangles and then combines them), but we did not find a way to express the overlap step using ideas from resembled Algebra of programming. In part, this was because the recursion is fairly complicated (first compute the lower left part recursively, then use that result to compute the upper left and lower right parts recursively, and finally use those results to compute the upper right part). So we did not know what we were supposed to aim for in our derivation.
+
+Second, the relation we have used as specification: $X$ is the transitive closure of an upper triangular matrix $C$ if $X$ is upper triangular and satisfies $X = XX + C$, is very nice to work with mathematically. Indeed, as we saw in Section \ref{Valiant:Derivation}, by combining the specification with block matrices, the algorithm falls out immediately. However, the relation does contain a lot of hidden information: mainly the fact that  matrix multiplication is a fairly complicated function when defined on our datatypes (see Section \ref{Mat-Mult}), that we have failed to express within Algebra of programming. Hence, we have neither a starting point, nor an end point of our derivation. It might be the case that other specifications or other datatypes for matrices are more suitable to do Algebra of programming-style derivations.
+
+%There has been a lot of work on finding algorithms that perform parsing in parallel, but none except \cite{JP-PP} seem to have considered Valiant's algorithm.
+%\todo{remove above sentence (parsing) maybe}
+The algebra involved in this thesis is fairly trivial. From an algebraic point of view, the most interesting fact is perhaps that the multiplication involved in parsing (see Section \ref{Parsing-Algebra}) is an example of a ``basic'' nonassociative operation. It is not the combination of more basic operations and functions that satisfy axioms that force it to be nonassociative (as is the case with subtraction in a group, for example).
+
+Doing algebra in Agda has the advantage of making it visible where the axioms are used, and hence, whether they are needed or not. In particular, since the origin of the algebraic structure for parsing (the nonassociative semiring) is as a set with set union and a multiplication, early on, we thought that we might need the axiom that addition is idempotent ($x + x = x$ for all $x$), which holds for set union. But after writing the proof, we found that we had never used the axiom, and so we removed it from our algebraic structure.
+
+A big problem of doing algebra in Agda is that if we change the definition of some datatype slightly (for example, if we allow empty matrices, or if we decide to remove the |sing| constructor and use one element vectors instead), almost all our proofs break, and we will have to redo them. To solve this problem, we could make our programs more modular, using interface-like records for nonassociative semirings that have splittings which respect addition and multiplication (to represent the triangles and matrices)---similar to the way the algebraic structures provide an interface to the addition and multiplication. However, doing this has two drawbacks in our case. First, we would have to write almost all the code to prove that the splittings respect addition and multiplication (so we gain little from doing it). Second, using these interfaces would make it impossible to use Agda's built in pattern matching tools, which would make proof writing take longer. We are not sure whether a better solution to this exists.

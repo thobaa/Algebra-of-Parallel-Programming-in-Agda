@@ -13,10 +13,10 @@ data Vec : Splitting → Set where
   one  : R → Vec one
   two  : {s₁ s₂ : Splitting} → Vec s₁ → Vec s₂ → Vec (bin s₁ s₂)
 \end{code}
-We can note that where |Splitting| is a binary tree of elements of the unit type, |Vec| is instead a binary tree of |Carrier| (with elements in the leaves). We move on to defining |Mat| as:
+We can note that where |Splitting| is a binary tree of elements of the unit type, |Vec| is instead a binary tree of |R| (with elements in the leaves). We move on to defining |Mat| as:
 \begin{code}
 data Mat : Splitting → Splitting → Set where
-  sing : (x : R) → Mat one one
+  sing : R → Mat one one
   rVec : {s₁ s₂ : Splitting} → Vec (bin s₁ s₂) → Mat one (bin s₁ s₂)
   cVec : {s₁ s₂ : Splitting} → Vec (bin s₁ s₂) → Mat (bin s₁ s₂) one
   quad : {r₁ r₂ c₁ c₂ : Splitting} →  Mat r₁ c₁ → Mat r₁ c₂ → 

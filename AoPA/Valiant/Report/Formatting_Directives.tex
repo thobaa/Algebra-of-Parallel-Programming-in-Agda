@@ -1,6 +1,8 @@
 \newcommand{\one}[2]{\tensor{#1}{_{\!_#2}}}
-\newcommand{\two}[3]{aa#1#2#3}
+\newcommand{\two}[3]{\tensor[_{_#2\!}]{#1}{_{\!_#3}}}
 \newcommand{\onex}[2]{#1_{\!_#2}}
+\newcommand{\help}[3]{\one{#1}{#2}\!\!\Varid{-#3}}
+\newcommand{\helpt}[4]{\two{#1}{#2}{#3}\!\!\Varid{-#4}}
 
 % NO INDEX
 %format _∷_  = "\unopun{∷}"
@@ -8,7 +10,7 @@
 %format _<_   = "\unopun{<}"
 %format _∧_   = "\unopun{∧}"
 %format _c_   = "\unopun{,}"
-%format c     = "\Varid{,}"
+% format c     = "\Varid{,}"
 %format _∨_   = "\unopun{∨}"
 %format _+_   = "\unopun{+}"
 %format _∙_   = "\unopun{∙}"
@@ -19,6 +21,12 @@
 %format _⁻¹   = "\unop{⁻¹}"
 %format _≈_   = "\unopun{≈}"
 %format _*_   = "\unopun{*}"
+
+%format _is-tc-of_ = "\unopun{\Varid{is-tc-of}}"
+%format _is-tcMat-of_ = "\unopun{\Varid{is-tcMat-of}}"
+%format _is-tcRow-of_ = "\unopun{\Varid{is-tcRow-of}}"
+%format _is-tcCol-of_ = "\unopun{\Varid{is-tcCol-of}}"
+
 
 % ONE INDEX
 %format _V+_  = "\unopun{\one{+}{V}}"
@@ -52,6 +60,8 @@
 %format _tm*_  = "\unopun{\two{*}{t}{m}}"
 %format _mv*_  = "\unopun{\two{*}{m}{v}}"
 %format _vm*_  = "\unopun{\two{*}{v}{m}}"
+%format _sv*_  = "\unopun{}"
+%format _vs*_  = "\unopun{}"
 
 % \outer
 
@@ -88,13 +98,14 @@
 %format t*  = "\one{*}{t}"
 
 % TWO INDICES
-%format _vt*_  = "\two{*}{v}{t}"
-%format _tv*_  = "\two{*}{t}{v}"
-%format _mt*_  = "\two{*}{m}{t}"
-%format _tm*_  = "\two{*}{t}{m}"
-%format _mv*_  = "\two{*}{m}{v}"
-%format _vm*_  = "\two{*}{v}{m}"
-
+%format vt*  = "\two{*}{v}{t}"
+%format tv*  = "\two{*}{t}{v}"
+%format mt*  = "\two{*}{m}{t}"
+%format tm*  = "\two{*}{t}{m}"
+%format mv*  = "\two{*}{m}{v}"
+%format vm*  = "\two{*}{v}{m}"
+%format sv*  = "\two{*}{R}{v}"
+%format vs*  = "\two{*}{v}{R}"
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % OTHER STUFF
@@ -104,11 +115,18 @@
 
 
 % STUFF REFERRING TO THE ABOVE THINGS
-% format R+-cong = "\ensuremath{+_{\!_R}\!\!\Varid{-cong}}"
-% format R+-comm = "\ensuremath{+_{\!_R}\!\!\Varid{-comm}}"
-% format R+-identity = "\ensuremath{+_{\!_R}\!\!\Varid{-identity}}"
-% format R+-CM = "\ensuremath{+_{\!_R}\!\!\Varid{-CM}}"
+%format R+-cong = "\help{+}{R}{cong}"
+%format R+-comm = "\help{+}{R}{comm}"
+%format R+-identity = "\help{+}{R}{identity}"
+%format R+-CM = "\help{+}{R}{CM}"
+%format t*-zeroˡ = "\help{*}{t}{zeroˡ}"
+%format tm*-zeroˡ = "\helpt{*}{t}{m}{zeroˡ}"
+%format mt*-zeroˡ = "\helpt{*}{m}{t}{zeroˡ}"
+%format *-cong = "*\!\Varid{-cong}"
 
+
+% "\ensuremath{+_{\!_R}\!\!\Varid{-CM}}"
+% \ensuremath{\one{+}{R}\!\!\Varid{-identity}}"
 % format [_]   = "AA"
 % format "[]"    = "AA"
 
@@ -124,39 +142,8 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-% format R+ = "\mathbin{+_{\!\!_R}}"
-% format R* = "\mathbin{*_{\!\!_R}}"
-% format R≈ = "\mathbin{≈_{_R}}"
-% format v+ = "\mathbin{+_{\!_v}}"
-% format v* = "\mathbin{*_{\!\!_v}}"
-% format v≈ = "\mathbin{≈_{\!_v}}"
-% format m+ = "\tensor{+}{_m}"
-% format m* = "\tensor{*}{_m}"
-
-
-%format M* = "\tensor{*}{_{\!_M}}"
-
-
-
-
 %format _-_ = "\unopunt{-}"
 
 
-%format "yes" = "\Varid{yes}\;\;\;\;\;"
-% subst comment a  = "-- \text{ " a "}"
+% format "yes" = "\Varid{yes}\;\;\;\;\;"
 % /by thomas

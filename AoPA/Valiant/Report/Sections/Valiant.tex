@@ -3,10 +3,14 @@
 \label{Valiant}
 In \cite{Valiant}, Leslie G. Valiant gave a divide and conquer algorithm for computing the transitive closure of an upper triangular matrix to prove that context free parsing has the same time complexity as matrix multiplication. The algorithm divides a string into two parts, parses them recursively, and then puts them together through a fairly complicated procedure that requires a constant number of matrix multiplications.
 
-Since the algorithm is a divide and conquer algorithm (where the combine step is also fairly parallelizable), it could potentially be used for parsing in parallel, as suggested in \cite{JP-PP}.
+Since the algorithm is a divide and conquer algorithm (where the combine step is also fairly parallelizable), it could potentially be used for parsing in parallel, as suggested in \citep{JP-PP}.
 
-\section{The Algorithm}
-We want to compute the transitive closure of a parse chart. The main idea of the algorithm is to split the chart into two subcharts and a rectangular overlap region (containing parses of strings that overlap the corresponding splitting of the string), see Figure \ref{Figure:ParseChart}. Next, compute the transitive closures of the subcharts, and combine them (somehow) to fill in the overlap part. A chart of size $1 \times 1$ contains just one element, which is zero because it is upper triangular, and the transitive closure of this is again the zero matrix.
+\section{Derivation}
+\label{Valiant:Der}
+\label{Valiant:Derivation}
+In this section, we are going to derive Valiant's algorithm from our specification \eqref{TC}.
+\subsection{Main structure}
+We want to compute the transitive closure of a parse chart. The main idea of the algorithm is to split the chart into two subcharts and a rectangular overlap region (containing parses of strings that overlap the corresponding splitting of the string). Next, compute the transitive closures of the subcharts, and combine them (somehow) to fill in the overlap part. A chart of size $1 \times 1$ contains just one element, which is zero because it is upper triangular, and the transitive closure of this is again the zero matrix.
 
 \label{Section:Subdivision-in-Specification}
 When the chart $X$ is $n \times n$, with $n > 1$, we can write it down as a block matrix 
@@ -66,7 +70,7 @@ To compute the overlap part, we need to consider four separate cases, depending 
 
 First, if $R$ is a $1 \times 1$ matrix, in which case we must have that $\tc{U}$ and $\tc{L}$ are also $1 \times 1$ matrices, and since they are upper triangular, they both equal the zero matrix. Hence, by \eqref{Equation:R-Specification}, $\rc{R} = R$.
 
-We leave out the cases where $R$ is $1 \times n$ or $n \times 1$. They are similar to the case when $R$ is $m \times n$ with both $m$ and $n$ greater than $1$ (and could be derived from it by allowing blocks with $0$ width or height, which we discuss in Section \ref{Empty-matttt}).
+We leave out the cases where $R$ is $1 \times n$ or $n \times 1$. They are similar to the case when $R$ is $m \times n$ with both $m$ and $n$ greater than $1$ (and could be derived from it by allowing blocks with $0$ width or height, which we discuss in Section \ref{Section:Empty-Matrices}).
 
 Now, if $R$ is an $m \times n$ matrix, with $m > 1$, $n > 1$, we can subdivide $R$ along both rows and colums, into four blocks ($A$ is an $i \times k$ matrix, $B$ an $i \times l$ matrix and so on):
 \begin{equation*}
@@ -158,12 +162,85 @@ statest that $\rc{A}$ satisfies it with $\tc{U} = \tc{U_U}$, $\tc{L} = \tc{L_U}$
 
 We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The equations for $\rc{A}$ and $\rc{D}$ in turn both contain $\rc{C}$, while $\rc{C}$ does not contain any of the other parts. So we can compute them recursively, starting with $\rc{C}$, and then computing $\rc{A}$ and $\rc{D}$, finishing with $\rc{B}$. We illustrate the recursion paths in Figure \ref{Fig:Overlap4}.
 \begin{figure}
-\missingfigure{Overlap step, 4-case}
-\caption{Illustration of the recursion paths taken during the overlap step.\label{Fig:Overlap4}}
+  \centering
+  \begin{subfigure}[b]{0.4\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}] (a) {
+        \tc{U_U} & \rc{U_R} & A   & B   \\
+           & \tc{U_L} & C   & D   \\
+           &    & \tc{L_U} & \rc{L_R} \\
+           &    &    & \tc{L_L} \\
+      };
+      \draw (a-2-2.north west) -- (a-2-2.south east) -- (a-2-2.north east) -- cycle;
+      \draw (a-3-3.north west) -- (a-3-3.south east) -- (a-3-3.north east) -- cycle;
+      \draw (a-2-3.north west) -- (a-2-3.south west) -- (a-2-3.south east) -- (a-2-3.north east) -- cycle;
+    \end{tikzpicture}
+    \subcaption{Computation of $\rc{C}$.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}, left of = a-1-4] (m) {
+        \tc{U_U} & \rc{U_R} & A   & B   \\
+        & \tc{U_L} & \rc{C}   & D   \\
+        &     & \tc{L_U} & \rc{L_R} \\
+        &     &     & \tc{L_L} \\
+      };
+      \draw (m-1-1.north west) -- (m-1-1.south east) -- (m-1-1.north east) -- cycle;
+      \draw (m-3-3.north west) -- (m-3-3.south east) -- (m-3-3.north east) -- cycle;
+      \draw (m-1-3.north west) -- (m-1-3.south west) -- (m-1-3.south east) -- (m-1-3.north east) -- cycle;
+      \draw[->] (m-1-2.south east) -- (m-2-3.north west);
+      \draw (m-1-2.center) circle (3.5*1.4142mm);
+      \draw (m-2-3.center) circle (3.5*1.4142mm);
+    \end{tikzpicture}
+    \subcaption{Computation of $\rc{A}$.}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{0.4\textwidth}
+    \centering
+\begin{tikzpicture}
+\matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}] (m) {
+\tc{U_U} & \rc{U_R} & A   & B   \\
+    & \tc{U_L} & \rc{C}   & D   \\
+    &     & \tc{L_U} & \rc{L_R} \\
+    &     &     & \tc{L_L} \\
+};
+\draw (m-2-2.north west) -- (m-2-2.south east) -- (m-2-2.north east) -- cycle;
+\draw (m-4-4.north west) -- (m-4-4.south east) -- (m-4-4.north east) -- cycle;
+\draw (m-2-4.north west) -- (m-2-4.south west) -- (m-2-4.south east) -- (m-2-4.north east) -- cycle;
+\draw [->] (m-2-3.south east) -- (m-3-4.north west);
+\draw (m-3-4.center) circle (3.5*1.4142mm);
+\draw (m-2-3.center) circle (3.5*1.4142mm);
+\end{tikzpicture}
+    \subcaption{Computation of $\rc{D}$.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\textwidth}
+    \centering
+\begin{tikzpicture}
+\matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}, below of = m] (n) {
+\tc{U_U} & \rc{U_R} & \rc{A}   & B   \\
+    & \tc{U_L} & \rc{C}   & \rc{D}   \\
+    &     & \tc{L_U} & \rc{L_R} \\
+    &     &     & \tc{L_L} \\
+};
+\draw (n-1-1.north west) -- (n-1-1.south east) -- (n-1-1.north east) -- cycle;
+\draw (n-4-4.north west) -- (n-4-4.south east) -- (n-4-4.north east) -- cycle;
+\draw (n-1-4.north west) -- (n-1-4.south west) -- (n-1-4.south east) -- (n-1-4.north east) -- cycle;
+\draw [->] (n-1-2.south east) -- (n-2-4.north west);
+\draw [->] (n-1-3.south east) -- (n-3-4.north west);
+\draw (n-1-3.center) circle (3.5*1.4142mm);
+\draw (n-3-4.center) circle (3.5*1.4142mm);
+\draw (n-1-2.center) circle (3.5*1.4142mm);
+\draw (n-2-4.center) circle (3.5*1.4142mm);
+\end{tikzpicture}
+    \subcaption{Computation of $\rc{B}$.}
+  \end{subfigure}
+\caption{Illustration of the overlap step.\label{Fig:Overlap4} Overlap is called on the two triangles and the square to which we add any circled parts, multiplied according to the arrows.}
 \end{figure}
-\subsection{The Algorithm (or Valiant's Algorithm, if we rename the section)}
+\subsection{Summary of Valiant's algorithm}
 \label{Valiant-summing-up}
-Summing up, we give the algorithm for computing the transitive closure $\tc{\chart}$ of an upper triangular matrix $\chart$ here (including the cases where the rectangular part is a row or column vector):
+Summing up, we give the algorithm for computing the transitive closure $\tc{\chart}$ of an upper triangular matrix $\chart$ here (including the cases where the rectangular part is a row or column vector) as a function $\valiant(\chart)$:
 \begin{itemize}
 \item If $\chart$ has size $1 \times 1$, return $\chart$.
 \item Otherwise $\chart$ has size $n \times n$, with $n > 1$. Split $\chart$ into
@@ -176,49 +253,99 @@ Summing up, we give the algorithm for computing the transitive closure $\tc{\cha
   \end{equation*}
   and then: 
   \begin{enumerate}
-  \item Recursively compute $\tc{U}$ and $\tc{L}$.
-  \item Compute $\rc{R}$ from $\tc{U}$, $R$, and $\tc{L}$ by:
+  \item Recursively compute $\tc{U} = \valiant(U)$ and $\tc{L} = \valiant(L)$.
+  \item Compute the overlap $\rc{R}$ with a function $\overlap(\tc{U}, R, \tc{L})$ defined by:
     \begin{itemize}
-    \item If $R$ has size $1 \times 1$, $\rc{R} = R$.
-    \item If $R$ has size $n \times 1$, $n > 1$, then $\tc{L}$ is the $1\times 1$ zero matrix, split $\tc{U}$ and $R$ into
+    \item If $R$ has size $1 \times 1$, return $R$.
+    \item If $R$ has size $n \times 1$, $n > 1$, then $\tc{L}$ is the $1\times 1$ zero matrix. Split $\tc{U}$ and $R$ into
       \begin{equation*}
         \tc{U} = 
         \begin{pmatrix}
-          \tc{U_U} & \tc{U_R} \\
+          \tc{U_U} & \rc{U_R} \\
           \zm      & \tc{U_L} 
-        \end{pmatrix} \quad \text{and}\quad
+        \end{pmatrix} 
+        \quad \text{and}\quad
         R = 
         \begin{pmatrix}
           u \\
           v
         \end{pmatrix}
       \end{equation*}
-        and recursively compute $ $ from $ $ and $ $ from $ $.
-        \begin{equation*}
-          \rc{R} = \begin{pmatrix}
+        and recursively compute 
+        \begin{align*}
+          \rc{v} &= \overlap(\tc{U_L}, v, \zeromat)\\
+          \rc{u} &= \overlap(\tc{U_U}, \rc{U_R}\rc{v} + u, \zeromat).
+        \end{align*}
+        Return $\begin{pmatrix}
             \rc{u}\\
             \rc{v}
-          \end{pmatrix}
-        \end{equation*}
-        \item if  
-        \item
+          \end{pmatrix}$.
+        \item If $R$ has size $1 \times n$, $n > 1$, then $\tc{U}$ is the $1 \times 1$ zero matrix. Split $R$ and $\tc{L}$ into 
+          \begin{equation*}
+            R = 
+            \begin{pmatrix}
+              u & v
+            \end{pmatrix}
+            \quad \text{and}\quad
+            \tc{L} = 
+            \begin{pmatrix}
+              \tc{L_U} & \rc{L_R}\\
+              \zm   & \tc{L_L} 
+            \end{pmatrix}
+          \end{equation*}
+          and recursively compute 
+          \begin{align*}
+            \rc{u} &= \overlap(\zm,u,\tc{L_U})\\
+            \rc{v} &= \overlap(\zm,\rc{u}\rc{L_R} + v,\tc{L_L}).
+          \end{align*} 
+          Return $
+            \begin{pmatrix}
+              \rc{u} & \rc{v}
+            \end{pmatrix}$.
+        \item Otherwise, $R$ has size $m \times n$ with $m > 1$ and $n > 1$. Split $\tc{U}$, $R$ and $\tc{L}$ into 
+          \begin{equation*}
+            \tc{U} = 
+            \begin{pmatrix}
+              \tc{U_U} & \rc{U_R} \\
+              \zm      & \tc{U_L} 
+            \end{pmatrix}
+            \quad \text{and}\quad
+            R = 
+            \begin{pmatrix}
+              A & B \\
+              C & D
+            \end{pmatrix}
+            \quad \text{and}\quad
+            \tc{L} = 
+            \begin{pmatrix}
+              \tc{L_U} & \rc{L_R}\\
+              \zm   & \tc{L_L} 
+            \end{pmatrix}
+          \end{equation*}
+          and recursively compute 
+          \begin{align*}
+            \rc{C} &= \overlap(\tc{U_L},C,\tc{L_U}) \\
+            \rc{A} &= \overlap(\tc{U_U},\rc{U_R}\rc{C} + A,\tc{L_U}) \\
+            \rc{D} &= \overlap(\tc{U_L},\rc{C}\rc{L_R} + D,\tc{L_L}) \\
+            \rc{B} &= \overlap(\tc{U_U},\rc{U_R}\rc{D} + \rc{A}\rc{L_R} + B,\tc{L_L}).
+          \end{align*}
+         Return $
+            \begin{pmatrix}
+              \rc{A} & \rc{B} \\
+              \rc{C} & \rc{D}
+            \end{pmatrix}$.
     \end{itemize}
-    \item Return 
-      \begin{equation*}
+    \item Return $
         \begin{pmatrix}
           \tc{U} & \rc{R} \\
           \zm    & \tc{L}
-        \end{pmatrix}
-      \end{equation*}
+        \end{pmatrix}$.
   \end{enumerate}
 \end{itemize}
-
-$\overlaprow()$
-\todo{THOMAS: clear this up}
-\section{Implementation}
-In this section, we are going to implement Valiant's Algorithm in Agda.
-\subsection{Data types}
-To implement this in Agda using the |Matrix| and |Triangle| datatypes from Section \ref{Section:Triangle} would be very complicated since we would have to handle the splitting manually. Instead, we define concrete representations for the matrices and triangle that have the way we split them built in.
+\section{Datatypes}
+In this section, we are going to define datatypes to use when we implement Valiant's algorithm in \ref{Implementation}.
+\subsection{Discussion}
+To implement this in Agda using the |Matrix| and |Triangle| datatypes from Sections \ref{Section:Matrices} and \ref{Section:Triangle} would be very complicated since we would have to handle the splitting and triangularity proofs manually. Instead, we define concrete representations for the matrices and triangle that have the way we split them built in.
 We will call the datatypes we use |Mat| and |Tri| for general matrices and upper triangular matrices, respectively.
 To build the split into the data types, we give them constructors for building a large |Mat| or |Tri| from four smaller |Mat|s or two |Tri| and one |Mat| respectively. We begin with |Mat| since it is needed to define |Tri|. 
 
@@ -252,25 +379,24 @@ where $e_m$ and $e_n$ are empty $m \times 0$ and $n\times 0$ matrices respective
 where $A$ is an arbitrary $m \times n$, $n \times p$ and $m \times n$ matrix, respectively.
 Another is that it keeps the number of constructors down (three constructors for the matrix type), and this is desirable when proving things with Agda, since we generally pattern match on the structures, and this gives us a case for each constructor.
 
-One Another downside is that there are multiple constructors for matrices of the same size (there is always |empty| and a nonempty way when $m > 0$, $n > 0$), removign some of the advantage we get from having few constructors.
+One downside is that there are multiple constructors for matrices of the same size (there is always |empty| and a nonempty way when $m > 0$, $n > 0$), removing some of the advantage we get from having few constructors.
 
 Another approach, which is the one we take in this report, is to have constructors for row and column vectors, $1 \times n$ and $n \times 1$ matrices for arbitrary $n > 1$, along with the single element matrices. We define |rVec| and |cVec| to take a vector of length $n > 1$ and turn it into a $1 \times n$ or $n \times 1$ matrix respectively.
 This approach has the advantage that we can define all matrices in a simple way, and that we could potentially specialize algorithms when the input is a vector, but introduces one extra constructor (|sing|, |rVec|, |cVec| and |quad| compared to |empy|, |sing| and |quad|).
 
 We then need a concrete representation |Vec| of vectors. Since we want to be able to split vectors along the middle (to implement Valiant's algorithm in the case where $R$ is a vector), we give them a constructor |two| that takes a vector of length $m$ and one of length $n$ and concatenates them. For our base cases, we need to be able to build single element vectors, this is enough to build any vector.
 To implement this approach, we need to define the datatypes |Vec| of vectors and |Mat| of matrices (that shoud be concrete representations of |Vector| and |Matrix|).
-
+\subsection{A first attempt at an Agda implementation}
 %include Code/Valiant/NaiveCode.lagda
-
-Instead we want to use an approach for indexing our matrices where we build the splitting further into the data structures. Looking at the first attempt to define |quad|, we see that we only use constant |ℕ|s and |_+_| (we never use |suc| to increase the size of a matrix). So we could use a datatype like |ℕ|, but, instead of having |suc| as a constructor, it has |_+_|.
+\subsection{|Mat| and |Tri|}
+Instead we want to use an approach for indexing our matrices where we build the splitting further into the datatypes. Looking at the first attempt to define |quad|, we see that we only use constant |ℕ|s and |_+_| (we never use |suc| to increase the size of a matrix). So we could use a datatype like |ℕ|, but, instead of having |suc| as a constructor, it has |_+_|.
 %include Code/Valiant/Splitting.lagda
 
-Using this data type we can finally define our datatypes |Mat| and |Tri|.
+Using this datatype we can finally define our datatypes |Mat| and |Tri|.
 %include Code/Valiant/MatAndTri.lagda
 %include Code/Valiant/Operations.lagda
 %include Code/Valiant/NANRings.lagda
+\section{Implementation and proof of correctness}
+We are now ready to implement the algorithm in Agda.
+\label{Implementation}
 %include Code/Valiant/Specification.lagda
-
-
-%\section{Correctness Proof}
-%Here we prove the correctness of Valiant's Algorithm.
