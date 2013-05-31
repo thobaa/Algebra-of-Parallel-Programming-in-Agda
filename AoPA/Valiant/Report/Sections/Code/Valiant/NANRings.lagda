@@ -35,10 +35,10 @@ Tri-isCommutativeMonoid : {s : Splitting} → IsCommutativeMonoid _t≈_ _t+_ (z
 Tri-isNonassociativeSemiring : {s : Splitting} → IsNonassociativeSemiring _t≈_ _t+_ _t*_ (zeroTri {s})
 \end{code}
 %endif
-the reason we include the Splitting in the zero element is that we need to make Agda infer what datatype we are talking about. To prove these things is generally very easy, but requires a lot of code. Complete proofs are available in our library. 
+The reason we include the Splitting in the zero elements is that we need to make Agda infer what datatype we are talking about. To prove these things is generally very easy, but requires a lot of code. Complete proofs are available in our library. 
 We also define instances of |CommutativeMonoid| (for |Vec|, |Mat| and |Tri|) and |NonassociativeSemiring| (for |Tri|).
 
-Proving things about addition means pushing the statements into the algebraic structure below. We examplify by proving that |zeroVec| is the left identity of |_v+_|:
+Proving things about addition means pushing the statements into the algebraic structure below. We exemplify by proving that |zeroVec| is the left identity of |_v+_|:
 \begin{code}
 Vec-identityˡ : {s : Splitting} → (x : Vec s) → zeroVec v+ x v≈ x
 Vec-identityˡ (one x)    = proj₁ R+-identity x
@@ -82,10 +82,11 @@ postulate
 t*-zeroˡ : {s : Splitting} → (x : Tri s) → zeroTri t* x t≈ zeroTri
 t*-zeroˡ              zer          = tt
 t*-zeroˡ {bin s₁ s₂}  (tri U R L)  = 
-  t*-zeroˡ U                                  ,  
-  e'∙e''≈e  Mat-commutativeMonoid {zeroTri tm* R} {zeroMat mt* L} 
-            (tm*-zeroˡ R) (mt*-zeroˡ {s₁} L)  ,  
-  t*-zeroˡ L
+  (  t*-zeroˡ U                                  
+  ,  e'∙e''≈e  Mat-commutativeMonoid {zeroTri tm* R} {zeroMat mt* L} 
+               (tm*-zeroˡ R) (mt*-zeroˡ {s₁} L)  
+  ,  t*-zeroˡ L 
+  )
 \end{code}
 where |tt| is the constructor of the true proposition (we want to prove that any two |zer| are equal), and
 \begin{spec}

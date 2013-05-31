@@ -161,13 +161,14 @@ The third equation states that  $\rc{C}$ satisfies the overlap specification wit
 statest that $\rc{A}$ satisfies it with $\tc{U} = \tc{U_U}$, $\tc{L} = \tc{L_U}$, $R = \rc{U_R}\rc{C} + A$. Similarily for the second and fourth equations.
 
 We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The equations for $\rc{A}$ and $\rc{D}$ in turn both contain $\rc{C}$, while $\rc{C}$ does not contain any of the other parts. So we can compute them recursively, starting with $\rc{C}$, and then computing $\rc{A}$ and $\rc{D}$, finishing with $\rc{B}$. We illustrate the recursion paths in Figure \ref{Fig:Overlap4}.
+\todo{make the circles tighter like in the example with |U_R| in fig.1}
 \begin{figure}
   \centering
   \begin{subfigure}[b]{0.4\textwidth}
     \centering
     \begin{tikzpicture}
-      \matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}, left of = a-1-4] (m) {
-        \tc{U_U} & \rc{U_R} & A   & B   \\
+      \matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}] (m) {
+        \tc{U_U} & \node (m-1-2) [draw=black,shape=circle,radius=3.5mm] {\rc{U_R}}; & A   & B   \\
         & \tc{U_L} & \rc{C}   & D   \\
         &     & \tc{L_U} & \rc{L_R} \\
         &     &     & \tc{L_L} \\
@@ -176,15 +177,15 @@ We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The e
       \draw (m-3-3.north west) -- (m-3-3.south east) -- (m-3-3.north east) -- cycle;
       \draw (m-1-3.north west) -- (m-1-3.south west) -- (m-1-3.south east) -- (m-1-3.north east) -- cycle;
       \draw[->] (m-1-2.south east) -- (m-2-3.north west);
-      \draw (m-1-2.center) circle (3.5*1.4142mm);
-      \draw (m-2-3.center) circle (3.5*1.4142mm);
+      
+      \draw (m-2-3.center) circle (3.5mm);
     \end{tikzpicture}
     \subcaption{Computation of $\rc{A}$.}
   \end{subfigure}
   \begin{subfigure}[b]{0.4\textwidth}
     \centering
 \begin{tikzpicture}
-\matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}, below of = m] (n) {
+\matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}] (n) {
 \tc{U_U} & \rc{U_R} & \rc{A}   & B   \\
     & \tc{U_L} & \rc{C}   & \rc{D}   \\
     &     & \tc{L_U} & \rc{L_R} \\

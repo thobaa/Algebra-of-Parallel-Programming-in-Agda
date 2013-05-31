@@ -90,7 +90,7 @@ v-col   : {s : Splitting}  (U⁺ : Tri s)  (v : Vec s)    →
 giving an object of the first type is easy:
 \begin{code}
 v-tc zer = tt
-v-tc (tri U R L) = v-tc U , v-mat (valiant U) R (valiant L) , v-tc L
+v-tc (tri U R L) = (v-tc U , v-mat (valiant U) R (valiant L) , v-tc L)
 \end{code}
 The other parts take a bit more code, but that code is for shuffling nonassociative semiring objects around and is easy to write. We include the proof of the correctness of |overlapRow| here:
 \begin{code}
@@ -99,13 +99,13 @@ v-row {bin s₁ s₂} (two u v) (tri U R L) = (v-row u U) , (begin
   overlapRow (overlapRow u U vm* R v+ v) L 
     ≈⟨ v-row (overlapRow u U vm* R v+ v) L ⟩ 
   v₁ v+ (v₂ v+ v) 
-    ≈⟨ sym (assoc v₁ v₂ v₃) ⟩
+    ≈⟨ sym (assoc v₁ v₂ v) ⟩
   (v₁ v+ v₂) v+ v
     ≈⟨ ∙-cong (comm v₁ v₂) refl ⟩
   (v₂ v+ v₁) v+ v
     ≈⟨ refl ⟩
-  overlapRow u U vm* R v+  overlapRow  
-    (overlapRow u U vm* R v+ v) L  vt* L v+ v ∎)
+  overlapRow u U vm* R  v+  
+  (overlapRow (overlapRow u U vm* R v+ v) L) vt* L v+ v ∎)
   where  open CM-Reasoning (Vec-commutativeMonoid {s₂})
          v₁ = overlapRow (overlapRow u U vm* R v+ v) L vt* L
          v₂ = overlapRow u U vm* R        

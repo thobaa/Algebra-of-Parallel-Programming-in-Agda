@@ -100,11 +100,10 @@ and column vector--row vector multiplication (the outer product) is given by
 \end{equation*}
 
 We now begin defining these multiplications in Agda. There is some dependency between them, for example, to define outer product, we need both kinds of scalar--vector multiplication (although we do not need anything to define the dot product). We hence begin with the simplest kinds of multiplication, first scalar--vector mutliplication:
-\todo{This operator comes out wrong: |_sv*_|}
 \begin{code}
 _sv*_ : {s : Splitting} → R → Vec s → Vec s
-x sv* one x' = one (x R* x')
-x sv* two u v = two (x sv* u) (x sv* v) 
+x sv* one x'   = one (x R* x')
+x sv* two u v  = two (x sv* u) (x sv* v) 
 \end{code}
 Vector--scalar, scalar--matrix and matrix--scalar multiplication are similar, so we leave them out.
 We define the dot product:
@@ -185,10 +184,10 @@ quad A B C D    m*  quad A' B' C' D'  = quad
 To define triangle multiplication is simpler, since we only need to consider one index. However, we need matrix multiplication in its full generality, because in general, the |Splitting| involved is not a balanced binary tree, and hence, the row and column splittings differ.
 We also need to define multiplication between |Vec| and |Tri| and between |Mat| and |Tri|, all of which are straight-forward to define:
 \begin{code}
-_vt*_ : {s : Splitting} → Vec s → Tri s → Vec s
-_tv*_ : {s : Splitting} → Tri s → Vec s → Vec s
-_mt*_ : {s₁ s₂ : Splitting} → Mat s₁ s₂ → Tri s₂ → Mat s₁ s₂
-_tm*_ : {s₁ s₂ : Splitting} → Tri s₁ → Mat s₁ s₂ → Mat s₁ s₂
+_vt*_  : {s      : Splitting} → Vec s      → Tri s      → Vec s
+_tv*_  : {s      : Splitting} → Tri s      → Vec s      → Vec s
+_mt*_  : {s₁ s₂  : Splitting} → Mat s₁ s₂  → Tri s₂     → Mat s₁ s₂
+_tm*_  : {s₁ s₂  : Splitting} → Tri s₁     → Mat s₁ s₂  → Mat s₁ s₂
 \end{code}
 %if False
 \begin{code}
@@ -223,7 +222,7 @@ _v≈_ : {s : Splitting} → Vec s → Vec s → Set
 one x    v≈ one x'     = x R≈ x'
 two u v  v≈ two u' v'  = (u v≈ u') ∧ (v v≈ v')
 \end{code}
-Note that this (and the other equality definitions only apply to vectors with the same splitting, so vectors which contain the same elements can be unequal and have the same length).
+Note that this (and the other equality definitions) only apply to vectors with the same splitting, so vectors which contain the same elements can be unequal and have the same length.
 
 We move on to equality for |Mat|:
 \begin{code}

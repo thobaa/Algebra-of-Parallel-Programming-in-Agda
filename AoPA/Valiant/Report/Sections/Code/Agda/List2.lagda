@@ -31,6 +31,7 @@ maxL (x ∷ (x' ∷ xs))  _ = max x (maxL (x' ∷ xs) (s≤s z≤n))
 On the first line, we use the absurd pattern |()| to denote the empty case resulting from pattern matching on the proof (there are no cases when pattern matchin on an element of |1 ≤ 0|, and |()| is used to denote this, since Agda does not allow us to just leave out a case). On the second two lines, we do not care about what the input proof is (it is |s≤s z≤n| in both cases, so we write |_|, which takes the place of the variable but does not allow it to be used in the definition to signify that it is not important).
 
 \subsection{Indexing function and specification}
+\label{Example-property}
 We also need an indexing function (to specify that |maxL xs _| is in the list), and again, we only define it for sensible inputs (nonempty lists). The simplest definition would probably be:
 \begin{code}
 index : ∀ {a} → (xs : [ a ]) → (i : ℕ) → (i < length xs) → a
@@ -172,6 +173,7 @@ max-≤₁  {suc k}   {suc l}    = s≤s max-≤₁
 \end{code}
 
 \subsection{Assembling the proof}
+\label{Example-proof}
 Using |max-≤₁| and |≤-refl|, we are able to prove the initial step in the induction proof, |max-greatest-base|. We pattern match on |xs|. If it is |[]|, we need to show that |x ≤ x|, which we do with |≤-refl|, again:
 \savecolumns
 \begin{code}
@@ -209,7 +211,7 @@ max-greatest  (x ∷ (x' ∷ xs))    (s≤s z≤n)  (fsuc i)    =  ≤-trans
                                                              (max-≤₂ {x})
 \end{code}
 We put the whole proof in Figure \ref{Intro-proof-figure}.
-\begin{figure}
+\begin{figure}[htb]
 %include Proof.lagda
 \caption{Proof that the |maxL| function finds a maximal element in the list. \label{Intro-proof-figure}}
 \end{figure}
@@ -219,7 +221,7 @@ We put the whole proof in Figure \ref{Intro-proof-figure}.
 \section{Final remarks about Agda}
 We end the section about Agda by going over a few parts of Agda that we have not mentioned but will be used in the remainder of the report. 
 
-First, Agda has Standard Library \cite{AgdaStaLib} that contains most of the definitions we have made above (sometimes under slightly different names, for example, |_∧_| is called |_×_|, and in more generality---definitions are made to work for all of |Set₁|, |Set₂|, \ldots). In the remainder of the report, and in our library proving the correctness of Valiant's algorithm, we use the Standard Library definitions whenever possible.
+First, Agda has Standard Library \citep{AgdaStaLib} that contains most of the definitions we have made above (sometimes under slightly different names, for example, |_∧_| is called |_×_|, and in more generality---definitions are made to work for all of |Set₁|, |Set₂|, \ldots). In the remainder of the report, and in our library proving the correctness of Valiant's algorithm, we use the Standard Library definitions whenever possible.
 
 Our second comment is about the structure of Agda programs. Agda code is partitioned into modules, which contain a sequence of function and datatype definitions. 
 Modules can be imported, and an imported module can be opened to bring all definitions into scope in the current module. Additionally, modules can be parametrised by elements of a datatype, which basically means that all functions in the module take an extra argument of that type. To open a parametrised module, an element of the parameter type is needed. We use parametrised modules frequently in this report and in our library, starting in Section \ref{Matrices}.
