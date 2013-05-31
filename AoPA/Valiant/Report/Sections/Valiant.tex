@@ -168,17 +168,17 @@ We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The e
     \centering
     \begin{tikzpicture}
       \matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}] (m) {
-        \tc{U_U} & \node (m-1-2) [draw=black,shape=circle,radius=3.5mm] {\rc{U_R}}; & A   & B   \\
-        & \tc{U_L} & \rc{C}   & D   \\
-        &     & \tc{L_U} & \rc{L_R} \\
-        &     &     & \tc{L_L} \\
+        \tc{U_U} & \node (m-1-2) [draw=black,shape=circle,radius=3.5mm] {\rc{U_R}}; & A                                                                & B   \\
+                 & \tc{U_L}                                                         & \node (m-2-3) [draw=black,shape=circle,radius=3.5mm] {\rc{C}};   & D   \\
+                 &                                                                  & \tc{L_U}                                                         & \rc{L_R} \\
+                 &                                                                  &                                                                  & \tc{L_L} \\
       };
       \draw (m-1-1.north west) -- (m-1-1.south east) -- (m-1-1.north east) -- cycle;
       \draw (m-3-3.north west) -- (m-3-3.south east) -- (m-3-3.north east) -- cycle;
       \draw (m-1-3.north west) -- (m-1-3.south west) -- (m-1-3.south east) -- (m-1-3.north east) -- cycle;
       \draw[->] (m-1-2.south east) -- (m-2-3.north west);
       
-      \draw (m-2-3.center) circle (3.5mm);
+      %\draw (m-2-3.center) circle (3.5mm);
     \end{tikzpicture}
     \subcaption{Computation of $\rc{A}$.}
   \end{subfigure}
@@ -186,20 +186,20 @@ We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The e
     \centering
 \begin{tikzpicture}
 \matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}] (n) {
-\tc{U_U} & \rc{U_R} & \rc{A}   & B   \\
-    & \tc{U_L} & \rc{C}   & \rc{D}   \\
-    &     & \tc{L_U} & \rc{L_R} \\
+\tc{U_U} & \node (n-1-2) [draw=black,shape=circle,radius=3.5mm] {\rc{U_R}}; & \node (n-1-3) [draw=black,shape=circle,radius=3.5mm] {\rc{A}};   & B   \\
+    & \tc{U_L} & \rc{C}   & \node (n-2-4) [draw=black,shape=circle,radius=3.5mm] {\rc{D}};   \\
+    &     & \tc{L_U} & \node (n-3-4) [draw=black,shape=circle,radius=3.5mm] {\rc{L_R}}; \\
     &     &     & \tc{L_L} \\
 };
 \draw (n-1-1.north west) -- (n-1-1.south east) -- (n-1-1.north east) -- cycle;
 \draw (n-4-4.north west) -- (n-4-4.south east) -- (n-4-4.north east) -- cycle;
 \draw (n-1-4.north west) -- (n-1-4.south west) -- (n-1-4.south east) -- (n-1-4.north east) -- cycle;
-\draw [->] (n-1-2.south east) -- (n-2-4.north west);
-\draw [->] (n-1-3.south east) -- (n-3-4.north west);
-\draw (n-1-3.center) circle (3.5*1.4142mm);
-\draw (n-3-4.center) circle (3.5*1.4142mm);
-\draw (n-1-2.center) circle (3.5*1.4142mm);
-\draw (n-2-4.center) circle (3.5*1.4142mm);
+\draw [->] (n-1-2.south) -- (n-2-4.west);
+\draw [->] (n-1-3.south) -- (n-3-4.west);
+%\draw (n-1-3.center) circle (3.5*1.4142mm);
+%\draw (n-3-4.center) circle (3.5*1.4142mm);
+%\draw (n-1-2.center) circle (3.5*1.4142mm);
+%\draw (n-2-4.center) circle (3.5*1.4142mm);
 \end{tikzpicture}
     \subcaption{Computation of $\rc{B}$.}
   \end{subfigure}
@@ -224,16 +224,16 @@ We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The e
 \begin{tikzpicture}
 \matrix[matrix of math nodes,left delimiter = (,right delimiter = ),row sep=5pt,column sep = 5pt,nodes={inner sep=0pt,anchor = center, minimum width=7mm, minimum height = 7mm}] (m) {
 \tc{U_U} & \rc{U_R} & A   & B   \\
-    & \tc{U_L} & \rc{C}   & D   \\
-    &     & \tc{L_U} & \rc{L_R} \\
+    & \tc{U_L} & \node (m-2-3) [draw=black,shape=circle,radius=3.5mm] {\rc{C}};   & D   \\
+    &     & \tc{L_U} & \node (m-3-4) [draw=black,shape=circle,radius=3.5mm] {\rc{L_R}}; \\
     &     &     & \tc{L_L} \\
 };
 \draw (m-2-2.north west) -- (m-2-2.south east) -- (m-2-2.north east) -- cycle;
 \draw (m-4-4.north west) -- (m-4-4.south east) -- (m-4-4.north east) -- cycle;
 \draw (m-2-4.north west) -- (m-2-4.south west) -- (m-2-4.south east) -- (m-2-4.north east) -- cycle;
 \draw [->] (m-2-3.south east) -- (m-3-4.north west);
-\draw (m-3-4.center) circle (3.5*1.4142mm);
-\draw (m-2-3.center) circle (3.5*1.4142mm);
+%draw (m-3-4.center) circle (3.5*1.4142mm);
+%draw (m-2-3.center) circle (3.5*1.4142mm);
 \end{tikzpicture}
     \subcaption{Computation of $\rc{D}$.}
   \end{subfigure}

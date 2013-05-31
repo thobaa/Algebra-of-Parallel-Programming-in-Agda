@@ -1,0 +1,50 @@
+\usepackage{tikz}
+
+
+\usetikzlibrary{matrix,decorations.pathreplacing,calc}
+
+% Set various styles for the matrices and braces. It might pay off to fiddle around with the values a little bit
+\pgfkeys{tikz/mymatrixenv/.style={decoration=brace,every left delimiter/.style={xshift=3pt},every right delimiter/.style={xshift=-3pt}}}
+\pgfkeys{tikz/mymatrix/.style={matrix of math nodes,left delimiter=[,right delimiter={]},inner sep=2pt,column sep=1em,row sep=0.5em,nodes={inner sep=0pt}}}
+\pgfkeys{tikz/mymatrixbrace/.style={decorate,thick}}
+\newcommand\mymatrixbraceoffseth{0.5em}
+\newcommand\mymatrixbraceoffsetv{0.2em}
+
+% Now the commands to produce the braces. (I'll explain below how to use them.)
+\newcommand*\mymatrixbraceright[4][m]{
+    \draw[mymatrixbrace] ($(#1.north west)!(#1-#3-1.south west)!(#1.south west)-(\mymatrixbraceoffseth,0)$)
+        -- node[left=2pt] {#4} 
+        ($(#1.north west)!(#1-#2-1.north west)!(#1.south west)-(\mymatrixbraceoffseth,0)$);
+}
+\newcommand*\mymatrixbraceleft[4][m]{
+    \draw[mymatrixbrace] ($(#1.north east)!(#1-#2-1.north east)!(#1.south east)+(\mymatrixbraceoffseth,0)$)
+        -- node[right=2pt] {#4} 
+        ($(#1.north east)!(#1-#3-1.south east)!(#1.south east)+(\mymatrixbraceoffseth,0)$);
+}
+\newcommand*\mymatrixbracetop[4][m]{
+    \draw[mymatrixbrace] ($(#1.north west)!(#1-1-#2.north west)!(#1.north east)+(0,\mymatrixbraceoffsetv)$)
+        -- node[above=2pt] {#4} 
+        ($(#1.north west)!(#1-1-#3.north east)!(#1.north east)+(0,\mymatrixbraceoffsetv)$);
+}
+\newcommand*\mymatrixbracebottom[4][m]{
+    \draw[mymatrixbrace] ($(#1.south west)!(#1-1-#3.south east)!(#1.south east)-(0,\mymatrixbraceoffsetv)$)
+        -- node[below=2pt] {#4} 
+        ($(#1.south west)!(#1-1-#2.south west)!(#1.south east)-(0,\mymatrixbraceoffsetv)$);
+}
+
+
+\usepackage{mathtools}
+\pagestyle{empty}
+
+\newcommand\coolover[2]{\mathrlap{\smash{\overbrace{\phantom{%
+    \begin{matrix} #2 \end{matrix}}}^{\mbox{$#1$}}}}#2} 
+
+\newcommand\coolunder[2]{\mathrlap{\smash{\underbrace{\phantom{%
+    \begin{matrix} #2 \end{matrix}}}_{\mbox{$#1$}}}}#2}
+
+
+\newcommand\coolleftbrace[2]{%
+#1\left\{\vphantom{\begin{matrix} #2 \end{matrix}}\right.}
+
+\newcommand\coolrightbrace[2]{%
+\left.\vphantom{\begin{matrix} #1 \end{matrix}}\right\}#2}
