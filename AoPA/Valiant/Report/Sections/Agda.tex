@@ -22,7 +22,7 @@ There are a couple of things to note about the definition:
 \item Following |data|, we give the name of the new type, |Bool|.
 \end{itemize}
 Moreover, everything has a type, and we generally need to provide the types as opposed to languages like Haskell or ML, where it is usually possible for the compiler to infer them. Statements of the form |a : b| mean that |a| is an element of type |b|. In this case, |True| and |False| are elements of type |Bool|, while |Bool| is an element of type |Set|, the type of small types (which itself is an element of |Set₁|, which is an element of |Set₂|, and so on).
-The spacing in the above example is important. Agda allows identifiers to be almost any sequence of unicode symbols, excluding spaces and parentheses (but including unicode characters like |₁| in |Set₁|). Because of this, we need to write spaces in |Bool : Set|, because |Bool:Set| is a valid identifier. In the same spirit, there are no rules specifying that some identifiers need to begin with upper or lower case letters (as opposed to Haskell's requirement that constructors and types begin with an upper case letter and variables begin with a lower case letter). We could define a (different, but isomorphic) type |bool|:
+The spacing in the above example is important. Agda allows identifiers to be almost any sequence of Unicode symbols, excluding spaces and parentheses (but including Unicode characters like |₁| in |Set₁|). Because of this, we need to write spaces in |Bool : Set|, because |Bool:Set| is a valid identifier. In the same spirit, there are no rules specifying that some identifiers need to begin with upper or lower case letters (as opposed to Haskell's requirement that constructors and types begin with an upper case letter and variables begin with a lower case letter). We could define a (different, but isomorphic) type |bool|:
 \begin{code}
 data bool : Set where   -- this type is not used in this report,
   true   : bool         -- included here only as an example
@@ -56,7 +56,7 @@ If we only want to use a function locally, we can define an anonymous function u
 \label{Example-start}
 In this section, we will define a function that takes a list of natural numbers and returns its maximum. The return value should be greater than or equal to every element in the list. In Section \ref{Example-property}, we state this property using Agda, and finally, in Section \ref{Example-proof} we are going to prove in Agda that this property hold.
 
-The first reason for doing this is to continue our introduction to Agda, by defining more complicated functions and poining out additional features of the language (and in particular proving things with it). The second reason is that a proof in Agda can require quite a bit of boilerplate code, and hence, in later sections, we only include parts of them, and we feel that there should be a complete proof written in Agda somewhere in this thesis.
+The first reason for doing this is to continue our introduction to Agda, by defining more complicated functions and pointing out additional features of the language (and in particular proving things with it). The second reason is that a proof in Agda can require quite a bit of boilerplate code, and hence, in later sections, we only include parts of them, and we feel that there should be a complete proof written in Agda somewhere in this thesis.
 %\subsection{Some datatypes and functions}
 %include /Code/Agda/List1.lagda
 

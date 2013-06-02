@@ -16,7 +16,7 @@ For convenience, we define a strictly less than relation:
 _<_ : ℕ → ℕ → Set
 m < n = suc m ≤ n
 \end{code}
-We do not need to create a new datatype using |data| for this because we can use the fact that |m < n| should be equivalent to |suc m ≤ n|. In fact, with this definition, Agda will evaluate any occurence of |m < n| to |suc m ≤ n| internally, which helps us when we write proofs. 
+We do not need to create a new datatype using |data| for this because we can use the fact that |m < n| should be equivalent to |suc m ≤ n|. In fact, with this definition, Agda will evaluate any occurrence of |m < n| to |suc m ≤ n| internally, which helps us when we write proofs. 
 
 Now, we can define the type of the |maxL| function:
 \begin{code}
@@ -28,7 +28,7 @@ maxL []               ()
 maxL (x ∷ [])         _ = x
 maxL (x ∷ (x' ∷ xs))  _ = max x (maxL (x' ∷ xs) (s≤s z≤n))
 \end{code}
-On the first line, we use the absurd pattern |()| to denote the empty case resulting from pattern matching on the proof (there are no cases when pattern matchin on an element of |1 ≤ 0|, and |()| is used to denote this, since Agda does not allow us to just leave out a case). On the second two lines, we do not care about what the input proof is (it is |s≤s z≤n| in both cases, so we write |_|, which takes the place of the variable but does not allow it to be used in the definition to signify that it is not important).
+On the first line, we use the absurd pattern |()| to denote the empty case resulting from pattern matching on the proof (there are no cases when pattern matching on an element of |1 ≤ 0|, and |()| is used to denote this, since Agda does not allow us to just leave out a case). On the second two lines, we do not care about what the input proof is (it is |s≤s z≤n| in both cases, so we write |_|, which takes the place of the variable but does not allow it to be used in the definition to signify that it is not important).
 
 \subsection{Indexing function and specification}
 \label{Example-property}
@@ -46,7 +46,7 @@ However, we can shorten the function definition by including the fact that the i
 data Σ (A : Set) (B : A → Set) : Set where
   _c_ : (x : A) → B x → Σ A B 
 \end{code}
-The order these definitions should be done is, first define |Σ|, then define |A ∧ B = Σ A (λ x → B)| and |∃ P = Σ _ P|, where the underscore is used to denote the fact that the first argument of |Σ| can be infered from the type of the second.
+The order these definitions should be done is, first define |Σ|, then define |A ∧ B = Σ A (λ x → B)| and |∃ P = Σ _ P|, where the underscore is used to denote the fact that the first argument of |Σ| can be inferred from the type of the second.
 Then, we could define |Fin| as:
 \begin{spec}
 Fin : ℕ → Set

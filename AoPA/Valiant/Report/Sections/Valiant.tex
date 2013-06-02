@@ -72,7 +72,7 @@ First, if $R$ is a $1 \times 1$ matrix, in which case we must have that $\tc{U}$
 
 We leave out the cases where $R$ is $1 \times n$ or $n \times 1$. They are similar to the case when $R$ is $m \times n$ with both $m$ and $n$ greater than $1$ (and could be derived from it by allowing blocks with $0$ width or height, which we discuss in Section \ref{Section:Empty-Matrices}).
 
-Now, if $R$ is an $m \times n$ matrix, with $m > 1$, $n > 1$, we can subdivide $R$ along both rows and colums, into four blocks ($A$ is an $i \times k$ matrix, $B$ an $i \times l$ matrix and so on):
+Now, if $R$ is an $m \times n$ matrix, with $m > 1$, $n > 1$, we can subdivide $R$ along both rows and columns, into four blocks ($A$ is an $i \times k$ matrix, $B$ an $i \times l$ matrix and so on):
 \begin{equation*}
   R =
   %\begin{pmatrix}
@@ -158,7 +158,7 @@ Hence, after rearranging (and inserting parentheses to make things clearer), we 
 Now, recall that the overlap specification of $\rc{R}$ \eqref{Equation:R-Specification} contains three parts, something to multiply with on the left, denoted by $\tc{U}$, something to multiply with on the right, denoted by $\tc{L}$ and something to add, denoted by $R$. Looking at the above equations, we see that they state that $\rc{A}$, $\rc{B}$, $\rc{C}$ and $\rc{D}$ satisfy the  overlap specification for some particular choices of $R$, $\tc{U}$ and $\tc{L}$.
 
 The third equation states that  $\rc{C}$ satisfies the overlap specification with $\tc{U} = \tc{U_L}$, $\tc{L} = \tc{L_U}$ and $R = C$. The first equation
-statest that $\rc{A}$ satisfies it with $\tc{U} = \tc{U_U}$, $\tc{L} = \tc{L_U}$, $R = \rc{U_R}\rc{C} + A$. Similarily for the second and fourth equations.
+states that $\rc{A}$ satisfies it with $\tc{U} = \tc{U_U}$, $\tc{L} = \tc{L_U}$, $R = \rc{U_R}\rc{C} + A$. Similarly for the second and fourth equations.
 
 We see also that the equation for $\rc{B}$ contains $\rc{A}$ and $\rc{D}$. The equations for $\rc{A}$ and $\rc{D}$ in turn both contain $\rc{C}$, while $\rc{C}$ does not contain any of the other parts. So we can compute them recursively, starting with $\rc{C}$, and then computing $\rc{A}$ and $\rc{D}$, finishing with $\rc{B}$. We illustrate the recursion paths in Figure \ref{Fig:Overlap4}.
 \begin{figure}
@@ -369,7 +369,7 @@ One way to allow arbitrary dimensions for the matrices is to have a constructor 
   e_{0\,m} & e_{0\,n}
 \end{pmatrix} = (A,  B),
 \end{equation}
-where $e_m$ and $e_n$ are empty $m \times 0$ and $n\times 0$ matrices respectively. Similarily, empty $n \times 0$ matrices are used to put two matrice with the same number of columns on top of each others. Second, an empty $m \times n$ matrix, $m > 0$, $n > 0$, represents a $m \times n$ matrix whose entries are all zero. One advantages of this method is that we could give fast implementations of  addition and multiplication of ``empty'' matrices:
+where $e_m$ and $e_n$ are empty $m \times 0$ and $n\times 0$ matrices respectively. Similarly, empty $n \times 0$ matrices are used to put two matrices with the same number of columns on top of each others. Second, an empty $m \times n$ matrix, $m > 0$, $n > 0$, represents a $m \times n$ matrix whose entries are all zero. One advantages of this method is that we could give fast implementations of  addition and multiplication of ``empty'' matrices:
 \begin{align*}
   e_{m\, n} + A &= A \\ 
   A + e_{m\,n}  &= A \\
@@ -382,10 +382,10 @@ Another is that it keeps the number of constructors down (three constructors for
 One downside is that there are multiple constructors for matrices of the same size (there is always |empty| and a nonempty way when $m > 0$, $n > 0$), removing some of the advantage we get from having few constructors.
 
 Another approach, which is the one we take in this report, is to have constructors for row and column vectors, $1 \times n$ and $n \times 1$ matrices for arbitrary $n > 1$, along with the single element matrices. We define |rVec| and |cVec| to take a vector of length $n > 1$ and turn it into a $1 \times n$ or $n \times 1$ matrix respectively.
-This approach has the advantage that we can define all matrices in a simple way, and that we could potentially specialize algorithms when the input is a vector, but introduces one extra constructor (|sing|, |rVec|, |cVec| and |quad| compared to |empy|, |sing| and |quad|).
+This approach has the advantage that we can define all matrices in a simple way, and that we could potentially specialise algorithms when the input is a vector, but introduces one extra constructor (|sing|, |rVec|, |cVec| and |quad| compared to |empty|, |sing| and |quad|).
 
 We then need a concrete representation |Vec| of vectors. Since we want to be able to split vectors along the middle (to implement Valiant's algorithm in the case where $R$ is a vector), we give them a constructor |two| that takes a vector of length $m$ and one of length $n$ and concatenates them. For our base cases, we need to be able to build single element vectors, this is enough to build any vector.
-To implement this approach, we need to define the datatypes |Vec| of vectors and |Mat| of matrices (that shoud be concrete representations of |Vector| and |Matrix|).
+To implement this approach, we need to define the datatypes |Vec| of vectors and |Mat| of matrices (that should be concrete representations of |Vector| and |Matrix|).
 \subsection{A first attempt at an Agda implementation}
 %include Code/Valiant/NaiveCode.lagda
 \subsection{|Mat| and |Tri|}

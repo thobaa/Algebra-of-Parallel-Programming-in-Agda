@@ -70,7 +70,7 @@ Tri-nonassociativeSemiring {s} = record { isNonassociativeSemiring = Tri-isNonas
 \end{code}
 %endif
 
-Proving things about multiplication also means moving the properties down to the nonassociative semiring below, but here, the path is longer. We examplify the beginning of this path by giving the proof that |zeroTri| is a left zero of |_t*_|, and that |_t*_| distributes over |_t+_|, on the left:
+Proving things about multiplication also means moving the properties down to the nonassociative semiring below, but here, the path is longer. We exemplify the beginning of this path by giving the proof that |zeroTri| is a left zero of |_t*_|, and that |_t*_| distributes over |_t+_|, on the left:
 %if False
 \begin{code}
 postulate 
@@ -95,4 +95,4 @@ tm*-zeroˡ  : {s₁ s₂ : Splitting} → (x : Mat s₁ s₂)
 mt*-zeroˡ  : {s₁ s₂ : Splitting} → (x : Tri s₂) 
            → (zeroMat {s₁} {s₂}) mt* x m≈ zeroMat
 \end{spec}
-are the proofs (that we would need to write) that |zeroTri| is a ``left zero'' of |_tm*_|, and that |zeroMat| is a ``left zero'' of |_mt*_| (if the concept of a zero is slightly generalized to ``operations'' |f : A → B → A| and |f : A → B → B|).
+are the proofs (that we would need to write) that |zeroTri| is a ``left zero'' of |_tm*_|, and that |zeroMat| is a ``left zero'' of |_mt*_| (if the concept of a zero is slightly generalised to ``operations'' |f : A → B → A| and |f : A → B → B|).

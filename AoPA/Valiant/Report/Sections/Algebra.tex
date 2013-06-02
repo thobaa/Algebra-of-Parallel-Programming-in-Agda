@@ -19,7 +19,7 @@ is often not what we want. For the datatype |ℕ|, it coincides with the ``mathe
 data ℤ : Set where
   _-_ : ℕ → ℕ → ℤ
 \end{code}
-we want a concept of equality that considers |5 - 3| as equal to |0 - 2|, for example. Also, if we define a datatype of sets, we want sets where the elements have been added in different orders to be equal. Hence, we need to generalize the propositional equality to some kind of relation that behaves well. We cannot choose an arbitrary relation, for example, $<$ does not behave as we expect equality to. 
+we want a concept of equality that considers |5 - 3| as equal to |0 - 2|, for example. Also, if we define a datatype of sets, we want sets where the elements have been added in different orders to be equal. Hence, we need to generalise the propositional equality to some kind of relation that behaves well. We cannot choose an arbitrary relation, for example, $<$ does not behave as we expect equality to. 
 
 It turns out that there are three properties we want a concept of equality to have. First, it should be reflexive: every element should be equal to itself. Second, it should be symmetric: if $a$ is equal to $b$, $b$ should be equal to $a$. Third, it should be transitive: if $a$ is equal to $b$ and $b$ is equal to $c$, then $a$ should be equal to $c$. A relation that satisfies this is called an equivalence relation:
 \begin{Definition}
@@ -30,7 +30,7 @@ It turns out that there are three properties we want a concept of equality to ha
   \item Transitive: for $x$, $y$, $z \in X$, if $x \sim y$ and $y \sim z$, then $x \sim z$.
   \end{itemize}
 \end{Definition}
-The following proposition formalizes the way it behaves like an equality:% (for a proof, see for example \cite{Equivalence-proof}):
+The following proposition formalises the way it behaves like an equality:% (for a proof, see for example \cite{Equivalence-proof}):
 \begin{Proposition}
 An equivalence relation $\sim$ partitions the elements of a set $X$ into disjoint nonempty equivalence classes (subsets $[x] = \{y \in X \st y \sim x\}$) satisfying: 
 \begin{itemize}
@@ -92,7 +92,7 @@ When we have two different binary operations on the same set, we often want them
 %%%%%%%%%%%%%%%%%%
 %% Distributivity
 %%%%%%%%%%%%%%%%%%
-We recall the distributive law $x\cdot(y + z) = x\cdot y + x\cdot z$, where $x$, $y$, and $z$ are numbers and $\cdot$ and $+$ are multiplication and addition, respectively and generalize it to two arbitrary operations:
+We recall the distributive law $x\cdot(y + z) = x\cdot y + x\cdot z$, where $x$, $y$, and $z$ are numbers and $\cdot$ and $+$ are multiplication and addition, respectively and generalise it to two arbitrary operations:
 \begin{Definition}
   A binary operation $\cdot$ on $X$ \emph{distributes over} a binary operation $+$ if, for all $x$, $y$, $z \in X$,
   \begin{itemize}
@@ -126,7 +126,7 @@ If we do not have inverses, we cannot perform the final step (for example, if $+
 \label{Set-with-one-op}
 In this section, we are going to discuss algebraic structures made up of a set and a binary operation on the set.
 \subsection{Monoid-like structures}
-In mathematics, the most common such structure is the group. Many mathematical objects form groups, including the integers $\Z$, the rational numbers $\Q$, the real numbers $\R$ and the complex numbers $\C$, with addition as the binary opertaion, and the non-zero rational numbers $\Q\setminus{0}$, non-zero real numbers $\R\setminus{0}$, and non-zero complex numbers $\C\setminus{0}$, with multiplication as the binary operation. Although groups satisfy too many axioms to be useful to us, we give the definition below, to clarify the difference between them and the perhaps less familiar structure, the monoid, that we present next.
+In mathematics, the most common such structure is the group. Many mathematical objects form groups, including the integers $\Z$, the rational numbers $\Q$, the real numbers $\R$ and the complex numbers $\C$, with addition as the binary operation, and the non-zero rational numbers $\Q\setminus{0}$, non-zero real numbers $\R\setminus{0}$, and non-zero complex numbers $\C\setminus{0}$, with multiplication as the binary operation. Although groups satisfy too many axioms to be useful to us, we give the definition below, to clarify the difference between them and the perhaps less familiar structure, the monoid, that we present next.
 \begin{Definition}
 A \emph{group} is a set $G$ together with a binary operation $\cdot$ on $G$, satisfying the following:
 \begin{itemize}
@@ -177,7 +177,7 @@ Examples of rings include the integers, real and complex numbers with the usual 
 
 However, for the applications we have in mind, parsing, the algebraic structure in question (see Section \ref{Parsing-Algebra}) does not even have associative multiplication, and does not have inverses for addition. We still have an additive $0$ (the empty set---representing no parse), which is a zero element with regard to multiplication (if the left, say, substring has no parse, then the whole string has no parse). We also do not have a unit element for multiplication (there is no guarantee that there is a string $A$ such that $A$ followed by $X$ has the same parse as $X$ for every string $X$). The usual proof that $0$ is an absorbing element depends on the existence of the ability to cancel (which is implied by the existence of additive inverses in a group), as seen in section \ref{zero-element}. So if we are to define an algebraic structure modelling this, we need to include as an axiom that zero absorbs.
 
-There are a number of fairly standard generalizations of a ring, but none of these matches our requirements. One generalization is the semiring, which has the same axioms as a ring, except that addition need not have inverses:
+There are a number of fairly standard generalisations of a ring, but none of these matches our requirements. One generalisation is the semiring, which has the same axioms as a ring, except that addition need not have inverses:
 \begin{Definition}
 A set $R$ together with two binary operations $+$ and $*$ forms a \emph{semiring} if:
 \begin{itemize}
@@ -187,7 +187,7 @@ A set $R$ together with two binary operations $+$ and $*$ forms a \emph{semiring
 \item $0 * x = x * 0 = 0$ for all $x \in R$.
 \end{itemize}
 \end{Definition}
-Another generalization is the nonassociative ring, which instead does away with the requirement that multiplication is associative and that there is an identity element for multiplication.
+Another generalisation is the nonassociative ring, which instead does away with the requirement that multiplication is associative and that there is an identity element for multiplication.
 \begin{Definition}
 A set $R$ together with two binary operations $+$ and $*$ forms a \emph{non\-associative ring} if:
 \begin{itemize}

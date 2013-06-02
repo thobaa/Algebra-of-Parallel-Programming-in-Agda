@@ -99,7 +99,7 @@ and column vector--row vector multiplication (the outer product) is given by
   \end{pmatrix}.
 \end{equation*}
 
-We now begin defining these multiplications in Agda. There is some dependency between them, for example, to define outer product, we need both kinds of scalar--vector multiplication (although we do not need anything to define the dot product). We hence begin with the simplest kinds of multiplication, first scalar--vector mutliplication:
+We now begin defining these multiplications in Agda. There is some dependency between them, for example, to define outer product, we need both kinds of scalar--vector multiplication (although we do not need anything to define the dot product). We hence begin with the simplest kinds of multiplication, first scalar--vector multiplication:
 \begin{code}
 _sv*_ : {s : Splitting} → R → Vec s → Vec s
 x sv* one x'   = one (x R* x')

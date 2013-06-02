@@ -238,7 +238,7 @@ Next, we prove \ref{1}, again by induction on $i + j$. If $i + j = 2$, then $\na
 
 We prove \ref{3} by induction on $k$. First, $R_1$ contains no structurally equal terms. Second, if $R_k$ contains no structurally equal terms, then if $R_{k+1}$ contains two structurally equal terms, they must both be products, say $X_1Y_1$ and $X_2Y_2$, and then, $R_{k}$ contains all four factors $X_1$, $Y_1$, $X_2$ and $Y_2$, but for $X_1Y_1$ to be structurally equal to $X_2Y_2$, their outermost parentheses must be equal, and so we must have that $X_1$ is structurally equal to $X_2$ and $Y_1$ is structurally equal to $Y_2$, since otherwise the placement of the parentheses would be different in the products. 
 
-We prove \ref{4} by induction on $k$. In $R_1$, $XX$ is the only term containing $X$, and contains $2$ factors. If it is true for $k = n$, then when formin $R_{n+1}$, we multiply each term containing $X$, which contains at least $n + 1$ factors, by something and the result thus contains at least $n+2$ factors.
+We prove \ref{4} by induction on $k$. In $R_1$, $XX$ is the only term containing $X$, and contains $2$ factors. If it is true for $k = n$, then when forming $R_{n+1}$, we multiply each term containing $X$, which contains at least $n + 1$ factors, by something and the result thus contains at least $n+2$ factors.
 \end{proof}
 
 Since we have proven that our specification \eqref{TC} is equivalent to Valiant's definition of transitive closure, \eqref{VSpec}, we will refer to our upper triangular matrix $X$ as the transitive closure of $C$. 

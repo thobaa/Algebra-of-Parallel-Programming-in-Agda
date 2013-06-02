@@ -53,7 +53,7 @@ valiant (tri U R L)  = tri U⁺ (overlap U⁺ R L⁺) L⁺
 \end{code}
 In the next section, we give a specification for the algorithm, and in Section \ref{Proof}, we prove it correct.
 \subsection{Specification in Agda}
-We are now ready to express the transitive closure problem in Agda. It is a relation between two |Tri|s, that is, a function that takes two |Tri|s, |C⁺| and |C|, and returns the propostion that |C⁺| is the transitive closure of |C|, which is true if |C⁺| and |C| satisfy the specification \eqref{TC} as implemented in Agda:
+We are now ready to express the transitive closure problem in Agda. It is a relation between two |Tri|s, that is, a function that takes two |Tri|s, |C⁺| and |C|, and returns the proposition that |C⁺| is the transitive closure of |C|, which is true if |C⁺| and |C| satisfy the specification \eqref{TC} as implemented in Agda:
 \begin{code}
 _is-tc-of_ : {s : Splitting} → Tri s → Tri s → Set
 C⁺ is-tc-of C = C⁺ t≈ C⁺ t* C⁺ t+ C

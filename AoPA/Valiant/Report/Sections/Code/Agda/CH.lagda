@@ -30,8 +30,8 @@ If we have an element of type |m ≤ n| it is either constructed by |z≤n|, whi
 
 We now present the logical operations (as interpreted in constructive logic) that are done on propositions to generate new propositions, and their implementations in Agda, using syntax similar to the one used in logic, through the Curry--Howard correspondence.
 
-\subsection{Predicate logic}
-We begin with concepts from predicate logic, and in the next section, we consider propositional logic.
+\subsection{Propositional logic}
+We begin with concepts from propositional logic, and in the next section, we consider predicate logic.
 
 To define a conjunction between two propositions |P| and |Q|, we use the pair, defined as
 %if False
@@ -75,8 +75,8 @@ data ⊤ : Set where
 \end{code}
 To prove this proposition we simply use the element |tt|.
 
-\subsection{Propositional logic}
-Now we move on to define the quantifications (universal and existential) in predicate logic.
+\subsection{Predicate logic}
+Now we move on to define the quantifiers (universal and existential) in predicate logic.
  
 For universal quantification, we again use functions, but this time, dependent functions: If $P$ is a predicate on $X$ (a function that takes elements of $X$ to propositions $P(x)$), the proposition $\forall x. P(x)$ corresponds to the type |(x : X) → P x|, since to give a function of that type would mean providing a way to construct an element of |P x| (that is, a proof of $P(x)$) for every |x : X|, which is what $\forall x. P(x)$ means.
 Agda includes the syntax |∀ x| for |(x : _)| in type definitions (where the underscore indicates that the type should be inferred), so that |∀ x → P x| means exactly what we expect it to mean.
