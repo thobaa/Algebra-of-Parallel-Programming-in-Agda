@@ -1,28 +1,28 @@
-import Sets 
-open Sets using (_≡_)
-module Examples.MSS.Derivation 
+import AoPA.Sets 
+open AoPA.Sets using (_≡_)
+module AoPA.Examples.MSS.Derivation 
   {Val : Set} 
   (ø : Val) 
   (_+_ : Val → Val → Val)
   (_↑_ : Val → Val → Val) 
   (↑assoc :  ∀ a b c → ((a ↑ b) ↑ c)  ≡ (a ↑ (b ↑ c)))
   (+distr↑ : ∀ a b c → ((a + (b ↑ c)) ≡ ((a + b) ↑ (a + c))))
-where
+ where
 
 open import Function using (id; _∘_)
 open import Data.Product  using (Σ; ∃; _,_; proj₁; proj₂)
 open import Data.List     using (List; _∷_; []; foldr)
                    -- hiding (sum; tails; inits; scanr)
 
-open Sets
+open AoPA.Sets
   using (refl; sym; cong)
-open import AlgebraicReasoning.Equality 
+open import AoPA.AlgebraicReasoning.Equality 
   using (     ≡-begin_; _≡⟨_⟩_; _≡∎)
-open import AlgebraicReasoning.ExtensionalEquality 
+open import AoPA.AlgebraicReasoning.ExtensionalEquality 
   using (_≐_; ≐-begin_; _≐⟨_⟩_; _≐∎; ≐-refl; ≐-sym)
 
-open import Examples.MSS.ListProperties using (foldr-fusion)
-open import Examples.MSS.List+ 
+open import AoPA.Examples.MSS.ListProperties using (foldr-fusion)
+open import AoPA.Examples.MSS.List+ 
   using (List⁺; _∷⁺_; [_]⁺;
          map⁺; foldr⁺; _++⁺_; concat⁺;
          foldr⁺-fusion'; map⁺-compose; map⁺-eq; concat⁺-map⁺)

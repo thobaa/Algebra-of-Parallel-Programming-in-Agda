@@ -3,7 +3,7 @@ open Relation.Binary
      using (Setoid; module Setoid)
 
 open import Level
-module Examples.Sorting.Bags (c : Level)
+module AoPA.Examples.Sorting.Bags (c : Level)
                              (ℓ : Level)
                              (elem-s : Setoid c ℓ) where
 

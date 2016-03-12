@@ -271,10 +271,12 @@ foldR-to-foldr f e b (a ∷ x) foldr$x≡b  =
 
 -- idR as a relational fold
 
+{-
 idR⊑foldR : {A : Set} → idR ⊑ foldR {A} cons nil
 idR⊑foldR .xs xs refl with xs
 ... | [] = refl
 ... | y ∷ ys = (y , ys) , (refl , idR⊑foldR ys ys refl) , refl
+-}
 
 idR⊒foldR : {A : Set} → idR ⊒ foldR {A} cons nil 
 idR⊒foldR = foldR-induction-⊒ idR cons nil (id○cons⊒cons○Pid , ℰidnil⊇nil)

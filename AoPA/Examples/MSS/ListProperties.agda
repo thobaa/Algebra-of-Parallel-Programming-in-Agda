@@ -1,13 +1,13 @@
-module Examples.MSS.ListProperties where
+module AoPA.Examples.MSS.ListProperties where
 
-open import Sets
+open import AoPA.Sets
   using (_≡_; refl; sym; cong)
 open import Data.List 
   using (List; []; _∷_; foldr; _++_; map; concat)
 open import Function using (_∘_)
-open import AlgebraicReasoning.Equality
+open import AoPA.AlgebraicReasoning.Equality
   using (     ≡-begin_; _≡⟨_⟩_; _≡∎)
-open import AlgebraicReasoning.ExtensionalEquality
+open import AoPA.AlgebraicReasoning.ExtensionalEquality
   using (_≐_; ≐-begin_; _≐⟨_⟩_; _≐∎; ≐-refl; ≐-sym)
 
 foldr-universal : ∀ {A B} (h : List A → B) f e →

@@ -2,7 +2,7 @@
 -- Several polymorphic variations of the PreorderReasoning module 
 ------------------------------------------------------------------------
 
-module AlgebraicReasoning.PolyPreorderReasoning1 where
+module AoPA.AlgebraicReasoning.PolyPreorderReasoning1 where
 
 module UnaryCarrier
      (F : Set -> Set1)
