@@ -1,6 +1,6 @@
 open import Valiant.Abstract.NonAssociativeNonRing
 open import Valiant.Abstract.NonAssociativeNonRing.Structure
-module ImportAll {l₁ l₂} (NAR : NonAssociativeNonRing l₁ l₂) where
+module ValiantImportAll {l₁ l₂} (NAR : NonAssociativeNonRing l₁ l₂) where
 
 -- importing stuff
 

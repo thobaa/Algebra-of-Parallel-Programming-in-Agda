@@ -10,7 +10,7 @@ open import Data.Nat.Properties using (m≤m+n) renaming (≰⇒> to n≰⇒>;
                                          commutativeSemiring to ncsr)
 open import Data.Nat as ℕ using (ℕ; z≤n; s≤s; ≤-pred) renaming (_+_ to _n+_; _≤_ to _n≤_; _≤?_ to _n≤?_; zero to nzero; suc to nsuc; _<_ to _n<_; _≰_ to _n≰_; _>_ to _n>_)
 open import Data.Product using () renaming (proj₁ to proj1; proj₂ to proj2)
-open import Relation.Nullary.Core using (yes; no)
+open import Relation.Nullary using (yes; no)
 open import Algebra using (CommutativeRing)
 --open import Algebra.FunctionProperties using ()
 open import Relation.Binary using (DecTotalOrder; _⇒_; _Preserves₂_⟶_⟶_)

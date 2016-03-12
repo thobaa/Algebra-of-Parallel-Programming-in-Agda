@@ -9,7 +9,7 @@ open import Data.Vec using (Vec; []; _∷_; foldr; map; zip; reverse)
 open import Function using (_∘_; id)
 open import Data.Product using (uncurry; uncurry′; <_,_>; proj₂)
 open import Data.Fin using (inject+; raise; Fin; toℕ; fromℕ≤) renaming (zero to f0; suc to fsuc)
-open import Data.Fin.Props using (inject+-lemma; fromℕ≤-toℕ)
+open import Data.Fin.Properties using (inject+-lemma; fromℕ≤-toℕ)
 open import Relation.Nullary using (yes; no)
 open import Data.Empty using (⊥-elim)
 import Relation.Binary.EqReasoning as EqR
