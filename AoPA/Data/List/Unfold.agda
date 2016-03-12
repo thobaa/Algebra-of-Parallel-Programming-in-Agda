@@ -1,4 +1,4 @@
-module Data.List.Unfold where
+module AoPA.Data.List.Unfold where
 
 open import Function
 open import Data.Empty
@@ -9,14 +9,14 @@ open import Data.Product
 open import Data.Nat      -- for the example
 open import Data.List
 
-open import Data.Unit.Core
+-- open import Data.Unit.Core
 open import Relation.Binary.PropositionalEquality 
                             using (inspect) renaming ([_] to [-[_]-])
 
-open import Sets      using (_≡_; refl; subst)
-open import Relations using (_←_; _○_; fun; _˘; _⊑_; _⊒_)
-open import Relations.WellFound
-open import Data.List.Fold
+open import AoPA.Sets      using (_≡_; refl; subst)
+open import AoPA.Relations using (_←_; _○_; fun; _˘; _⊑_; _⊒_)
+open import AoPA.Relations.WellFound
+open import AoPA.Data.List.Fold
 
 -- A membership relation for the base functor of lists.
 

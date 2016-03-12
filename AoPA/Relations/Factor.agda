@@ -1,13 +1,13 @@
 {-# OPTIONS --universe-polymorphism #-}
 
-module Relations.Factor where
+module AoPA.Relations.Factor where
 
 open import Level
 open import Data.Product  using (_×_; _,_)
 
-open import Sets
-open import Relations
-open import AlgebraicReasoning.Implications using (_⇔_; ⇐-begin_; _⇐⟨_⟩_; _⇐∎)
+open import AoPA.Sets
+open import AoPA.Relations
+open import AoPA.AlgebraicReasoning.Implications using (_⇔_; ⇐-begin_; _⇐⟨_⟩_; _⇐∎)
 
 _/_ : ∀ {j k} {A : Set} {B : Set j} {C : Set k} → (B ← A) → (C ← A) → (B ← C) 
 (R / S) b c = ∀ a → S c a → R b a
@@ -91,11 +91,11 @@ _₁﹨_ : {A : Set1} {B C : Set} → (B ←₁ A) → (B ← C) → (A ₁← C
 -}
 
 /∋○Λ-cancelation-⊒ : {A B C : Set} → (R : B ← A) → (S : A ← C) →
-     R / ∋ ₁∘ Λ S ⊒ R / S ˘
+     R / ∋ ₁∘ Λ (S ⊒ R / S) ˘
 /∋○Λ-cancelation-⊒ R S b c aSc⇒bRa aSc = aSc⇒bRa aSc 
 
 /∋○Λ-cancelation-⊑ : {A B C : Set} → (R : B ← A) → (S : A ← C) →
-     R / ∋ ₁∘ Λ S ⊑ R / S ˘
+     R / ∋ ₁∘ Λ (S ⊑ R / S) ˘
 /∋○Λ-cancelation-⊑ R S b c aSc⇒bRa aSc = aSc⇒bRa aSc
 
 

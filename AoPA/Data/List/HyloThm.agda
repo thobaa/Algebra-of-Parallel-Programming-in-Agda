@@ -1,4 +1,4 @@
-module Data.List.HyloThm where
+module AoPA.Data.List.HyloThm where
 
 open import Relation.Binary.PropositionalEquality 
 
@@ -6,16 +6,16 @@ open import Function
 open import Data.List
 open import Data.Product
 
-open import AlgebraicReasoning.Implications
-open import AlgebraicReasoning.Relations
-open import Data.List.Fold
-open import Relations
-open import Relations.CompChain
-open import Relations.Converse
-open import Relations.Factor
-open import Relations.Function
-open import Relations.Product
-open import Sets
+open import AoPA.AlgebraicReasoning.Implications
+open import AoPA.AlgebraicReasoning.Relations
+open import AoPA.Data.List.Fold
+open import AoPA.Relations
+open import AoPA.Relations.CompChain
+open import AoPA.Relations.Converse
+open import AoPA.Relations.Factor
+open import AoPA.Relations.Function
+open import AoPA.Relations.Product
+open import AoPA.Sets
 
 {- For now it seems that we do not need it immediately
 

@@ -1,4 +1,4 @@
-module Relations.WellFound where
+module AoPA.Relations.WellFound where
 
 {-
 
@@ -15,8 +15,8 @@ by Logic.Induction.WellFounded.
 -}
 open import Data.Product
 open import Data.Nat
-open import Sets --  using  (_≡_; ≡-refl; ...)
-open import Relations
+open import AoPA.Sets --  using  (_≡_; ≡-refl; ...)
+open import AoPA.Relations
 
 -- Monotype Factor
 
@@ -42,9 +42,9 @@ private
 acc-fold : {a : Set} (R : a → a → Set) {P : a → Set} →
   ((x : a) → (∀ y → R y x → P y) → P x) →
      (x : a) → Acc R x → P x
-acc-fold R {P} f x accx = f x g
-  where g : ∀ y → R y x → P y
-        g with accx
+acc-fold R {P} f x accx = f x (g accx)
+  where g : Acc R x → ∀ y → R y x → P y
+        g accx with accx
         ... | acc .x h = (λ y yRx → acc-fold R f y (h y yRx)) 
 {-
 

@@ -1,6 +1,6 @@
 {-# OPTIONS --universe-polymorphism #-}
 
-module Relations.Product where
+module AoPA.Relations.Product where
 
 open import Level
 open import Data.Sum      using (_⊎_)
@@ -8,10 +8,10 @@ open import Data.Product  using (Σ; _×_; _,_; proj₁ ; proj₂)
                        renaming (map to map-×)
 open import Function using (_∘_; id)
 
-open import Sets
-open import Relations
+open import AoPA.Sets
+open import AoPA.Relations
 
-open import AlgebraicReasoning.Relations
+open import AoPA.AlgebraicReasoning.Relations
      using (⊑-begin_; _⊑⟨_⟩_; _⊑∎)
 
 ⨉-functor-⊒ : ∀ {i j k l} {A : Set} {B : Set i} {C : Set} {D : Set j}

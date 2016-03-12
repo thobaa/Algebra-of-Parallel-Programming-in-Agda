@@ -1,36 +1,36 @@
-module Data.List.Fold where
+module AoPA.Data.List.Fold where
 
 open import Data.Product using (Σ; _×_; _,_; uncurry)
 open import Data.List    using (List; []; _∷_; foldr)
 
-open import Sets 
+open import AoPA.Sets 
      using (ℙ; singleton;
             _⊆_; ⊆-refl;
             _⊇_; ⊇-refl;
             _≡_; refl; trans; cong; subst; sym)
-open import Relations
+open import AoPA.Relations
      using (_←_; fun; idR; _○_; _⨉_; _⊑_; _⊒_; id-intro-r; id-intro-l;
             id-elim-l; 
             Λ; ∈; ℰ;
             _₁∘_; _·_; _˘; 
             ○-assocl; ○-assocr; ○-monotonic-r; ○-monotonic-l;
             ⊑-refl; ⊒-refl; id-idempotent-⊑; id-idempotent-⊒)
-open import Relations.Product
+open import AoPA.Relations.Product
      using (⨉-functor-⊒; ⨉-functor-⊑; ⨉-id-⊑; ⨉-monotonic;
             Λ⨉-absorption-⊆; Λ⨉-absorption-⊇; Λ⨉-monotonic)
-open import Relations.PowerTrans
+open import AoPA.Relations.PowerTrans
      using (Λ∈-galois-1; Λ∈-galois-2; Λ∈-cancelation;
             Λ-monotonic; ℰ-functor-⊆; ℰ-functor-⊇; ℰ-monotonic')
 
-open import Relations.CompChain
+open import AoPA.Relations.CompChain
 
-open import AlgebraicReasoning.Sets
+open import AoPA.AlgebraicReasoning.Sets
      using (⊆-begin_; _⊆⟨_⟩_; _⊆∎;
             ⊇-begin_; _⊇⟨_⟩_; _⊇∎)
-open import AlgebraicReasoning.Relations
+open import AoPA.AlgebraicReasoning.Relations
      using (⊒-begin_; _⊒⟨_⟩_; _⊒∎;
             ⊑-begin_; _⊑⟨_⟩_; _⊑∎)
-open import AlgebraicReasoning.Implications
+open import AoPA.AlgebraicReasoning.Implications
 
 foldr₁ : {A : Set} → {PB : Set1} → ((A × PB) → PB) → PB → List A → PB
 foldr₁ f e []      = e

@@ -1,4 +1,4 @@
-module Data.Tree.Unfold where
+module AoPA.Data.Tree.Unfold where
 
 open import Relation.Binary.PropositionalEquality 
       using (inspect; [_])
@@ -8,23 +8,23 @@ open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _×_; _,_)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 
-open import Sets
+open import AoPA.Sets
      using (ℙ; _⊆_; _⊇_; ⊆-refl; singleton;
             _≡_; refl; trans; subst; sym)
-open import Relations
-open import Relations.PowerTrans
+open import AoPA.Relations
+open import AoPA.Relations.PowerTrans
      using (Λ∈-galois-2; Λ-monotonic; ℰ-functor-⊆; ℰ-monotonic')
-open import AlgebraicReasoning.Sets
+open import AoPA.AlgebraicReasoning.Sets
      using (⊆-begin_; _⊆⟨_⟩_; _⊆∎;
             ⊇-begin_; _⊇⟨_⟩_; _⊇∎)
-open import AlgebraicReasoning.Relations
+open import AoPA.AlgebraicReasoning.Relations
      using (⊒-begin_; _⊒⟨_⟩_; _⊒∎)
-open import AlgebraicReasoning.Implications
+open import AoPA.AlgebraicReasoning.Implications
 
-open import Relations.WellFound
+open import AoPA.Relations.WellFound
 
-open import Data.Tree
-open import Data.Tree.Fold using (foldT)
+open import AoPA.Data.Tree
+open import AoPA.Data.Tree.Fold using (foldT)
 
 ε-TreeF : {A B : Set} → (B ← (⊤ ⊎ (A × B × B)))
 ε-TreeF _ (inj₁ tt) = ⊥

@@ -1,10 +1,10 @@
-module AlgebraicReasoning.Sets where
+module AoPA.AlgebraicReasoning.Sets where
 
 open import Level
-open import Sets using (ℙ; _⊆_; ⊆-refl; ⊆-trans;
+open import AoPA.Sets using (ℙ; _⊆_; ⊆-refl; ⊆-trans;
                            _⊇_; ⊇-refl; ⊇-trans )
 
-import AlgebraicReasoning.PolyPreorderReasoning as PPR
+import AoPA.AlgebraicReasoning.PolyPreorderReasoning as PPR
 
   -- Shall we make it more level-polymorphic?
 

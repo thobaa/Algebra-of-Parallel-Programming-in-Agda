@@ -1,8 +1,8 @@
-module Relations.Coreflexive where
+module AoPA.Relations.Coreflexive where
 
 open import Data.Product
-open import Sets
-open import Relations
+open import AoPA.Sets
+open import AoPA.Relations
 
 -- coreflexives built from sets
 
@@ -23,7 +23,7 @@ corefl-idempotent-⊑ C⊑idR y x (z , zCx , yCz) with C⊑idR z x zCx | C⊑idR
 corefl-idempotent-⊑ C⊑idR x .x (.x , xCx , xCx') | refl | refl = xCx
 
 open import Data.List using (List)
-open import Data.List.Utilities using (check; corefl-check)
+open import AoPA.Data.List.Utilities using (check; corefl-check)
 check-idempotent : {A : Set} → (p : ℙ (A × List A)) → 
                    check (p ¿) ○ check (p ¿) ⊒ check (p ¿)
 check-idempotent p = corefl-idempotent-⊒ (corefl-check (set-corefl⊑idR p))

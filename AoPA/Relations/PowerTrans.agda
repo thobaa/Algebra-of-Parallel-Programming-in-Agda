@@ -1,16 +1,16 @@
 {-# OPTIONS --universe-polymorphism #-}
 
-module Relations.PowerTrans where
+module AoPA.Relations.PowerTrans where
 
 open import Level renaming (_⊔_ to _⊔l_)
 open import Data.Sum      using (_⊎_)
 open import Data.Product  using (_×_; _,_)
 open import Function using (_∘_; id)
 
-open import Sets
-open import Relations
+open import AoPA.Sets
+open import AoPA.Relations
 
-open import AlgebraicReasoning.Sets
+open import AoPA.AlgebraicReasoning.Sets
      using (⊆-begin_; _⊆⟨_⟩_; _⊆∎;
             ⊇-begin_; _⊇⟨_⟩_; _⊇∎)
 

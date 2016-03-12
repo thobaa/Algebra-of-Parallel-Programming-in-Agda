@@ -1,23 +1,23 @@
-module Data.List.GreedyThm where
+module AoPA.Data.List.GreedyThm where
 
 open import Function
 open import Data.List
 open import Data.Product renaming (map to map-×)
 open import Relation.Binary.PropositionalEquality
 
-open import AlgebraicReasoning.Implications
-open import AlgebraicReasoning.Relations
-open import Data.List.Fold
-open import Data.List.HyloThm
-open import Data.List.Utilities
-open import Relations
-open import Relations.CompChain
-open import Relations.Converse
-open import Relations.Coreflexive
-open import Relations.Factor
-open import Relations.Minimum
-open import Relations.Product
-open import Sets
+open import AoPA.AlgebraicReasoning.Implications
+open import AoPA.AlgebraicReasoning.Relations
+open import AoPA.Data.List.Fold
+open import AoPA.Data.List.HyloThm
+open import AoPA.Data.List.Utilities
+open import AoPA.Relations
+open import AoPA.Relations.CompChain
+open import AoPA.Relations.Converse
+open import AoPA.Relations.Coreflexive
+open import AoPA.Relations.Factor
+open import AoPA.Relations.Minimum
+open import AoPA.Relations.Product
+open import AoPA.Sets
 
 corefl-greedy-thm : {A B : Set}
   {S : B ← (A × B)} {s : ℙ B} {R : B ← B} {C : (A × B) ← (A × B)} →

@@ -1,15 +1,15 @@
-module Relations.Function where
+module AoPA.Relations.Function where
 
 open import Data.Sum      using (_⊎_)
 open import Data.Product  using (_×_; _,_; proj₁ ; proj₂)
   renaming (map to map-×)
 open import Function using (_∘_; id)
 
-open import Sets
-open import Relations
+open import AoPA.Sets
+open import AoPA.Relations
 
-open import AlgebraicReasoning.Equality
-open import AlgebraicReasoning.Implications
+open import AoPA.AlgebraicReasoning.Equality
+open import AoPA.AlgebraicReasoning.Implications
 
 -- Functions are simple and entire
 

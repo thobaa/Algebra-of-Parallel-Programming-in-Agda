@@ -1,13 +1,13 @@
 {-# OPTIONS --universe-polymorphism #-}
 
-module Relations.Converse where
+module AoPA.Relations.Converse where
 
 open import Level
 open import Data.Product  using (Σ; _×_; _,_)
 
-open import Sets
-open import Relations 
-open import AlgebraicReasoning.Implications
+open import AoPA.Sets
+open import AoPA.Relations 
+open import AoPA.AlgebraicReasoning.Implications
 
 -- ˘-universal : X ⊑ R ˘  ⇔  X ˘ ⊑ R
 

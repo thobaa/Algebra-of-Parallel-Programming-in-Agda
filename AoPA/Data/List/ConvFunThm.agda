@@ -1,19 +1,19 @@
-module Data.List.ConvFunThm where
+module AoPA.Data.List.ConvFunThm where
 
 open import Relation.Binary.PropositionalEquality
 open import Data.Product renaming (map to map-×)
 open import Data.List
 open import Function using (id)
 
-open import Sets
-open import Relations
-open import Relations.Function
-open import Relations.Converse
-open import Relations.Product using (˘-dist-⨉; ⨉-monotonic)
-open import Data.List.Fold
+open import AoPA.Sets
+open import AoPA.Relations
+open import AoPA.Relations.Function
+open import AoPA.Relations.Converse
+open import AoPA.Relations.Product using (˘-dist-⨉; ⨉-monotonic)
+open import AoPA.Data.List.Fold
 
-open import AlgebraicReasoning.Relations
-open import AlgebraicReasoning.Implications
+open import AoPA.AlgebraicReasoning.Relations
+open import AoPA.AlgebraicReasoning.Implications
    
 conv-fun-thm : {A B : Set} → (f : B → List A) →
     (R : B ← (A × B)) → (e : ℙ B) →

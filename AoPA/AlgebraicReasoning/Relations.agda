@@ -1,13 +1,13 @@
-module AlgebraicReasoning.Relations where
+module AoPA.AlgebraicReasoning.Relations where
 
 open import Level renaming (_⊔_ to _⊔l_)
-open import Relations using
+open import AoPA.Relations using
      (_←_;  _⊑_;  ⊑-refl;  ⊑-trans;
             _⊒_;  ⊒-refl;  ⊒-trans)
 --      _←₁_; _⊑₁_; ⊑₁-refl; ⊑₁-trans;
 --            _⊒₁_; ⊒₁-refl; ⊒₁-trans)
 
-import AlgebraicReasoning.PolyPreorderReasoning as PPR
+import AoPA.AlgebraicReasoning.PolyPreorderReasoning as PPR
 
 module ⊑-reasoning {i j : Level} = PPR.BinaryCarrier {i} {j} _←_ _⊑_ ⊑-refl ⊑-trans
    renaming (begin_ to ⊑-begin_ ; _∼⟨_⟩_ to _⊑⟨_⟩_ ; _∎ to _⊑∎)

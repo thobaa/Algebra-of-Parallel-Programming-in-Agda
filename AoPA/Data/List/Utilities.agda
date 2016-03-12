@@ -1,13 +1,13 @@
-module Data.List.Utilities where
+module AoPA.Data.List.Utilities where
 
 open import Data.List using (List; []; _∷_)
 open import Data.Unit
 open import Data.Product
 
-open import Sets using (⊆-refl)
-open import Relations
-open import Relations.Product
-open import Data.List.Fold using (foldR; nil; cons; corefl-foldR)
+open import AoPA.Sets using (⊆-refl)
+open import AoPA.Relations
+open import AoPA.Relations.Product
+open import AoPA.Data.List.Fold using (foldR; nil; cons; corefl-foldR)
 
 
 All : {A : Set} → (A → Set) → (List A → Set)
