@@ -3,7 +3,7 @@ open import Data.Nat using (ℕ; _+_; suc; _≤?_; zero; _<_; _≤_; z≤n; s≤
 open import Data.Nat.Properties using (≰⇒>)
 open import Data.Fin using (Fin; toℕ; reduce≥; _ℕ-ℕ_; inject; fromℕ≤)
                      renaming (zero to f0; suc to fsuc)
-open import Relation.Nullary.Core using (yes; no; ¬_)
+open import Relation.Nullary using (yes; no; ¬_)
 open import Relation.Binary.PropositionalEquality as PropEq using (_≡_; cong; cong₂; refl)
 open import Data.Empty using (⊥-elim)
 

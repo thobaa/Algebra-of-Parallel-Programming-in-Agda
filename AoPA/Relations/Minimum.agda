@@ -1,16 +1,16 @@
-module Relations.Minimum where
+module AoPA.Relations.Minimum where
 
 open import Function  using (id; _$_; _∘_)
 open import Data.Product  using (Σ; _×_; _,_; proj₁; proj₂)
          renaming (map to map-×)
 
-open import Sets
-open import Relations
-open import Relations.Factor
-open import Relations.Converse
+open import AoPA.Sets
+open import AoPA.Relations
+open import AoPA.Relations.Factor
+open import AoPA.Relations.Converse
 
-open import AlgebraicReasoning.Relations
-open import AlgebraicReasoning.Implications
+open import AoPA.AlgebraicReasoning.Relations
+open import AoPA.AlgebraicReasoning.Implications
 
 min : {A : Set} → (A ← A) → (A ← ℙ A)
 min R = ∈ ⊓ (R / ∋)
@@ -35,7 +35,7 @@ min-universal-⇒ {R = R} {S} {X} =
    ⇒⟨  ⇒-refl  ⟩
      (X ⊑ S  ×  X ⊑ (R / ∋) ₁∘ Λ S)
    ⇒⟨  ⇒-refl  ⟩   -- /∋○Λ-cancelation-⊑ is deducible by Agda
-     (X ⊑ S  ×  X ⊑ (R / S ˘))
+     (X ⊑ S  ×  X ⊑ (R / (S ˘)))
    ⇒⟨  map-× id /-universal-⇐ ⟩
      (X ⊑ S  ×  X ○ (S ˘) ⊑ R)
    ⇒∎
@@ -55,14 +55,14 @@ min-universal-⇐ {R = R} {S} {X} =
    ⇐⟨  ⇐-refl  ⟩
      (X ⊑ S  ×  X ⊑ (R / ∋) ₁∘ Λ S)
    ⇐⟨  ⇐-refl  ⟩   -- /∋○Λ-cancelation-⊒ is deducible by Agda
-     (X ⊑ S  ×  X ⊑ (R / S ˘))
+     (X ⊑ S  ×  X ⊑ (R / (S ˘)))
    ⇐⟨  map-× id /-universal-⇒ ⟩
      (X ⊑ S  ×  X ○ (S ˘) ⊑ R)
    ⇐∎
 
 min-universal : {A B : Set} →
    {R : A ← A} {S : A ← B} {X : A ← B} →
-      X ⊑ min R ₁∘ Λ S  ⇔  (X ⊑ S  ×  X ○ (S ˘) ⊑ R)
+      (X ⊑ min R ₁∘ Λ S)  ⇔  (X ⊑ S  ×  X ○ (S ˘) ⊑ R)
 min-universal = (min-universal-⇒ , min-universal-⇐)
 
 min-monotonic : {A B : Set} {R S : A ← A} {T : A ← B} →

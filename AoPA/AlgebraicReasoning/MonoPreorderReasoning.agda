@@ -1,8 +1,8 @@
 {-# OPTIONS --universe-polymorphism #-}
 
-module AlgebraicReasoning.MonoPreorderReasoning where
+module AoPA.AlgebraicReasoning.MonoPreorderReasoning where
 open import Level
-open import AlgebraicReasoning.PolyPreorderReasoning as PPR
+open import AoPA.AlgebraicReasoning.PolyPreorderReasoning as PPR
 
 {-
 module Mono 
@@ -22,7 +22,7 @@ module Mono
 
   infix  4 _IsRelatedTo_
   infix  2 _∎
-  infixr 2 _∼⟨_⟩_ --  _≈⟨_⟩_
+  infixr 1 _∼⟨_⟩_ --  _≈⟨_⟩_
   infix  1 begin_
 
   private

@@ -1,12 +1,12 @@
 {-# OPTIONS --universe-polymorphism #-}
 
-module AlgebraicReasoning.Implications where
+module AoPA.AlgebraicReasoning.Implications where
 
 open import Level
 open import Data.Product
 open import Function
 
-import AlgebraicReasoning.MonoPreorderReasoning as MPR
+import AoPA.AlgebraicReasoning.MonoPreorderReasoning as MPR
 
 infixr 5 _⇒_ _⇐_ _⇔_ -- _⇒₁_
 

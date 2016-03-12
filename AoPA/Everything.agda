@@ -1,41 +1,41 @@
-module Everything where
+module AoPA.Everything where
 
 
 -- Basic definitions.
 
-import Sets
+import AoPA.Sets
 
-import Relations
-import Relations.Function
-import Relations.PowerTrans
-import Relations.Product
-import Relations.Coreflexive
-import Relations.Factor
-import Relations.Converse
-import Relations.CompChain
-import Relations.Minimum
-import Relations.WellFound
+import AoPA.Relations
+import AoPA.Relations.Function
+import AoPA.Relations.PowerTrans
+import AoPA.Relations.Product
+import AoPA.Relations.Coreflexive
+import AoPA.Relations.Factor
+import AoPA.Relations.Converse
+import AoPA.Relations.CompChain
+import AoPA.Relations.Minimum
+import AoPA.Relations.WellFound
 
 -- Algebraic reasoning
 
-import AlgebraicReasoning.MonoPreorderReasoning
-import AlgebraicReasoning.PolyPreorderReasoning
-import AlgebraicReasoning.PolyPreorderReasoning1
-import AlgebraicReasoning.PipeReasoning
-import AlgebraicReasoning.Equality
-import AlgebraicReasoning.ExtensionalEquality
-import AlgebraicReasoning.Sets
-import AlgebraicReasoning.Relations
-import AlgebraicReasoning.Implications
+import AoPA.AlgebraicReasoning.MonoPreorderReasoning
+import AoPA.AlgebraicReasoning.PolyPreorderReasoning
+import AoPA.AlgebraicReasoning.PolyPreorderReasoning1
+import AoPA.AlgebraicReasoning.PipeReasoning
+import AoPA.AlgebraicReasoning.Equality
+import AoPA.AlgebraicReasoning.ExtensionalEquality
+import AoPA.AlgebraicReasoning.Sets
+import AoPA.AlgebraicReasoning.Relations
+import AoPA.AlgebraicReasoning.Implications
 
 -- Datatypes and their folds
 
-import Data.List.Fold
-import Data.List.Unfold
-import Data.List.ConvFunThm
-import Data.List.GreedyThm
-import Data.List.HyloThm
-import Data.List.Utilities
+import AoPA.Data.List.Fold
+import AoPA.Data.List.Unfold
+import AoPA.Data.List.ConvFunThm
+import AoPA.Data.List.GreedyThm
+import AoPA.Data.List.HyloThm
+import AoPA.Data.List.Utilities
 {- To be updated 
 import Data.Tree
 import Data.Tree.Fold
@@ -45,14 +45,14 @@ import Data.Tree.Unfold
 -- Examples
 
 -- import Examples.MSS.IntRNG   -- not finished yet!
-import Examples.MSS.List+
-import Examples.MSS.ListProperties
-import Examples.MSS.Derivation
+import AoPA.Examples.MSS.List+
+import AoPA.Examples.MSS.ListProperties
+import AoPA.Examples.MSS.Derivation
 -- import Examples.MSS.MSS      -- unfinished because IntRNG is not.
 
-import Examples.Sorting.Bags
-import Examples.Sorting.Spec
-import Examples.Sorting.iSort
+import AoPA.Examples.Sorting.Bags
+import AoPA.Examples.Sorting.Spec
+import AoPA.Examples.Sorting.iSort
 
 {- To be updated
 import Examples.Optimisation.ActivitySelection

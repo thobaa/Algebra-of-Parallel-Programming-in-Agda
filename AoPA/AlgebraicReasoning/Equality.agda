@@ -1,6 +1,6 @@
 {-# OPTIONS --universe-polymorphism #-}
 
-module AlgebraicReasoning.Equality where
+module AoPA.AlgebraicReasoning.Equality where
 
 open import Level
 
@@ -10,7 +10,7 @@ import Relation.Binary.PropositionalEquality
 open Relation.Binary.PropositionalEquality 
   -- could be public, but requires changes in several places
 
-import AlgebraicReasoning.PolyPreorderReasoning as PPR
+import AoPA.AlgebraicReasoning.PolyPreorderReasoning as PPR
 
   -- shall we make it more level-polymorphic?
 

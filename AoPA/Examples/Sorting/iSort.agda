@@ -1,4 +1,4 @@
-module Examples.Sorting.iSort where
+module AoPA.Examples.Sorting.iSort where
 
 open import Relation.Nullary
   using (¬_; Dec; yes; no)
@@ -18,7 +18,7 @@ open import Data.Product using (Σ; ∃; _×_; _,_; uncurry; proj₁; proj₂)
 open import Data.List    using (List; []; _∷_; foldr)
 open import Data.Unit    using (⊤; tt)
 
-open import Sets 
+open import AoPA.Sets 
   using (_∪_; _⊇_; ℙ; ⊆-refl; ⊇-refl;
          _≡_)
   renaming (trans to ≡-trans;
@@ -27,23 +27,23 @@ open import Sets
             refl to ≡-refl;
             sym to ≡-sym)
 
-open import Relations
+open import AoPA.Relations
   using (_←_; _˘; fun; _○_; _·_; idR; 
          Λ; 
          ∈; _⊑_; _⊒_; _⨉_; id-intro-r; ⊒-refl;
          ○-monotonic-r)
-open import Relations.Coreflexive
-open import Data.List.Fold 
+open import AoPA.Relations.Coreflexive
+open import AoPA.Data.List.Fold 
   using (nil; cons; foldr₁; foldR; foldR-fusion-⊒;
          idR⊒foldR; foldR-to-foldr; corefl-foldR)
 
-open import AlgebraicReasoning.Sets
+open import AoPA.AlgebraicReasoning.Sets
      using (⊇-begin_; _⊇⟨_⟩_; _⊇∎)
-open import AlgebraicReasoning.Relations
+open import AoPA.AlgebraicReasoning.Relations
      using (⊑-begin_; _⊑⟨_⟩_; _⊑∎; 
             ⊒-begin_; _⊒⟨_⟩_; _⊒∎)
 
-open import Examples.Sorting.Spec
+open import AoPA.Examples.Sorting.Spec
      using (Val; _≤_; _≤?_; ≤-trans; ≰-elim; <-relax;
             Bag; Bag-decSetoid; 
             bCons; bNil; bagify; permute; lbound; ordered?; ordered?⊑idR; sort;
@@ -332,8 +332,8 @@ permute-is-fold = proof₁ perm-der
 
 module Second-try where
 
-  open import AlgebraicReasoning.PipeReasoning
-  open import AlgebraicReasoning.Equality
+  open import AoPA.AlgebraicReasoning.PipeReasoning
+  open import AoPA.AlgebraicReasoning.Equality
 
   -- the function insert and its properties
 

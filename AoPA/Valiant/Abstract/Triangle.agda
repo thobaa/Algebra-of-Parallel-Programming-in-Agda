@@ -2,7 +2,7 @@
 open import Data.Nat using (ℕ; _+_; zero; suc; _≤?_; ≤-pred; s≤s; z≤n; _∸_; pred) renaming (_≤_ to _ℕ≤_)
 open import Data.Nat.Properties using (≰⇒>)
 open import Data.Fin using (Fin; _≤_; toℕ; reduce≥; fromℕ≤) renaming (zero to fzero; suc to fsuc)
-open import Data.Fin.Props using (toℕ-fromℕ≤)
+open import Data.Fin.Properties using (toℕ-fromℕ≤)
 open import Data.Integer using (+_; _-_)
 open import Data.Empty using (⊥-elim)
 open import Relation.Binary using (_Preserves₂_⟶_⟶_)

@@ -10,7 +10,7 @@ open import Data.Product
 open import Function using (_∘_)
 
 open import AoPA.Sets
-open import Relations hiding (_,₁_; _×₁_; _⨉₁_)
+open import AoPA.Relations hiding (_,₁_; _×₁_; _⨉₁_)
 open import AoPA.Relations.Minimum
 
 -- 'externally bounded' sorted list.

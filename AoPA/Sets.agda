@@ -1,6 +1,6 @@
 {-# OPTIONS --universe-polymorphism #-}
 
-module Sets where
+module AoPA.Sets where
 
 open import Data.Empty   using (⊥)
 open import Relation.Unary public 

@@ -1,8 +1,8 @@
-module Data.Tree where
+module AoPA.Data.Tree where
 
 
 -- fixed by Thomas!
-open import Sets using (_≡_; refl)
+open import AoPA.Sets using (_≡_; refl)
 open import Data.Product using (_×_; _,_)
 open import Level using (Level)
 

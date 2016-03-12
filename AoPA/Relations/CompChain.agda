@@ -1,10 +1,10 @@
-module Relations.CompChain where
+module AoPA.Relations.CompChain where
 
 open import Function using (id)
 open import Data.Product  using (Σ; _×_; _,_)
 
-open import Sets
-open import Relations
+open import AoPA.Sets
+open import AoPA.Relations
 
 data _⇦_ : Set → Set → Set1 where
   _‥ : {A B : Set} → B ← A → B ⇦ A

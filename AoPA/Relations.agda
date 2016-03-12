@@ -1,13 +1,13 @@
 {-# OPTIONS --universe-polymorphism #-}
 
-module Relations where
+module AoPA.Relations where
 
 open import Level renaming (_⊔_ to _⊔l_)
 open import Data.Product  using (Σ; ∃; _×_; _,_; proj₁; proj₂)
 open import Data.Sum      using (_⊎_; inj₁; inj₂)
 open import Function using (_∘_; id)
 
-open import Sets          using (_⊆_; ⊆-refl; ⊆-trans; 
+open import AoPA.Sets          using (_⊆_; ⊆-refl; ⊆-trans; 
                                  ℙ; singleton; _∪_; _∩_;
                                  _≡_; refl; subst; sym; cong)
 
@@ -44,7 +44,7 @@ _₁⊓₁_ : {A B : Set1} → (B ₁←₁ A) → (B ₁←₁ A) → (B ₁←
 -}
 -- Relational Inclusion
 
-infixr 6 _⊑_ _⊒_
+infixr 4 _⊑_ _⊒_
 
 _⊑_ : ∀ {i j : Level} {A : Set i} {B : Set j} → (B ← A) → (B ← A) → Set (j ⊔l i)
 R ⊑ S = ∀ b a → R b a → S b a

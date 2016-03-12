@@ -1,12 +1,12 @@
 {-# OPTIONS --universe-polymorphism #-}
 
-module AlgebraicReasoning.PipeReasoning where
+module AoPA.AlgebraicReasoning.PipeReasoning where
 
 open import Level
 open import Data.Product using (_,_)
 
-open import Sets         using (ℙ; _≡_; subst)
-open import Relations    using (_←_; _·_; Λ)
+open import AoPA.Sets         using (ℙ; _≡_; subst)
+open import AoPA.Relations    using (_←_; _·_; Λ)
 
 {-- a simple example:
 

@@ -4,7 +4,7 @@
 
 {-# OPTIONS --universe-polymorphism #-}
 
-module AlgebraicReasoning.PolyPreorderReasoning where
+module AoPA.AlgebraicReasoning.PolyPreorderReasoning where
 
 open import Level -- renaming (_⊔_ to _⊔l_)
 
@@ -18,7 +18,7 @@ module UnaryCarrier
 
   infix  4 _IsRelatedTo_
   infix  2 _∎
-  infixr 2 _∼⟨_⟩_ --  _≈⟨_⟩_
+  infixr 1 _∼⟨_⟩_ --  _≈⟨_⟩_
   infix  1 begin_
 
   private
@@ -60,7 +60,7 @@ module BinaryCarrier
 
   infix  4 _IsRelatedTo_
   infix  2 _∎
-  infixr 2 _∼⟨_⟩_ --  _≈⟨_⟩_
+  infixr 1 _∼⟨_⟩_ --  _≈⟨_⟩_
   infix  1 begin_
 
   private

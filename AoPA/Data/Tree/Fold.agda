@@ -1,4 +1,4 @@
-module Data.Tree.Fold where
+module AoPA.Data.Tree.Fold where
 
 -- Fixed by Thomas!
 open import Level using (zero)
@@ -8,27 +8,27 @@ open import Data.Unit using (⊤; tt)
 open import Data.Product using (Σ; _×_; _,_)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 
-open import Sets
+open import AoPA.Sets
      using (ℙ; _⊆_; _⊇_; ⊆-refl; ⊇-refl; singleton;
             _≡_; refl; trans; cong; subst; sym)
-open import Relations
-open import Relations.PowerTrans
+open import AoPA.Relations
+open import AoPA.Relations.PowerTrans
      using (Λ∈-galois-1; Λ∈-galois-2; Λ-monotonic; ℰ-functor-⊆;
             ℰ-functor-⊇; ℰ-monotonic')
-open import Relations.Product
+open import AoPA.Relations.Product
      using (Λ⨉⨉-monotonic; Λ⨉⨉-absorption-⊆; Λ⨉⨉-absorption-⊇;
             ⨉3-functor-⊑; ⨉3-functor-⊒; ⨉-monotonic; ⨉3-id-⊑)
-open import Relations.CompChain
+open import AoPA.Relations.CompChain
 
-open import AlgebraicReasoning.Sets
+open import AoPA.AlgebraicReasoning.Sets
      using (⊆-begin_; _⊆⟨_⟩_; _⊆∎;
             ⊇-begin_; _⊇⟨_⟩_; _⊇∎)
-open import AlgebraicReasoning.Relations
+open import AoPA.AlgebraicReasoning.Relations
      using (⊑-begin_; _⊑⟨_⟩_; _⊑∎;
             ⊒-begin_; _⊒⟨_⟩_; _⊒∎)
-open import AlgebraicReasoning.Implications
+open import AoPA.AlgebraicReasoning.Implications
 
-open import Data.Tree
+open import AoPA.Data.Tree
 
 
 foldT : {A B : Set} → (B ← (A × B × B)) → ℙ B → (B ← Tree A)

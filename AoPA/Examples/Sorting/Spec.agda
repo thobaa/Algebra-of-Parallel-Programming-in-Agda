@@ -1,4 +1,4 @@
-module Examples.Sorting.Spec where
+module AoPA.Examples.Sorting.Spec where
 
 open import Relation.Nullary
   using (¬_; Dec; yes; no)
@@ -13,7 +13,7 @@ open import Data.Unit    using (⊤; tt)
 open import Data.Product using (_×_; _,_; uncurry)
 open import Data.List    using (List; []; _∷_; foldr)
 
-open import Sets using (ℙ; ⊆-refl; ⊇-refl;
+open import AoPA.Sets using (ℙ; ⊆-refl; ⊇-refl;
                         _≡_)
   renaming (trans to ≡-trans;
             subst to ≡-subst;
@@ -21,17 +21,17 @@ open import Sets using (ℙ; ⊆-refl; ⊇-refl;
             refl to ≡-refl;
             sym to ≡-sym)
 
-open import Relations
-open import Relations.Converse
-open import Relations.Coreflexive
-open import Relations.Function
-open import Relations.CompChain
+open import AoPA.Relations
+open import AoPA.Relations.Converse
+open import AoPA.Relations.Coreflexive
+open import AoPA.Relations.Function
+open import AoPA.Relations.CompChain
 
-open import Data.List.Utilities using (All)
-open import Data.List.Fold 
+open import AoPA.Data.List.Utilities using (All)
+open import AoPA.Data.List.Fold 
      using (nil; cons; foldR; idR⊒foldR; foldR-monotonic; corefl-foldR)
 
-open import AlgebraicReasoning.Relations
+open import AoPA.AlgebraicReasoning.Relations
      using (⊑-begin_; _⊑⟨_⟩_; _⊑∎; 
             ⊒-begin_; _⊒⟨_⟩_; _⊒∎)
 
@@ -96,8 +96,8 @@ open Value-properties public using (≰-elim; <-relax)
 
 -- bags.
 
-import Examples.Sorting.Bags
-open Examples.Sorting.Bags _ _ Val-setoid public 
+import AoPA.Examples.Sorting.Bags
+open AoPA.Examples.Sorting.Bags _ _ Val-setoid public 
   using (Bag; bCons; bNil; 
           _|≈|_; Bag-decSetoid; |≈|-refl; |≈|-sym;
          |≈|-cong; ≡-|≈|-cong; |≈|-≡-cong;

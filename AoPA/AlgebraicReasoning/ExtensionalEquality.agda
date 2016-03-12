@@ -1,9 +1,9 @@
-module AlgebraicReasoning.ExtensionalEquality where
+module AoPA.AlgebraicReasoning.ExtensionalEquality where
 
-open import Sets
+open import AoPA.Sets
      using (_≡_; refl; sym; subst)
 
-import AlgebraicReasoning.PolyPreorderReasoning as PPR
+import AoPA.AlgebraicReasoning.PolyPreorderReasoning as PPR
 
 infix 4 _≐_
 

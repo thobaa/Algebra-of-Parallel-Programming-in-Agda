@@ -1,4 +1,4 @@
-module Data.List.HyloThm where
+module AoPA.Data.List.HyloThm where
 
 open import Relation.Binary.PropositionalEquality 
 
@@ -6,16 +6,16 @@ open import Function
 open import Data.List
 open import Data.Product
 
-open import AlgebraicReasoning.Implications
-open import AlgebraicReasoning.Relations
-open import Data.List.Fold
-open import Relations
-open import Relations.CompChain
-open import Relations.Converse
-open import Relations.Factor
-open import Relations.Function
-open import Relations.Product
-open import Sets
+open import AoPA.AlgebraicReasoning.Implications
+open import AoPA.AlgebraicReasoning.Relations
+open import AoPA.Data.List.Fold
+open import AoPA.Relations
+open import AoPA.Relations.CompChain
+open import AoPA.Relations.Converse
+open import AoPA.Relations.Factor
+open import AoPA.Relations.Function
+open import AoPA.Relations.Product
+open import AoPA.Sets
 
 {- For now it seems that we do not need it immediately
 
@@ -97,9 +97,9 @@ hylo-induction-⊒ R r S s X R○FX○S˘⊑X c∈s∧b∈r⇒Xbc b c
       R ○ ((idR ○ idR) ⨉ ((X / (foldR S s ˘)) ○ foldR S s ˘)) ○ S ˘ ⊑ X
    ⇐⟨ ⊑-trans $ ○-monotonic-r $ ○-monotonic-l $ 
         ⨉-monotonic {R = idR ○ idR}{T = ((X / (foldR S s ˘)) ○ foldR S s ˘)} id-intro-l ⊑-refl ⟩
-      R ○ (idR ⨉ ((X / (foldR S s)˘) ○ (foldR S s)˘)) ○ S ˘ ⊑ X
+      R ○ (idR ⨉ ((X / ((foldR S s)˘)) ○ (foldR S s)˘)) ○ S ˘ ⊑ X
    ⇐⟨ ⊑-trans $ ○-monotonic-r $ ○-monotonic-l $
-          ⨉-monotonic {R = idR} ⊑-refl (/-universal-⇐ {R = (X / (foldR S s)˘)} {S = (foldR S s)˘ } ⊑-refl) ⟩
+          ⨉-monotonic {R = idR} ⊑-refl (/-universal-⇐ {R = (X / ((foldR S s)˘))} {S = (foldR S s)˘ } ⊑-refl) ⟩
       R ○ (idR ⨉ X) ○ S ˘ ⊑ X
    ⇐∎) R○FX○S˘⊑X b c (x ∷ xs , fold-S-x∷xs-c , fold-R-x∷xs-b)
 
@@ -186,4 +186,4 @@ hylo-computation-⊑ R r S s X hylo-eqn⊑X c∈s∧b∈r⇒cXb b c
               →[ cons ]→        x ∷ xs   ⟨ refl ⟩
               →[ foldR R r ]→   b        ⟨ b-fold-R-x∷xs ⟩
               →∎)
-  where open import AlgebraicReasoning.PipeReasoning
+  where open import AoPA.AlgebraicReasoning.PipeReasoning

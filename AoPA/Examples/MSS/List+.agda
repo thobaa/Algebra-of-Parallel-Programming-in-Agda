@@ -1,9 +1,9 @@
-module Examples.MSS.List+ where
+module AoPA.Examples.MSS.List+ where
 
-open import Sets using (_≡_; refl; sym; cong)
+open import AoPA.Sets using (_≡_; refl; sym; cong)
 open import Function
-open import AlgebraicReasoning.Equality
-open import AlgebraicReasoning.ExtensionalEquality
+open import AoPA.AlgebraicReasoning.Equality
+open import AoPA.AlgebraicReasoning.ExtensionalEquality
 
 data List⁺ (A : Set) : Set where
   [_]⁺ : A → List⁺ A
